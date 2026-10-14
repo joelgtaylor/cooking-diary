@@ -47,17 +47,24 @@
       preheated Dutch oven.</li>
 </ul>
 <h2>Photos</h2>
-<figure><img src="photos/01-dough-early.jpg" alt="Dough after fermentolyse — Oct 12, 2:23 PM" loading="lazy"><figcaption>Dough after fermentolyse — Oct 12, 2:23 PM</figcaption></figure>
-<figure><img src="photos/02-dough-stretch-folds.jpg" alt="Dough during stretch-and-folds — 3:05 PM" loading="lazy"><figcaption>Dough during stretch-and-folds — 3:05 PM</figcaption></figure>
-<figure><img src="photos/03-dough-stretch-folds-2.jpg" alt="Dough, later folds — 3:58 PM" loading="lazy"><figcaption>Dough, later folds — 3:58 PM</figcaption></figure>
-<figure><img src="photos/04-dough-developing.jpg" alt="Dough developing — 5:25 PM" loading="lazy"><figcaption>Dough developing — 5:25 PM</figcaption></figure>
-<figure><img src="photos/05-dough-evening.jpg" alt="Dough, evening — 7:41 PM" loading="lazy"><figcaption>Dough, evening — 7:41 PM</figcaption></figure>
-<figure><img src="photos/06-dough-bulk-check.jpg" alt="Bulk ferment check — 9:14 PM" loading="lazy"><figcaption>Bulk ferment check — 9:14 PM</figcaption></figure>
-<figure><img src="photos/07-dough-late.jpg" alt="Dough, late evening — 10:28 PM" loading="lazy"><figcaption>Dough, late evening — 10:28 PM</figcaption></figure>
-<figure><img src="photos/08-dough-closeup.jpg" alt="Dough close-up — 10:28 PM" loading="lazy"><figcaption>Dough close-up — 10:28 PM</figcaption></figure>
-<figure><img src="photos/09-loaf-in-oven.jpg" alt="Loaf in the oven — Oct 13, 7:22 AM" loading="lazy"><figcaption>Loaf in the oven — Oct 13, 7:22 AM</figcaption></figure>
-<figure><img src="photos/10-finished-loaf.jpg" alt="Finished loaf — 7:54 AM" loading="lazy"><figcaption>Finished loaf — 7:54 AM</figcaption></figure>
-<figure><img src="photos/11-two-loaves.jpg" alt="Both loaves, done — 8:34 AM" loading="lazy"><figcaption>Both loaves, done — 8:34 AM</figcaption></figure>
+<figure><img data-b64="photos/01-dough-early.jpg" alt="Dough after fermentolyse — Oct 12, 2:23 PM" loading="lazy"><figcaption>Dough after fermentolyse — Oct 12, 2:23 PM</figcaption></figure>
+<figure><img data-b64="photos/02-dough-stretch-folds.jpg" alt="Dough during stretch-and-folds — 3:05 PM" loading="lazy"><figcaption>Dough during stretch-and-folds — 3:05 PM</figcaption></figure>
+<figure><img data-b64="photos/03-dough-stretch-folds-2.jpg" alt="Dough, later folds — 3:58 PM" loading="lazy"><figcaption>Dough, later folds — 3:58 PM</figcaption></figure>
+<figure><img data-b64="photos/04-dough-developing.jpg" alt="Dough developing — 5:25 PM" loading="lazy"><figcaption>Dough developing — 5:25 PM</figcaption></figure>
+<figure><img data-b64="photos/05-dough-evening.jpg" alt="Dough, evening — 7:41 PM" loading="lazy"><figcaption>Dough, evening — 7:41 PM</figcaption></figure>
+<figure><img data-b64="photos/06-dough-bulk-check.jpg" alt="Bulk ferment check — 9:14 PM" loading="lazy"><figcaption>Bulk ferment check — 9:14 PM</figcaption></figure>
+<figure><img data-b64="photos/07-dough-late.jpg" alt="Dough, late evening — 10:28 PM" loading="lazy"><figcaption>Dough, late evening — 10:28 PM</figcaption></figure>
+<figure><img data-b64="photos/08-dough-closeup.jpg" alt="Dough close-up — 10:28 PM" loading="lazy"><figcaption>Dough close-up — 10:28 PM</figcaption></figure>
+<figure><img data-b64="photos/09-loaf-in-oven.jpg" alt="Loaf in the oven — Oct 13, 7:22 AM" loading="lazy"><figcaption>Loaf in the oven — Oct 13, 7:22 AM</figcaption></figure>
+<figure><img data-b64="photos/10-finished-loaf.jpg" alt="Finished loaf — 7:54 AM" loading="lazy"><figcaption>Finished loaf — 7:54 AM</figcaption></figure>
+<figure><img data-b64="photos/11-two-loaves.jpg" alt="Both loaves, done — 8:34 AM" loading="lazy"><figcaption>Both loaves, done — 8:34 AM</figcaption></figure>
 <div class="verdict"><strong>Result:</strong> Both loaves baked successfully with excellent crust color. Kefir-for-water worked &mdash; worth repeating, possibly with the extra splash of water built into the ratio next time.</div>
+<script>
+document.querySelectorAll('img[data-b64]').forEach(img => {
+  fetch(img.dataset.b64).then(r => r.text()).then(t => {
+    img.src = 'data:image/jpeg;base64,' + t.trim();
+  });
+});
+</script>
 </body>
 </html>

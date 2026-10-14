@@ -29,7 +29,14 @@
 <div class="entry-card"><a href="2026-10-12-sourdough-kefir-loaves/">
 <h2>Sourdough Kefir Loaves</h2>
 <div class="sub">Oct 12&ndash;13, 2026 &middot; two loaves, kefir in place of water</div>
-<img class="thumb" src="2026-10-12-sourdough-kefir-loaves/photos/11-two-loaves.jpg" alt="Two finished sourdough loaves">
+<img class="thumb" data-b64="2026-10-12-sourdough-kefir-loaves/photos/11-two-loaves.jpg" alt="Two finished sourdough loaves">
 </a></div>
+<script>
+document.querySelectorAll('img[data-b64]').forEach(img => {
+  fetch(img.dataset.b64).then(r => r.text()).then(t => {
+    img.src = 'data:image/jpeg;base64,' + t.trim();
+  });
+});
+</script>
 </body>
 </html>
