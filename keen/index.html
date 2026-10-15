@@ -191,7 +191,7 @@ let stars = [];
 for (let i=0;i<90;i++) stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.6+0.4,tw:Math.random()*6.28});
 
 const P = { x:0,y:0,w:22,h:30, vx:0,vy:0, face:1, onGround:false, pogo:false,
-            coyote:0, jbuf:0, shootCd:0, anim:0, squash:0 };
+            coyote:0, jbuf:0, shootCd:0, anim:0, squash:0, runPh:0, spring:0 };
 
 function tileAt(c,r){
   if (c<0||c>=COLS||r<0||r>=ROWS) return '#';
@@ -216,12 +216,12 @@ function loadLevel(n){
   }
   resetPlayer();
 }
-function mkYorp(x,y){ return {x:x+2,y:y+8,w:26,h:22,vx:0.9,vy:0,dir:1,alive:true,ph:Math.random()*6.28}; }
+function mkYorp(x,y){ return {x:x+2,y:y+8,w:26,h:22,vx:0,vy:0,dir:1,alive:true,ph:Math.random()*6.28,hopT:30+Math.random()*40,squash:0}; }
 function mkGarg(x,y){ return {x:x+1,y:y-4,w:28,h:34,vx:0,vy:0,dir:-1,alive:true,charge:false,ph:0}; }
 
 function resetPlayer(){
   P.x=spawn.x; P.y=spawn.y; P.vx=0; P.vy=0; P.pogo=false; P.face=1;
-  P.coyote=0; P.jbuf=0; P.shootCd=0; P.squash=0; invuln=120;
+  P.coyote=0; P.jbuf=0; P.shootCd=0; P.squash=0; P.runPh=0; P.spring=0; invuln=120;
 }
 function startGame(){ score=0; lives=3; loadLevel(0); state='play'; }
 function onConfirm(){
@@ -297,12 +297,22 @@ function update(){
   if (inp.pogo && !pogoKeyWas) togglePogo();
   pogoKeyWas = inp.pogo;
 
-  // horizontal
+  // horizontal (acceleration-based, with skid)
   P.anim++;
-  if (inp.left){ P.vx=-MOVE; P.face=-1; }
-  else if (inp.right){ P.vx=MOVE; P.face=1; }
-  else P.vx*=0.7;
-  if (Math.abs(P.vx)<0.1) P.vx=0;
+  P.runPh += Math.abs(P.vx)*0.09;
+  const acc = P.onGround ? 0.95 : 0.6;
+  const skidding = d => (d<0 && P.vx>1.2) || (d>0 && P.vx<-1.2);
+  if (inp.left){
+    P.vx = Math.max(P.vx - (skidding(-1)&&P.onGround ? 1.7 : acc), -MOVE);
+    if (skidding(-1) && P.onGround && Math.random()<0.6) spawnPart(P.x+P.w/2,P.y+P.h,-1,-0.6,14,'#b9a88f',3,0.1);
+    P.face=-1;
+  }
+  else if (inp.right){
+    P.vx = Math.min(P.vx + (skidding(1)&&P.onGround ? 1.7 : acc), MOVE);
+    if (skidding(1) && P.onGround && Math.random()<0.6) spawnPart(P.x+P.w/2,P.y+P.h,1,-0.6,14,'#b9a88f',3,0.1);
+    P.face=1;
+  }
+  else { const fr = P.onGround?0.8:0.97; P.vx*=fr; if (Math.abs(P.vx)<0.08) P.vx=0; }
 
   // jumping w/ coyote + buffer
   if (P.onGround) P.coyote=7; else if (P.coyote>0) P.coyote--;
@@ -318,13 +328,14 @@ function update(){
   const wasGround=P.onGround, fallV=P.vy;
   moveBody(P,true);
   if (P.squash>0) P.squash--;
+  if (P.spring>0) P.spring=Math.max(0,P.spring-0.12);
   if (!wasGround && P.onGround){
     if (fallV>7){ burst(P.x+P.w/2,P.y+P.h,10,'#b9a88f',2.2,28,4); P.squash=9; }
     else if (fallV>2){ burst(P.x+P.w/2,P.y+P.h,4,'#b9a88f',1.4,18,3); }
   }
 
   // pogo auto-bounce
-  if (P.pogo && P.onGround && inp.jump){ P.vy=-POGO_V; P.onGround=false; sfx.pogo(); burst(P.x+P.w/2,P.y+P.h+8,6,'#cfc3ad',1.8,20,3); }
+  if (P.pogo && P.onGround && inp.jump){ P.vy=-POGO_V; P.onGround=false; P.spring=1; sfx.pogo(); burst(P.x+P.w/2,P.y+P.h+8,6,'#cfc3ad',1.8,20,3); }
 
   // fell out of world
   if (P.y>H+60){ lives--; if(lives<=0) state='over'; else loadLevel(level); return; }
@@ -346,18 +357,29 @@ function update(){
   }
   shots = shots.filter(s=>s.life>0);
 
-  // yorps
+  // yorps (hoppers)
   for (const y of yorps){
     if (!y.alive) continue;
-    y.ph+=0.1;
-    y.vx = y.dir*0.9;
-    const wasGround = y.onGround;
+    y.ph+=0.15;
+    if (y.squash>0) y.squash--;
+    if (y.onGround){
+      y.vx*=0.7;
+      y.hopT--;
+      if (y.hopT<=0){
+        y.vy=-(3.8+Math.random()*1.6); y.vx=y.dir*(1.1+Math.random()*0.9);
+        y.hopT=50+Math.random()*55; y.onGround=false;
+      }
+      // turn at walls or ledges
+      const noseX = y.dir>0 ? y.x+y.w+1 : y.x-1;
+      const nc=Math.floor(noseX/TILE), nr=Math.floor((y.y+y.h/2)/TILE);
+      const aheadX = y.dir>0 ? y.x+y.w+2 : y.x-2;
+      const ac=Math.floor(aheadX/TILE), ar=Math.floor((y.y+y.h+4)/TILE);
+      if (solidAt(nc,nr) || !solidAt(ac,ar)) y.dir*=-1;
+    }
+    const yWasG=y.onGround, yVyB=y.vy;
     moveBody(y,false);
     y.vy += GRAV; if (y.vy>12) y.vy=12;
-    // turn at walls or ledges
-    const aheadX = y.dir>0 ? y.x+y.w+2 : y.x-2;
-    const ac=Math.floor(aheadX/TILE), ar=Math.floor((y.y+y.h+4)/TILE);
-    if (y.vx===0 || !solidAt(ac,ar)) y.dir*=-1;
+    if (!yWasG && y.onGround){ y.squash=8; burst(y.x+y.w/2,y.y+y.h,5,'#7ed087',1.4,16,3); }
     // shot?
     for (const s of shots){
       if (s.life>0 && rectsOverlap(s,y)){ y.alive=false; s.life=0; score+=200; sfx.kill(); burst(y.x+y.w/2,y.y+y.h/2,14,'#3fae4a',2.6,34,5); floater(y.x+y.w/2,y.y-4,'+200'); }
@@ -372,12 +394,18 @@ function update(){
     if (!g.alive) continue;
     g.ph+=0.12;
     const dx=(P.x+P.w/2)-(g.x+g.w/2), dy=(P.y+P.h/2)-(g.y+g.h/2);
-    if (!g.charge && Math.abs(dx)<230 && Math.abs(dy)<70) g.charge=true;
-    if (g.charge){ g.dir = dx>0?1:-1; g.vx = g.dir*2.5; }
-    else g.vx*=0.8;
+    if (!g.charge && Math.abs(dx)<230 && Math.abs(dy)<70){ g.charge=true; burst(g.x+g.w/2,g.y+g.h,8,'#b9a88f',2.2,24,4); }
+    if (g.charge){
+      g.dir = dx!==0 ? Math.sign(dx) : g.dir;
+      const tgt=g.dir*2.7;
+      g.vx += Math.sign(tgt-g.vx)*0.35;
+      if (Math.abs(g.vx)>2.7) g.vx=g.dir*2.7;
+      const nx=g.dir>0?g.x+g.w+1:g.x-1, nnc=Math.floor(nx/TILE), nnr=Math.floor((g.y+g.h/2)/TILE);
+      if (solidAt(nnc,nnr)) g.dir*=-1;
+    }
+    else { g.vx*=0.85; if (Math.abs(g.vx)<0.1) g.vx=0; }
     moveBody(g,false);
     g.vy+=GRAV; if(g.vy>12) g.vy=12;
-    if (g.vx===0 && g.charge) g.dir*=-1;
     for (const s of shots){
       if (s.life>0 && rectsOverlap(s,g)){ g.alive=false; s.life=0; score+=300; sfx.kill(); burst(g.x+g.w/2,g.y+g.h/2,16,'#c0392b',2.8,36,5); floater(g.x+g.w/2,g.y-4,'+300'); }
     }
@@ -437,81 +465,178 @@ function drawCookie(c){
   [[-3,-2],[2,-4],[3,3],[-2,4]].forEach(o=>cx.fillRect(c.x+6+o[0]-1,c.y+6+bob+o[1]-1,3,3));
 }
 function drawYorp(y){
-  const w=Math.sin(y.ph)*2;
-  cx.fillStyle='#3fae4a';
-  cx.beginPath(); cx.ellipse(y.x+y.w/2,y.y+y.h/2+y.w*0.06,y.w/2,y.h/2+w*0.3,0,0,7); cx.fill();
+  const cx0=y.x+y.w/2, feet=y.y+y.h;
+  const sq = y.squash>0 ? y.squash/8 : 0;
+  cx.save();
+  cx.translate(cx0,feet); cx.scale(1+0.28*sq, 1-0.28*sq);
+  // paddling feet
+  const fp=Math.sin(y.ph)*2.5;
   cx.fillStyle='#2c7d34';
-  cx.fillRect(y.x+3,y.y+y.h-6,7,6); cx.fillRect(y.x+y.w-10,y.y+y.h-6,7,6);
+  cx.fillRect(-11,-4+Math.max(0,fp),8,4.5);
+  cx.fillRect(3,-4+Math.max(0,-fp),8,4.5);
+  // round body + belly
+  cx.fillStyle='#3fae4a';
+  cx.beginPath(); cx.ellipse(0,-13,13,12,0,0,7); cx.fill();
+  cx.fillStyle='#7ed087';
+  cx.beginPath(); cx.ellipse(0,-9,8,7,0,0,7); cx.fill();
+  // stubby waving arms
+  const ap=Math.sin(y.ph+1)*3;
+  cx.fillStyle='#2c7d34';
+  cx.fillRect(-16,-16+ap*0.4,5,8); cx.fillRect(11,-16-ap*0.4,5,8);
+  // eyes track the player
+  const dx=Math.sign((P.x+P.w/2)-cx0)||1;
   cx.fillStyle='#fff';
-  const ex=y.x+y.w/2 + y.dir*5;
-  cx.fillRect(ex-7,y.y+5,7,9); cx.fillRect(ex+1,y.y+5,7,9);
+  cx.fillRect(-7+dx*2.5,-23,6.5,8.5); cx.fillRect(1+dx*2.5,-23,6.5,8.5);
   cx.fillStyle='#111';
-  cx.fillRect(ex-5,y.y+8,3,4); cx.fillRect(ex+3,y.y+8,3,4);
+  cx.fillRect(-5+dx*3.5,-20,3,4.5); cx.fillRect(3+dx*3.5,-20,3,4.5);
+  // antenna with blinking tip
+  cx.strokeStyle='#2c7d34'; cx.lineWidth=2;
+  const aw=Math.sin(y.ph*1.3)*2;
+  cx.beginPath(); cx.moveTo(0,-25); cx.quadraticCurveTo(2,-30,5,-31+aw); cx.stroke();
+  cx.fillStyle='#ffd75e'; cx.fillRect(3.5,-33+aw,3,3);
+  cx.restore();
 }
 function drawGarg(g){
-  const j=g.charge?Math.sin(g.ph)*3:0;
+  const cx0=g.x+g.w/2, feet=g.y+g.h;
+  const f=g.dir;
+  const lean=g.charge?f*0.14:0;
+  cx.save();
+  cx.translate(cx0,feet); cx.rotate(lean);
+  // stomping legs
+  const sp=Math.sin(g.ph)*(g.charge?1:0.35);
+  cx.fillStyle='#7e241a';
+  cx.fillRect(-11+sp*2,-9+Math.max(0,sp),8,9);
+  cx.fillRect(3-sp*2,-9+Math.max(0,-sp),8,9);
+  // bulky body + belly
   cx.fillStyle='#c0392b';
-  cx.beginPath(); cx.ellipse(g.x+g.w/2,g.y+g.h/2,g.w/2,g.h/2,0,0,7); cx.fill();
-  cx.fillStyle='#922b21';
-  cx.fillRect(g.x+4,g.y+g.h-7,8,7); cx.fillRect(g.x+g.w-12,g.y+g.h-7,8,7);
-  cx.fillStyle='#fff';
-  const ex=g.x+g.w/2+g.dir*4;
-  cx.fillRect(ex-9,g.y+8,8,7); cx.fillRect(ex+2,g.y+8,8,7);
-  cx.fillStyle='#a00';
-  cx.fillRect(ex-7,g.y+10,4,3); cx.fillRect(ex+4,g.y+10,4,3);
-  // angry brows
+  cx.beginPath(); cx.ellipse(0,-21,14,15,0,0,7); cx.fill();
+  cx.fillStyle='#e0675a';
+  cx.beginPath(); cx.ellipse(f*2,-17,9,10,0,0,7); cx.fill();
+  // back spikes
+  cx.fillStyle='#7e241a';
+  for(let i=0;i<3;i++){ const syy=-32-i*7;
+    cx.beginPath(); cx.moveTo(-f*10,syy); cx.lineTo(-f*16,syy+3); cx.lineTo(-f*10,syy+6); cx.fill(); }
+  // swinging arms with claws
+  const ap=Math.sin(g.ph+1)*(g.charge?5:1.6);
+  cx.fillStyle='#a93226';
+  cx.fillRect(-19+ap*0.5,-32,7,15); cx.fillRect(12-ap*0.5,-32,7,15);
+  cx.fillStyle='#f5e6c8';
+  for(let c=0;c<3;c++){
+    cx.fillRect(-19+ap*0.5+c*2.2,-19,1.8,4);
+    cx.fillRect(12-ap*0.5+c*2.2,-19,1.8,4);
+  }
+  // angry brows, eyes, jaw with teeth
   cx.fillStyle='#5e130d';
-  cx.fillRect(ex-9,g.y+5,8,3); cx.fillRect(ex+2,g.y+5,8,3);
-  if (g.charge){ cx.fillStyle='rgba(255,80,40,.5)'; cx.fillRect(g.x-4+j,g.y,4,g.h); }
+  cx.fillRect(-11+f*3,-36,9,4); cx.fillRect(2+f*3,-36,9,4);
+  cx.fillStyle='#fff';
+  cx.fillRect(-9+f*4,-32,7.5,6.5); cx.fillRect(2+f*4,-32,7.5,6.5);
+  cx.fillStyle='#a00';
+  cx.fillRect(-7+f*5,-30,3.5,3); cx.fillRect(4+f*5,-30,3.5,3);
+  cx.fillStyle='#7e241a'; cx.fillRect(-9+f*2,-16,17,6);
+  cx.fillStyle='#fff';
+  for(let c=0;c<4;c++) cx.fillRect(-7+f*2+c*4,-16,2.5,3);
+  cx.restore();
+}
+// articulated limb: draws a rect from (x,y) at angle (0=down, +=toward facing); returns end point
+function seg(x,y,len,wid,ang,col){
+  cx.save(); cx.translate(x,y); cx.rotate(ang);
+  cx.fillStyle=col; cx.fillRect(-wid/2,0,wid,len);
+  cx.restore();
+  return [x+Math.sin(ang)*len, y+Math.cos(ang)*len];
 }
 function drawPlayer(){
   if (invuln>0 && Math.floor(invuln/4)%2===0 && state==='play') return; // blink
-  const x=Math.round(P.x), y=Math.round(P.y);
-  const bob = P.onGround && Math.abs(P.vx)>0.5 ? Math.sin(P.anim*0.5)*2 : 0;
+  const f=P.face;
+  const run = P.onGround && Math.abs(P.vx)>0.6;
+  const ph = P.runPh;
   // squash & stretch
   let sx=1, sy=1;
   if (P.squash>0){ const k=P.squash/9; sx=1+0.26*k; sy=1-0.26*k; }
-  else if (!P.onGround){ if (P.vy<-4){ sx=0.9; sy=1.1; } else if (P.vy>5){ sx=1.08; sy=0.92; } }
+  else if (!P.onGround){ if (P.vy<-4){ sx=0.92; sy=1.08; } else if (P.vy>5){ sx=1.07; sy=0.93; } }
   cx.save();
-  cx.translate(x+P.w/2, y+P.h);
-  cx.scale(sx,sy);
-  cx.translate(-(x+P.w/2), -(y+P.h));
-  // pogo stick
+  cx.translate(Math.round(P.x)+P.w/2, Math.round(P.y)+P.h);
+  cx.scale(sx*f, sy); // mirror: always draw facing +x. feet at (0,0), up is -y.
+  const bob = run ? Math.abs(Math.sin(ph))*1.4 : 0;
+
+  // ---- pogo stick ----
   if (P.pogo){
-    cx.fillStyle='#888';
-    cx.fillRect(x+P.w/2-2, y+P.h, 4, 12);
-    cx.fillStyle='#c33';
-    cx.fillRect(x+P.w/2-5, y+P.h+10, 10, 4);
-    cx.fillStyle='#aaa';
-    for(let i=0;i<3;i++) cx.fillRect(x+P.w/2-3, y+P.h+2+i*3, 6, 1);
+    const comp=P.spring;
+    cx.fillStyle='#8a8f98';
+    cx.fillRect(-1.5,-2,3,12);
+    cx.strokeStyle='#c7ccd4'; cx.lineWidth=2;
+    const coils=4, span=8*(1-0.45*comp);
+    cx.beginPath();
+    for(let i=0;i<=coils;i++){
+      const yy=2+(span/coils)*i, xx=(i%2===0?-4:4);
+      if(i===0) cx.moveTo(0,1); else cx.lineTo(xx,yy);
+    }
+    cx.stroke();
+    cx.fillStyle='#5a5e66'; cx.fillRect(-7,-5,14,3);
+    cx.fillStyle='#c33'; cx.fillRect(-6,9.5,12,3.5);
   }
-  // legs (run cycle)
-  cx.fillStyle='#2b3a67';
-  const run = P.onGround && Math.abs(P.vx)>0.5;
-  const sw = run ? Math.sin(P.anim*0.55)*4 : 0;
-  cx.fillRect(x+4+sw*0.5, y+22+bob-Math.max(0,sw*0.35), 6, 8);
-  cx.fillRect(x+12-sw*0.5, y+22+bob-Math.max(0,-sw*0.35), 6, 8);
-  // body (blue shirt)
+
+  // ---- legs: hip -> thigh -> knee -> shin -> shoe ----
+  const pants='#2b3a67', pantsD='#223052', shoeC='#7a4a2b';
+  function leg(hipX, swing, bend, back){
+    const col=back?pantsD:pants;
+    const k=seg(hipX,-13, 6.5, 5.5, swing, col);
+    const s=seg(k[0],k[1], 6.5, 4.5, swing-bend*0.9, col);
+    cx.save(); cx.translate(s[0],s[1]); cx.rotate((swing-bend*0.9)*0.35);
+    cx.fillStyle=shoeC; cx.fillRect(-2.5,-4,8.5,4.5);
+    cx.restore();
+  }
+  if (P.pogo){
+    leg(-3.5, 0.85, 1.5, true); leg(3.5, 0.7, 1.35, false); // tucked on the stick
+  } else if (!P.onGround){
+    const rising=P.vy<0;
+    leg(-3.5, rising?0.55:-0.25, rising?1.1:0.4, true);
+    leg(3.5, rising?-0.35:0.45, rising?0.5:1.0, false);
+  } else if (run){
+    const s1=Math.sin(ph), s2=Math.sin(ph+Math.PI);
+    leg(-3.5, s1*0.62, Math.max(0,-Math.cos(ph))*0.9+0.15, true);
+    leg(3.5, s2*0.62, Math.max(0,-Math.cos(ph+Math.PI))*0.9+0.15, false);
+  } else {
+    leg(-3.5, 0.06, 0.12, true); leg(3.5, -0.06, 0.12, false);
+  }
+
+  // ---- torso group (leans forward when running), pivot at hips ----
+  const lean=run?0.10:0;
+  cx.save(); cx.translate(0,-13); cx.rotate(lean);
   cx.fillStyle='#2f6fd0';
-  cx.fillRect(x+3, y+10+bob, P.w-6, 13);
-  cx.fillStyle='#255aab'; cx.fillRect(x+3, y+19+bob, P.w-6, 4);
-  // head
+  cx.beginPath();
+  if (cx.roundRect) cx.roundRect(-7,-12,14,12,4); else cx.rect(-7,-12,14,12);
+  cx.fill();
+  cx.fillStyle='#255aab'; cx.fillRect(-7,-4,14,4);
+  cx.fillStyle='#1d2b4a'; cx.fillRect(-7,-2.5,14,2.5);  // belt
+  cx.fillStyle='#ffd75e'; cx.fillRect(-1.5,-2.5,3,2.5); // buckle
+  // back arm swings opposite the legs
+  const armSw=run?Math.sin(ph+Math.PI)*0.5:0.12;
+  const be=seg(-2,-10, 6, 4.5, armSw, '#2f6fd0');
+  seg(be[0],be[1], 5.5, 4, armSw+0.4, '#f2c89b');
+  // front arm aims the raygun forward
+  const aimBob=run?Math.sin(ph*2)*0.06:0;
+  const ge=seg(3,-10, 6, 4.5, 1.15+aimBob, '#2f6fd0');
+  const he=seg(ge[0],ge[1], 5, 4, 1.35+aimBob, '#f2c89b');
+  cx.fillStyle='#666'; cx.fillRect(he[0],he[1]-2,11,4.5);
+  cx.fillStyle='#3d3d3d'; cx.fillRect(he[0]+3,he[1]+2.5,3,3);
+  cx.fillStyle='#ffe95e'; cx.fillRect(he[0]+11,he[1]-1.5,3.5,3.5);
+  // ---- head ----
+  const hx0=2.5, hy0=-16-bob*0.4;
   cx.fillStyle='#f2c89b';
-  cx.fillRect(x+4, y+bob, P.w-8, 11);
-  // helmet (red with stripe)
-  cx.fillStyle='#d23b3b';
-  cx.fillRect(x+2, y-4+bob, P.w-4, 8);
-  cx.fillStyle='#a02a2a'; cx.fillRect(x+2, y+1+bob, P.w-4, 3);
-  cx.fillStyle='#fff'; cx.fillRect(x+P.w/2-2, y-4+bob, 4, 8);
-  // visor/eye
-  cx.fillStyle='#123';
-  const ex = x + P.w/2 + P.face*4;
-  cx.fillRect(ex-3, y+4+bob, 6, 3);
-  // raygun
-  cx.fillStyle='#666';
-  cx.fillRect(x + (P.face>0?P.w-2:-8), y+14+bob, 10, 4);
-  cx.fillStyle='#ff5'; cx.fillRect(x + (P.face>0?P.w+4:-10), y+14+bob, 4, 4);
-  cx.restore();
+  cx.beginPath();
+  if (cx.roundRect) cx.roundRect(hx0-5,hy0-5,11,10,4); else cx.rect(hx0-5,hy0-5,11,10);
+  cx.fill();
+  cx.fillStyle='#e0a878'; cx.fillRect(hx0+6,hy0-1,2,3);          // nose
+  cx.fillStyle='#fff'; cx.fillRect(hx0+1,hy0-3,4.5,4.5);          // eye
+  cx.fillStyle='#1b2a4a'; cx.fillRect(hx0+3.4,hy0-2,2.2,3);        // pupil
+  cx.fillStyle='#d23b3b';                                         // helmet dome
+  cx.beginPath(); cx.arc(hx0+0.5,hy0-5,6.5,Math.PI,0); cx.fill();
+  cx.fillRect(hx0-6,hy0-6.5,13.5,2.5);
+  cx.fillStyle='#a02a2a'; cx.fillRect(hx0-6,hy0-4.5,13.5,2);
+  cx.fillStyle='#fff'; cx.fillRect(hx0-1.5,hy0-11.5,3.5,7.5);     // stripe
+  cx.fillStyle='rgba(255,255,255,.35)'; cx.fillRect(hx0-4.5,hy0-10,3,4); // shine
+  cx.restore(); // torso lean
+  cx.restore(); // facing mirror
 }
 function drawExit(){
   const x=exit.x, y=exit.y;
