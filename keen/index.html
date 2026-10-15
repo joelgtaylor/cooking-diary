@@ -13,9 +13,9 @@
   #touch{position:fixed;inset:auto 0 0 0;display:none;justify-content:space-between;
     padding:0 12px 14px;pointer-events:none;z-index:5}
   body.touchmode #touch{display:flex}
-  .tbtn{pointer-events:auto;width:64px;height:64px;border-radius:50%;
-    background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.35);
-    color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;
+  .tbtn{pointer-events:auto;width:72px;height:72px;border-radius:50%;
+    background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.4);
+    color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;
     font-family:inherit}
   .tbtn:active{background:rgba(255,255,255,.32)}
   .tgrp{display:flex;gap:10px}
@@ -32,7 +32,7 @@
     <div class="tbtn" id="tR">&#9654;</div>
   </div>
   <div class="tgrp">
-    <div class="tbtn" id="tP">P</div>
+    <div class="tbtn" id="tP">X</div>
     <div class="tbtn" id="tB">B</div>
     <div class="tbtn" id="tA">A</div>
   </div>
@@ -144,7 +144,7 @@ function press(id, name){
 press('tL','left'); press('tR','right'); press('tA','jump'); press('tB','shoot');
 document.getElementById('tP').addEventListener('touchstart', e=>{e.preventDefault(); togglePogo();},{passive:false});
 document.getElementById('tP').addEventListener('mousedown', e=>{e.preventDefault(); togglePogo();});
-if ('ontouchstart' in window) document.body.classList.add('touchmode');
+if ('ontouchstart' in window || navigator.maxTouchPoints>0 || (window.matchMedia && matchMedia('(pointer:coarse)').matches)) document.body.classList.add('touchmode');
 cv.addEventListener('touchstart', e=>{ e.preventDefault(); onConfirm(); }, {passive:false});
 cv.addEventListener('mousedown', ()=>onConfirm());
 
@@ -167,11 +167,31 @@ let spawn = {x:0,y:0};
 let exit = {x:0,y:0};
 let cookies = [], yorps = [], gargs = [], shots = [];
 let clearTimer = 0, invuln = 0, shake = 0;
+let parts=[], floaters=[];
+function spawnPart(x,y,vx,vy,life,col,size,grav){ parts.push({x,y,vx,vy,life,max:life,col,size,grav:grav||0}); }
+function burst(x,y,n,col,spd,life,size){
+  for(let i=0;i<n;i++){ const a=Math.random()*6.283, s=spd*(0.4+Math.random()*0.8);
+    spawnPart(x,y,Math.cos(a)*s,Math.sin(a)*s-1.2,life*(0.6+Math.random()*0.8),col,size*(0.7+Math.random()*0.7),0.14); }
+}
+function floater(x,y,text,col){ floaters.push({x,y,text,col:col||'#ffd75e',t:55}); }
+function updateParts(){
+  for(const p of parts){ p.x+=p.vx; p.y+=p.vy; p.vy+=p.grav; p.vx*=0.98; p.life--; }
+  parts=parts.filter(p=>p.life>0);
+  for(const f of floaters){ f.y-=0.7; f.t--; }
+  floaters=floaters.filter(f=>f.t>0);
+}
+function drawParts(){
+  for(const p of parts){ cx.globalAlpha=Math.max(0,p.life/p.max); cx.fillStyle=p.col; const s=p.size; cx.fillRect(p.x-s/2,p.y-s/2,s,s); }
+  cx.globalAlpha=1;
+  cx.font='bold 13px "Courier New",monospace'; cx.textAlign='center';
+  for(const f of floaters){ cx.globalAlpha=Math.min(1,f.t/25); cx.fillStyle=f.col; cx.fillText(f.text,f.x,f.y); }
+  cx.globalAlpha=1; cx.textAlign='left';
+}
 let stars = [];
 for (let i=0;i<90;i++) stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.6+0.4,tw:Math.random()*6.28});
 
 const P = { x:0,y:0,w:22,h:30, vx:0,vy:0, face:1, onGround:false, pogo:false,
-            coyote:0, jbuf:0, shootCd:0, anim:0 };
+            coyote:0, jbuf:0, shootCd:0, anim:0, squash:0 };
 
 function tileAt(c,r){
   if (c<0||c>=COLS||r<0||r>=ROWS) return '#';
@@ -201,7 +221,7 @@ function mkGarg(x,y){ return {x:x+1,y:y-4,w:28,h:34,vx:0,vy:0,dir:-1,alive:true,
 
 function resetPlayer(){
   P.x=spawn.x; P.y=spawn.y; P.vx=0; P.vy=0; P.pogo=false; P.face=1;
-  P.coyote=0; P.jbuf=0; P.shootCd=0; invuln=120;
+  P.coyote=0; P.jbuf=0; P.shootCd=0; P.squash=0; invuln=120;
 }
 function startGame(){ score=0; lives=3; loadLevel(0); state='play'; }
 function onConfirm(){
@@ -295,10 +315,16 @@ function update(){
   P.vy += GRAV; if (P.vy>14) P.vy=14;
   // variable jump height
   if (!inp.jump && P.vy<-5) P.vy=-5;
+  const wasGround=P.onGround, fallV=P.vy;
   moveBody(P,true);
+  if (P.squash>0) P.squash--;
+  if (!wasGround && P.onGround){
+    if (fallV>7){ burst(P.x+P.w/2,P.y+P.h,10,'#b9a88f',2.2,28,4); P.squash=9; }
+    else if (fallV>2){ burst(P.x+P.w/2,P.y+P.h,4,'#b9a88f',1.4,18,3); }
+  }
 
   // pogo auto-bounce
-  if (P.pogo && P.onGround && inp.jump){ P.vy=-POGO_V; P.onGround=false; sfx.pogo(); }
+  if (P.pogo && P.onGround && inp.jump){ P.vy=-POGO_V; P.onGround=false; sfx.pogo(); burst(P.x+P.w/2,P.y+P.h+8,6,'#cfc3ad',1.8,20,3); }
 
   // fell out of world
   if (P.y>H+60){ lives--; if(lives<=0) state='over'; else loadLevel(level); return; }
@@ -308,6 +334,7 @@ function update(){
   if (inp.shoot && P.shootCd<=0){
     shots.push({x:P.x+P.w/2 + P.face*14, y:P.y+12, w:10,h:4, vx:P.face*7.5, life:90});
     P.shootCd=16; sfx.shoot();
+    burst(P.x+P.w/2+P.face*16, P.y+14, 3, '#ffe95e', 1.2, 10, 3);
   }
 
   // shots
@@ -333,7 +360,7 @@ function update(){
     if (y.vx===0 || !solidAt(ac,ar)) y.dir*=-1;
     // shot?
     for (const s of shots){
-      if (s.life>0 && rectsOverlap(s,y)){ y.alive=false; s.life=0; score+=200; sfx.kill(); }
+      if (s.life>0 && rectsOverlap(s,y)){ y.alive=false; s.life=0; score+=200; sfx.kill(); burst(y.x+y.w/2,y.y+y.h/2,14,'#3fae4a',2.6,34,5); floater(y.x+y.w/2,y.y-4,'+200'); }
     }
     // touch player?
     if (rectsOverlap(P,y)) die();
@@ -352,7 +379,7 @@ function update(){
     g.vy+=GRAV; if(g.vy>12) g.vy=12;
     if (g.vx===0 && g.charge) g.dir*=-1;
     for (const s of shots){
-      if (s.life>0 && rectsOverlap(s,g)){ g.alive=false; s.life=0; score+=300; sfx.kill(); }
+      if (s.life>0 && rectsOverlap(s,g)){ g.alive=false; s.life=0; score+=300; sfx.kill(); burst(g.x+g.w/2,g.y+g.h/2,16,'#c0392b',2.8,36,5); floater(g.x+g.w/2,g.y-4,'+300'); }
     }
     if (rectsOverlap(P,g)) die();
   }
@@ -369,8 +396,12 @@ function update(){
     c.ph+=0.08;
     if (rectsOverlap({x:P.x,y:P.y,w:P.w,h:P.h},{x:c.x-4,y:c.y-4,w:26,h:26})){
       c.taken=true; score+=100; sfx.coin();
+      burst(c.x+6,c.y+6,10,'#ffd75e',2,26,3); floater(c.x+6,c.y-6,'+100');
     }
   }
+
+  // dutch-oven rocket idling flame
+  if (P.anim%4===0) spawnPart(exit.x+15+(Math.random()-0.5)*10, exit.y+TILE+10, (Math.random()-0.5)*0.6, 1+Math.random()*1.2, 16, Math.random()<0.5?'#ff9d2e':'#ff5a2e', 4, 0.06);
 
   // exit (dutch-oven rocket!)
   if (rectsOverlap({x:P.x,y:P.y,w:P.w,h:P.h},{x:exit.x,y:exit.y,w:TILE,h:TILE+6})){
@@ -437,6 +468,14 @@ function drawPlayer(){
   if (invuln>0 && Math.floor(invuln/4)%2===0 && state==='play') return; // blink
   const x=Math.round(P.x), y=Math.round(P.y);
   const bob = P.onGround && Math.abs(P.vx)>0.5 ? Math.sin(P.anim*0.5)*2 : 0;
+  // squash & stretch
+  let sx=1, sy=1;
+  if (P.squash>0){ const k=P.squash/9; sx=1+0.26*k; sy=1-0.26*k; }
+  else if (!P.onGround){ if (P.vy<-4){ sx=0.9; sy=1.1; } else if (P.vy>5){ sx=1.08; sy=0.92; } }
+  cx.save();
+  cx.translate(x+P.w/2, y+P.h);
+  cx.scale(sx,sy);
+  cx.translate(-(x+P.w/2), -(y+P.h));
   // pogo stick
   if (P.pogo){
     cx.fillStyle='#888';
@@ -446,11 +485,12 @@ function drawPlayer(){
     cx.fillStyle='#aaa';
     for(let i=0;i<3;i++) cx.fillRect(x+P.w/2-3, y+P.h+2+i*3, 6, 1);
   }
-  // legs
+  // legs (run cycle)
   cx.fillStyle='#2b3a67';
-  const lp = P.onGround && Math.abs(P.vx)>0.5 ? Math.sin(P.anim*0.6)*4 : 0;
-  cx.fillRect(x+4, y+22+bob, 6, 8-Math.max(0,lp));
-  cx.fillRect(x+12, y+22+bob, 6, 8-Math.max(0,-lp));
+  const run = P.onGround && Math.abs(P.vx)>0.5;
+  const sw = run ? Math.sin(P.anim*0.55)*4 : 0;
+  cx.fillRect(x+4+sw*0.5, y+22+bob-Math.max(0,sw*0.35), 6, 8);
+  cx.fillRect(x+12-sw*0.5, y+22+bob-Math.max(0,-sw*0.35), 6, 8);
   // body (blue shirt)
   cx.fillStyle='#2f6fd0';
   cx.fillRect(x+3, y+10+bob, P.w-6, 13);
@@ -471,6 +511,7 @@ function drawPlayer(){
   cx.fillStyle='#666';
   cx.fillRect(x + (P.face>0?P.w-2:-8), y+14+bob, 10, 4);
   cx.fillStyle='#ff5'; cx.fillRect(x + (P.face>0?P.w+4:-10), y+14+bob, 4, 4);
+  cx.restore();
 }
 function drawExit(){
   const x=exit.x, y=exit.y;
@@ -541,6 +582,16 @@ function draw(){
     ['ARROWS / A D .... MOVE','SPACE / Z ...... JUMP','X .............. POGO STICK','C .............. SHOOT RAYGUN','M .............. MUTE'].forEach((l,i)=>cx.fillText(l,W/2,370+i*22));
     if (Math.floor(Date.now()/500)%2===0) centerText('PRESS ENTER TO PLAY', 500, 22, '#ffd75e');
     cx.textAlign='left';
+    // mini keen pogo-ing across the bottom
+    {
+      const bt=Date.now()*0.005;
+      const bx=140+((Date.now()*0.07)%(W-280));
+      const by=522-Math.abs(Math.sin(bt))*58;
+      const sv={x:P.x,y:P.y,pogo:P.pogo,face:P.face,vy:P.vy,vx:P.vx,og:P.onGround,inv:invuln,sq:P.squash,an:P.anim};
+      P.x=bx-11; P.y=by; P.pogo=true; P.face=1; P.vy=-Math.cos(bt)*9; P.vx=2; P.onGround=false; invuln=0; P.squash=0; P.anim+=2;
+      drawPlayer();
+      P.x=sv.x; P.y=sv.y; P.pogo=sv.pogo; P.face=sv.face; P.vy=sv.vy; P.vx=sv.vx; P.onGround=sv.og; invuln=sv.inv; P.squash=sv.sq; P.anim=sv.an;
+    }
   } else {
     for (const s of solids) drawTile(s.x,s.y);
     for (const p of plats) drawPlat(p.x,p.y);
@@ -557,6 +608,7 @@ function draw(){
     cx.fillStyle='#ffe95e';
     for (const s of shots){ cx.fillRect(s.x,s.y,s.w,s.h); cx.fillStyle='#fff'; cx.fillRect(s.x+s.w-3,s.y,3,s.h); cx.fillStyle='#ffe95e'; }
     drawPlayer();
+    drawParts();
     drawHUD();
     if (P.pogo){ cx.fillStyle='#ffd75e'; cx.font='bold 13px "Courier New",monospace'; cx.fillText('POGO!', 12, 42); }
   }
@@ -596,6 +648,7 @@ function loop(t){
     if (state==='play') update();
     else if (state==='clear'){ if(--clearTimer<=0){ if(level+1<LEVELS.length){ loadLevel(level+1); state='play'; } else { state='win'; sfx.win(); } } }
   }
+  updateParts();
   draw();
 }
 // validate maps in console (dev aid)
