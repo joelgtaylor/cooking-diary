@@ -298,9 +298,24 @@ g.scale(player.face,1);
 // CRUST_AI_SPRITES_V1
 const ai=assets.bakerAI;
 if(ai&&ai.complete&&ai.naturalWidth){
- let aiRow=row===0?0:row===1?1:row===2?5:row===3?2:row===4?3:row===5?6:row===7?4:0;
- let aiFrames=[6,9,4,4,4,4,6,3][aiRow];
- let aiFrame=frame%aiFrames;
+ // CRUST_AI_MAPPING_FIX_V2: map original animation states to the AI atlas.
+ // Old: 0 idle, 1 run, 2 skid, 3 jump, 4 fall, 5 hang, 6 pogo, 7 land
+ // AI:  0 idle, 1 run, 2 jump, 3 fall, 4 land, 5 hang, 6 pogo, 7 hurt
+ const aiRowByState=[0,1,4,2,3,5,6,4];
+ const aiCountByRow=[6,9,4,4,4,4,6,3];
+ const aiRow=aiRowByState[row] ?? 0;
+ const aiFrames=aiCountByRow[aiRow];
+ // Choose frames directly from the AI animation, not from a differently-sized
+ // source sequence. Use faster running and more deliberate airborne poses.
+ const aiRate=aiRow===1?Math.max(2,Math.round(6-speed*.6)):
+              aiRow===0?12:aiRow===5?8:aiRow===6?5:6;
+ let aiFrame=Math.floor(tick/aiRate)%aiFrames;
+ // Jump and fall should be selected by vertical motion, not cycle through
+ // every pose while airborne; this avoids the mid-air pose roulette.
+ if(aiRow===2)aiFrame=Math.max(0,Math.min(3,Math.floor(Math.max(0,player.vy+11)/4)));
+ if(aiRow===3)aiFrame=Math.max(0,Math.min(3,Math.floor(Math.max(0,player.vy)/3)));
+ // For landing use only the first two compression/recovery poses.
+ if(aiRow===4)aiFrame=Math.floor(tick/5)%2;
  g.imageSmoothingEnabled=false;g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,-96,84,96);
 }else{
 const big=assets.bakerReimagined;
