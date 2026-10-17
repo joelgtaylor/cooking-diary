@@ -5,6 +5,10 @@
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
 // Kept separate from Phase3 art so it can fall back safely if not loaded.
 loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
+ // CRUST_COMPLETE_TRILOGY_BG_V1: matching AI-generated backdrops.
+ // File-based images, loaded once; original Phase 3 backgrounds remain fallbacks.
+loadArt('generatedMoonlitBG','art/moonlit-bakery-city.webp');
+loadArt('generatedClockworkBG','art/clockwork-oven.webp');
 // CRUST_AI_SPRITES_V1: binary atlas uploaded via web UI
 // CRUST_AI_SPRITES_V1: binary atlas at art/baker-ai-atlas.png (web-uploaded to avoid text corruption)
 loadArt('bakerAI','art/baker-ai-stable.png');
@@ -181,10 +185,12 @@ for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'
 function draw(){
 const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
 const p3bg=assets['phase3'+bakery];
-const mushroomGenerated=assets.generatedMushroomBG;
-if(bakery===2&&mushroomGenerated&&mushroomGenerated.complete&&mushroomGenerated.naturalWidth){
+const generatedBackground=bakery===1?assets.generatedMoonlitBG
+ :bakery===2?assets.generatedMushroomBG
+ :assets.generatedClockworkBG;
+if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
  g.imageSmoothingEnabled=false;
- g.drawImage(mushroomGenerated,0,0,W,H);
+ g.drawImage(generatedBackground,0,0,W,H);
 }else if(p3bg&&p3bg.complete&&p3bg.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(p3bg,0,0,W,H)}
 else if(retro&&retro.complete&&retro.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(retro,0,0,W,H)}
 else if(assets.background.complete&&assets.background.naturalWidth){g.drawImage(assets.background,0,0,W,H);if(th.tint)rect(0,0,W,H,th.tint)}
