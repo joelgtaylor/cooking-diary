@@ -1,5 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Night Bakery</title><style>html,body{margin:0;height:100%;background:#101426;color:white;font-family:monospace;display:grid;place-items:center}#wrap{width:min(100vw,1040px);text-align:center}canvas{width:100%;image-rendering:pixelated;border:4px solid #6d78bd;box-sizing:border-box;background:#111}p{line-height:1.5}button{border:0;border-radius:6px;background:#dd5d90;color:white;padding:10px 20px;font-weight:bold;cursor:pointer}#touch{display:flex;gap:10px;justify-content:center;margin:10px;touch-action:none}#touch button{min-width:54px;font-size:19px;padding:12px 9px;user-select:none;touch-action:none}#status{color:#b9ffda;font-size:13px}</style></head><body><div id="wrap"><h2>🥖 CRUST QUEST: Rise of the Starter</h2><canvas id="c" width="960" height="540" aria-label="Retro platform video game">Your browser does not support canvas.</canvas><p>← → / A D move · Space / W / ↑ jump · C toggle pogo · X / K shoot · P pause · M mute · R restart · T recipes · TAP/ENTER next bakery</p><button id="restartBtn" type="button">Restart Mission</button> <button id="codexBtn" type="button">📖 Recipes</button> <button id="audioBtn" type="button">♫ Music: ON</button><p id="status">Controls ready. Gather wild yeast, grab ledges, and reach the bakery oven!</p><div id="touch"><button data-key="left">◀</button><button data-key="jump">⬆</button><button id="pogoBtn" type="button">🥣 Mixer OFF</button><button data-key="shoot">✦</button><button data-key="right">▶</button></div><p>Collect 5 wild yeast cultures, dodge the sourdough gremlins, and reach the glowing oven to bake the legendary loaf! Clear all 3 bakeries to unlock real recipes in the 📖 codex.</p></div><script src="art/phase3-bg.js"></script>
 <script src="art/baker-reimagined.js"></script>
+<script src="art/baker-rig.js"></script>
+<script src="art/baker-rig-clean.js"></script>
 <script>
 'use strict';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_AI_SPRITES_V1: binary atlas uploaded via web UI
@@ -288,43 +290,71 @@ else if(!player.ground){row=player.vy<0?3:4;n=row===3?5:4;rate=4;}
 else if(player.climb>0){row=7;n=4;rate=2;}
 else if(speed>0.45){row=1;n=10;rate=Math.max(2,7-speed);}
 const frame=Math.floor(tick/rate)%n;
-const bob=row===1?Math.abs(Math.sin(tick*.35))*1.4:row===0?Math.sin(tick*.06)*.7:0;
+const bob=window.__crustUseRig!==false?0:(row===1?Math.abs(Math.sin(tick*.35))*1.4:row===0?Math.sin(tick*.06)*.7:0);
 g.save();g.translate(player.x+player.w/2,player.y+player.h+2-bob);
 g.scale(player.face,1);
-// CRUST_AI_STABILIZED_V3: clean atlas and per-state animation clocks.
+// CRUST_RIGGED_BAKER_V2: clean separated limbs, stable torso, detailed eight-frame run.
 const ai=assets.bakerAI;
 if(ai&&ai.complete&&ai.naturalWidth){
- // Stable action mapping: old physics states -> AI atlas rows.
- // 0 idle, 1 run, 2 jump, 3 fall, 4 land, 5 hang, 6 pogo, 7 hurt
- const aiRowByState=[0,1,4,2,3,5,6,4];
- const aiRow=aiRowByState[row] ?? 0;
- const aiFrameCount=[5,4,4,4,4,4,3,2][aiRow];
- // Reset the animation clock whenever the state changes.
- // Tick-based rather than wall-clock based, so pausing doesn't skip frames.
- const anim=window.__crustAnimState||(window.__crustAnimState={row:-1,start:tick});
- if(anim.row!==aiRow){anim.row=aiRow;anim.start=tick;}
- const elapsed=Math.max(0,tick-anim.start);
- let aiFrame=0;
- if(aiRow===1){
-   // Run sequence loops smoothly at a speed appropriate to movement.
-   const cycle=[0,1,2,3,2,1];
-   aiFrame=cycle[Math.floor(elapsed/Math.max(3,Math.round(8-speed*.5)))%cycle.length];
- }else if(aiRow===0){
-   aiFrame=Math.floor(elapsed/14)%aiFrameCount;
- }else if(aiRow===2){
-   // Jump plays forward once; avoid looping back midair.
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/5));
- }else if(aiRow===3){
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/7));
- }else if(aiRow===4){
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/4));
- }else if(aiRow===5){
-   aiFrame=Math.floor(elapsed/10)%aiFrameCount;
- }else if(aiRow===6){
-   aiFrame=Math.floor(elapsed/7)%aiFrameCount;
+ // Clean rig: independent painted limb cutouts. V1 remains available for comparison.
+ const rigGenerator=window.__crustRigVersion==='previous'
+   ?window.CrustBakerRig:window.CrustBakerRigClean;
+ const rig=rigGenerator&&rigGenerator.ensure(ai);
+ const useRig=!!rig&&window.__crustUseRig!==false;
+ let source=ai,sourceX=0,sourceY=0,sourceW=96,sourceH=112;
+ if(useRig){
+   // Physics and collision code are untouched; this only selects a painted frame.
+   const mode=player.hang?'hang':pogoOn?'pogo'
+     :!player.ground?(player.vy<0?'jump':'fall')
+     :player.climb>0?'land':speed>.45?'run':'idle';
+   const anim=window.__crustRigClock||(window.__crustRigClock={
+     mode:null,start:tick,runPhase:0,lastX:player.x
+   });
+   if(anim.mode!==mode){anim.mode=mode;anim.start=tick;}
+   const elapsed=Math.max(0,tick-anim.start);
+   const traveled=Math.min(10,Math.abs(player.x-anim.lastX));
+   anim.lastX=player.x;
+   if(mode==='run'){
+     // Driven by actual world-space travel; feet don't keep cycling against walls.
+     anim.runPhase+=traveled*0.125;
+     source=rig.run;sourceX=(Math.floor(anim.runPhase)%8)*96;sourceY=0;
+   }else if(mode==='jump'){
+     source=rig.jump;sourceX=Math.min(3,Math.floor(elapsed/5))*96;sourceY=0;
+   }else if(mode==='fall'){
+     source=rig.fall;sourceX=Math.min(3,Math.floor(elapsed/6))*96;sourceY=0;
+   }else if(mode==='idle'){
+     // Keep the exact same face / clothing from one stable idle pose.
+     sourceX=96;sourceY=0;
+   }else if(mode==='hang'){
+     sourceX=96;sourceY=5*112;
+   }else if(mode==='pogo'){
+     sourceX=0;sourceY=6*112;
+   }else{
+     sourceX=0;sourceY=4*112;
+   }
+ }else{
+   // Original stabilized animation, available for A/B comparison in the preview.
+   const oldToAI=[0,1,4,2,3,5,6,4];
+   const aiRow=oldToAI[row]??0;
+   const counts=[5,4,4,4,4,4,3,2];
+   const legacy=window.__crustLegacyRigCompare||(window.__crustLegacyRigCompare={row:-1,start:tick});
+   if(legacy.row!==aiRow){legacy.row=aiRow;legacy.start=tick;}
+   const elapsed=Math.max(0,tick-legacy.start);
+   let aiFrame=0;
+   if(aiRow===1){
+     const cycle=[0,1,2,3,2,1];
+     aiFrame=cycle[Math.floor(elapsed/Math.max(3,Math.round(8-speed*.5)))%cycle.length];
+   }else if(aiRow===0){aiFrame=Math.floor(elapsed/14)%counts[aiRow];}
+   else if(aiRow===2){aiFrame=Math.min(counts[aiRow]-1,Math.floor(elapsed/5));}
+   else if(aiRow===3){aiFrame=Math.min(counts[aiRow]-1,Math.floor(elapsed/7));}
+   else if(aiRow===4){aiFrame=Math.min(counts[aiRow]-1,Math.floor(elapsed/4));}
+   else if(aiRow===5){aiFrame=Math.floor(elapsed/10)%counts[aiRow];}
+   else if(aiRow===6){aiFrame=Math.floor(elapsed/7)%counts[aiRow];}
+   sourceX=aiFrame*96;sourceY=aiRow*112;
  }
+ if(window.__crustRigFrameFrozen){source=ai;sourceX=96;sourceY=0;}
  g.imageSmoothingEnabled=false;
- g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,-96,84,96);
+ g.drawImage(source,sourceX,sourceY,sourceW,sourceH,-42,-96,84,96);
 }else{
 const big=assets.bakerReimagined;
 if(big&&big.complete&&big.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(big,frame*96,row*112,96,112,-42,-96,84,96);}
