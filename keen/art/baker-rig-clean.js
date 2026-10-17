@@ -48,7 +48,7 @@ function cleanTorso(original){
                     b<100 && r>gr*1.4);
     const keep=(y<53)
       ||(y<60&&(x>=41||redScarf))
-      ||(y<66&&x>=41&&x<=71)
+      ||(y<66&&x>=41&&x<=65)
       ||(y<78&&x>=38&&x<=64)
       ||(y<83&&x>=38&&x<=61);
     if(!keep)d[i+3]=0;
