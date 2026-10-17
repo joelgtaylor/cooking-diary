@@ -1,37 +1,63 @@
-# Baker Outline Polish — Phase 1
+# Baker Outline Polish — Phase 1, revision 2 (crisp)
 
-The **original AI baker sprite atlas stays intact** at `baker-ai-stable.png`. This is a conservative, non-destructive outline treatment.
+The first Phase 1 pass only darkened edge colors by ~10%, which was too
+subtle to distinguish at the game's 84×96-pixel display size. **Revision 2**
+gives the chef a more deliberate classic DOS pixel-art outline, without a
+redesign or any new silhouette pixels.
+
+## Art treatment
+
+- The existing **960×896 RGBA atlas** is the immutable source, split into
+  **96×112** cells. Every existing run, idle, jump, fall and pogo pose keeps
+  exactly its original frame and silhouette.
+- Only the **outer one-pixel 8-connected edge** and its **immediately adjacent
+  inside pixel** are changed. The inside layer is snapped to a curated
+  32-color ramp derived from the baker's original hues; the outer pixel uses
+  a corresponding deeper contour shade. **All deeper interior artwork stays
+  byte-for-byte identical.**
+- Keep all other alpha pixels unchanged. The sole exceptions are two
+  previously identified stray artifacts: the detached white line in run
+  row 1 / frame 1 and the fall row 3 / frame 3 vertical seam.
+- The program uses neither interpolation nor blurring, and never expands
+  the sprite. This avoids creating new jagged edges at the game's fractional
+  sprite display scale.
+- The face, chef hat, red scarf, sleeves, pants, boots and original
+  proportions are preserved.
 
 ## Files
 
-- `baker-outline-polish.js`: builds a polished Canvas atlas *once*, cached per source image. Used in the browser and by the Phase 1 preview.
-- `tools/bake_baker_outline.py`: matching offline exporter for `baker-ai-outline-polished.png` (requires Pillow).
-- Original atlas: `960 × 896`, rows of `96 × 112` tiles, no tile layout changes.
+- `keen/art/baker-outline-polish.js`: browser-side cached, deterministic
+  Canvas implementation used by both the preview and proposed main game.
+- `keen/art/tools/bake_baker_outline.py`: reproduces the same processing
+  as a physical PNG without overwriting the original atlas.
+- `keen/art/baker-ai-stable.png`: unchanged original artwork.
 
-## What changes
-
-- On each tile, the **outer one-pixel 8-connected ring** is gently darkened toward its own hue. The existing cream/lavender hat, face, coat, scarf, blue pants and brown boots retain their colors.
-- All interior pixels and all 96×112 rectangles are **bit-for-bit unchanged**.
-- Two disconnected artifacts (an isolated streak by run row 1/frame 1, a vertical seam in fall row 3/frame 3) are removed, without touching adjacent shoes or costume elements.
-- No blurring, antialiasing, interpolation, additive alpha, frame timing changes or new palette/colors.
-- The previously approved full-boot frame and eight-pixel foot-placement improvement are provided by the *parent branch* `fix/baker-foot-art-and-anchor`. They are not reimplemented here.
-- The merged ground-contact physics fix is unaffected.
-
-## Preview and rollback
-
-Live test: https://joelgtaylor.github.io/cooking-diary/keen/outline-polish-phase1-preview.html
-
-**K**: polished edges versus original edges. **J**: complete feet versus old incomplete pose. Keep **H** (ground physics) enabled to retain the ghosting fix.
-
-The asset is inert on production until the branch's `keen/index.html` change is merged. Setting `window.CrustOutlinePolish` to `null` before rendering also restores the original atlas.
-
-## Export a true PNG
-
-From the repository:
+To export a PNG from repo root (requires Pillow):
 
 ```sh
 python -m pip install pillow
 python keen/art/tools/bake_baker_outline.py
 ```
 
-This generates `keen/art/baker-ai-outline-polished.png` without overwriting the original. The production browser path deliberately uses the deterministic Canvas processor so the source and preview can be compared without replacing any binary atlas.
+Result: `keen/art/baker-ai-outline-polished.png`.
+
+## Browser preview
+
+**https://joelgtaylor.github.io/cooking-diary/keen/crisp-outline-preview.html**
+
+- **K**: crisp outline versus completely unmodified original colors.
+- A **2× before/after** contact sheet immediately below the playable game
+  lets you judge the contour on the same two poses.
+- **J**: previously approved complete boots and visual foot alignment.
+- **H**: merged ground-contact physics fix; leave enabled to avoid the
+  previously diagnosed idle/fall oscillation.
+
+## Invariants / merge strategy
+
+- This is stacked onto `fix/baker-foot-art-and-anchor` (PR #7);
+  merge the feet fix first, then the outline pass PR #8.
+- The physically separate main game remains unchanged until merge.
+- No physics, collisions, camera, game mechanics, recipe unlocks, progression,
+  music, animation clocks or gameplay sprite coordinates are touched.
+- Original atlas and the previous v1 treatment remain recoverable in Git
+  history; the original can always be selected by disabling the processor.
