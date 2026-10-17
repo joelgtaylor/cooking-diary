@@ -321,14 +321,17 @@ if(ai&&ai.complete&&ai.naturalWidth){
  const rig=rigGenerator&&rigGenerator.ensure(ai);
  const useRig=!!rig&&window.__crustUseRig!==false;
  let source=ai,sourceX=0,sourceY=0,sourceW=96,sourceH=112;
+ // Trace variables must outlive the useRig branch; the ground-state experiment
+ // also reads them after the legacy source fallback.
+ let rawMode=null,rawNow=0,trace=null;
  if(useRig){
    // Physics and collision code are untouched; this only selects a painted frame.
-   const rawMode=player.hang?'hang':pogoOn?'pogo'
+   rawMode=player.hang?'hang':pogoOn?'pogo'
      :!player.ground?(player.vy<0?'jump':'fall')
      :player.climb>0?'land':speed>.45?'run':'idle';
    // Record raw state transitions BEFORE applying any experimental smoothing.
-   const rawNow=performance.now();
-   const trace=window.__crustStateTrace||(window.__crustStateTrace={
+   rawNow=performance.now();
+   trace=window.__crustStateTrace||(window.__crustStateTrace={
      last:null,events:[],lastGround:0,raw:'?',ground:false,vx:0,vy:0,
      selected:'?',drawFrame:0
    });
@@ -425,7 +428,7 @@ if(ai&&ai.complete&&ai.naturalWidth){
  // GROUNDED_SPRITES_V1: never switch from the clean run rig to the unrelated
  // idle/land images while grounded. Standing uses frame 0 of the same run rig.
  // Mode 2 additionally smooths tiny ground-detection interruptions.
- if(window.__crustGroundMode>0 && rig && !pogoOn && !player.hang &&
+ if(useRig && window.__crustGroundMode>0 && rig && !pogoOn && !player.hang &&
      (player.ground || (window.__crustGroundMode===2 &&
        rawMode==='fall' && player.vy>=0 && player.vy<1.4 &&
        rawNow-trace.lastGround<85))){
@@ -440,7 +443,7 @@ if(ai&&ai.complete&&ai.naturalWidth){
      };
    }
  }
- trace.drawFrame=Math.round(sourceX/96);
+ if(trace)trace.drawFrame=Math.round(sourceX/96);
  // The original G diagnostic, now shown as an independent positive control.
  if(window.__crustForceRunning && rig){
    const forcedRig=window.CrustBakerRigClean&&window.CrustBakerRigClean.ensure(ai);
