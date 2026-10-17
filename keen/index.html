@@ -9,6 +9,11 @@ loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
  // File-based images, loaded once; original Phase 3 backgrounds remain fallbacks.
 loadArt('generatedMoonlitBG','art/moonlit-bakery-city.webp');
 loadArt('generatedClockworkBG','art/clockwork-oven.webp');
+// CRUST_DOUGH_GREMLINS_V1: compact transparent 4x4 animation atlases
+// derived from the two approved character sheets. Load asynchronously,
+// preserving the original item tile as a fallback if they are unavailable.
+loadArt('gremlinRun','art/dough-gremlins-primary.png');
+loadArt('gremlinExpressions','art/dough-gremlins-expressions.png');
 // CRUST_AI_SPRITES_V1: binary atlas uploaded via web UI
 // CRUST_AI_SPRITES_V1: binary atlas at art/baker-ai-atlas.png (web-uploaded to avoid text corruption)
 loadArt('bakerAI','art/baker-ai-stable.png');
@@ -299,19 +304,50 @@ for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
 if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
 else if(u.kind==='rye'){g.fillStyle='#a06830';g.beginPath();g.ellipse(u.x,uy,13,9,0,0,7);g.fill();g.fillStyle='#d8a860';g.beginPath();g.ellipse(u.x,uy-3,8,5,0,0,7);g.fill()}
 else{rect(u.x-11,uy-8,22,14,'#c9a06a');rect(u.x-11,uy-8,22,4,'#a87f4e');for(let qi=-8;qi<=8;qi+=8)rect(u.x+qi-1,uy-8,2,14,'#a87f4e')}}
-for(const e of enemies)if(e.alive){const bob=Math.sin(tick*.1+e.x*.02)*2;
-if(assets.items.complete&&assets.items.naturalWidth){g.save();g.translate(e.x+(e.vx>0?0:25),e.y+bob);g.scale(e.vx>0?1:-1,1);g.drawImage(assets.items,32,0,32,32,0,-5,29,32);g.restore()}
-else rect(e.x,e.y+bob,25,25,'#9c5e42');if(e.type==='hopper')rect(e.x+8,e.y+bob-9,9,5,'#ff9d2e');if(e.type==='chaser')rect(e.x+8,e.y+bob-9,9,5,'#ff4d5e')}
-// CRUST_PHASE3 - animated eyes, expressions and squish on existing gremlins.
+// CRUST_DOUGH_GREMLINS_V1: art-only integration. No changes to AI,
+// hitboxes, damage, collision, movement speed, or enemy spawn logic.
 for(const e of enemies)if(e.alive){
  const bob=Math.sin(tick*.1+e.x*.02)*2;
- const blink=tick%113<5;
- g.fillStyle='#2a1d32';
- g.fillRect(e.x+7,e.y+8+bob,blink?8:4,blink?2:5);
- g.fillRect(e.x+18,e.y+8+bob,blink?7:4,blink?2:5);
- g.fillStyle='#fff5d7';
- if(!blink){g.fillRect(e.x+8,e.y+9+bob,2,2);g.fillRect(e.x+19,e.y+9+bob,2,2);}
- g.fillStyle='#8d2b46';g.fillRect(e.x+11,e.y+19+bob,8,3);
+ const atlas=e.type==='hopper'?assets.gremlinExpressions:assets.gremlinRun;
+ const newArt=window.__crustGremlinArt!==false&&atlas&&atlas.complete&&atlas.naturalWidth===128;
+ if(newArt){
+   let row=0,frame=0;
+   if(e.type==='hopper'&&Math.abs(e.vy||0)>1){
+     row=2;frame=Math.min(3,Math.floor((tick+e.x*.1)/7)%4);
+   }else if(Math.abs(e.vx)>0.15){
+     row=1;frame=Math.floor((tick+e.x*.12)/9)%4;
+   }else{
+     row=0;frame=Math.floor((tick+e.x*.1)/18)%4;
+   }
+   // 32x32 art is visually larger than the 25x25 collision box;
+   // feet still meet the same world-space enemy ground line.
+   g.save();
+   g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h+bob));
+   g.scale(e.vx<0?-1:1,1);
+   g.imageSmoothingEnabled=false;
+   g.drawImage(atlas,frame*32,row*32,32,32,-16,-32,32,32);
+   g.restore();
+ }else{
+   if(assets.items.complete&&assets.items.naturalWidth){
+     g.save();g.translate(e.x+(e.vx>0?0:25),e.y+bob);
+     g.scale(e.vx>0?1:-1,1);
+     g.drawImage(assets.items,32,0,32,32,0,-5,29,32);g.restore();
+   }else rect(e.x,e.y+bob,25,25,'#9c5e42');
+   if(e.type==='hopper')rect(e.x+8,e.y+bob-9,9,5,'#ff9d2e');
+   if(e.type==='chaser')rect(e.x+8,e.y+bob-9,9,5,'#ff4d5e');
+   // Original blinking face drawn only for fallback old sprites.
+   const blink=tick%113<5;
+   g.fillStyle='#2a1d32';
+   g.fillRect(e.x+7,e.y+8+bob,blink?8:4,blink?2:5);
+   g.fillRect(e.x+18,e.y+8+bob,blink?7:4,blink?2:5);
+   g.fillStyle='#fff5d7';
+   if(!blink){
+     g.fillRect(e.x+8,e.y+9+bob,2,2);
+     g.fillRect(e.x+19,e.y+9+bob,2,2);
+   }
+   g.fillStyle='#8d2b46';
+   g.fillRect(e.x+11,e.y+19+bob,8,3);
+ }
 }
 for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';if(!player.inv||tick%8<4){
 // CRUST_PHASE4: animation state selection follows physics without changing it.
