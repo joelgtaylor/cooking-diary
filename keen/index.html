@@ -333,7 +333,11 @@ if(ai&&ai.complete&&ai.naturalWidth){
    const cycle=[0,1,2,3,2,1];
    aiFrame=cycle[Math.floor(elapsed/Math.max(3,Math.round(8-speed*.5)))%cycle.length];
  }else if(aiRow===0){
-   aiFrame=Math.floor(elapsed/14)%aiFrameCount;
+   // COMPLETE_BAKER_FEET_V1: choose a complete standing pose. Other idle
+   // frames have missing/partial boots (particularly atlas column 1).
+   aiFrame=window.__crustFullFeet===false
+     ?Math.floor(elapsed/14)%aiFrameCount
+     :4;
  }else if(aiRow===2){
    // Jump plays forward once; avoid looping back midair.
    aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/5));
@@ -347,7 +351,11 @@ if(ai&&ai.complete&&ai.naturalWidth){
    aiFrame=Math.floor(elapsed/7)%aiFrameCount;
  }
  g.imageSmoothingEnabled=false;
- g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,-96,84,96);
+ // Atlas cells include ~12 transparent source pixels below the shoes.
+ // The 8px visual offset aligns their visible bottom with the platform;
+ // collision boxes, physics and camera remain completely unchanged.
+ g.drawImage(ai,aiFrame*96,aiRow*112,96,112,
+   -42,window.__crustFullFeet===false?-96:-88,84,96);
 }else{
 const big=assets.bakerReimagined;
 if(big&&big.complete&&big.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(big,frame*96,row*112,96,112,-42,-96,84,96);}
