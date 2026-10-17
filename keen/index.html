@@ -2,6 +2,9 @@
 <script src="art/baker-reimagined.js"></script>
 <script>
 'use strict';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
+// CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
+// Kept separate from Phase3 art so it can fall back safely if not loaded.
+loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
 // CRUST_AI_SPRITES_V1: binary atlas uploaded via web UI
 // CRUST_AI_SPRITES_V1: binary atlas at art/baker-ai-atlas.png (web-uploaded to avoid text corruption)
 loadArt('bakerAI','art/baker-ai-stable.png');
@@ -178,7 +181,11 @@ for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'
 function draw(){
 const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
 const p3bg=assets['phase3'+bakery];
-if(p3bg&&p3bg.complete&&p3bg.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(p3bg,0,0,W,H)}
+const mushroomGenerated=assets.generatedMushroomBG;
+if(bakery===2&&mushroomGenerated&&mushroomGenerated.complete&&mushroomGenerated.naturalWidth){
+ g.imageSmoothingEnabled=false;
+ g.drawImage(mushroomGenerated,0,0,W,H);
+}else if(p3bg&&p3bg.complete&&p3bg.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(p3bg,0,0,W,H)}
 else if(retro&&retro.complete&&retro.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(retro,0,0,W,H)}
 else if(assets.background.complete&&assets.background.naturalWidth){g.drawImage(assets.background,0,0,W,H);if(th.tint)rect(0,0,W,H,th.tint)}
 else rect(0,0,W,H,'#382c49');
