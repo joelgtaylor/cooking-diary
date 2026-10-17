@@ -19,7 +19,7 @@ const platforms=[
  [49,13,8],[59,12,7],[68,11,7],[76,12,5],
  [80,13,7],[89,12,6],[97,13,7]
 ];
-const spikeTiles=[27,38,53,78,91]; // independently visible, never in gaps
+const spikeTiles=[15,39,58,82]; // visible above open floor, never concealed under rooftops or placed beside gap landings
 const cultures=[
  [9,14], // first jar is immediately visible on safe ground
  [35,11], // easy rooftop pickup from roof y=12
