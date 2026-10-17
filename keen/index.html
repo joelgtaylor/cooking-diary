@@ -245,6 +245,9 @@ for(let tx=lo;tx<hi;tx++){
   // Props only sit on top of solid terrain, avoiding collision changes.
   for(let ty=1;ty<rows;ty++){
     if(map[ty][tx]!=='#'||map[ty-1][tx]==='#')continue;
+    // Keep 3 tiles around any damaging spike completely unobscured.
+    // Cosmetic-only: the tile map, collisions and spike sprite are unchanged.
+    if(tile(tx,ty-1)==='^'||tile(tx-1,ty-1)==='^'||tile(tx+1,ty-1)==='^')continue;
     const py=ty*T;
     if(tx%11===3){
       if(envReady){drawEnv(4,px+2,py-28,28,28);continue;}
@@ -280,6 +283,9 @@ for(let tx=lo;tx<hi;tx++){
  const x=tx*T;
  for(let ty=1;ty<rows;ty++){
   if(map[ty][tx]!=='#'||map[ty-1][tx]==='#')continue;
+    // Keep 3 tiles around any damaging spike completely unobscured.
+    // Cosmetic-only: the tile map, collisions and spike sprite are unchanged.
+    if(tile(tx,ty-1)==='^'||tile(tx-1,ty-1)==='^'||tile(tx+1,ty-1)==='^')continue;
   const y=ty*T;
   // Themed frosting and stone highlights
   g.fillStyle=trim;g.fillRect(x,y,32,4);
