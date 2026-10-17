@@ -291,40 +291,65 @@ const frame=Math.floor(tick/rate)%n;
 const bob=row===1?Math.abs(Math.sin(tick*.35))*1.4:row===0?Math.sin(tick*.06)*.7:0;
 g.save();g.translate(player.x+player.w/2,player.y+player.h+2-bob);
 g.scale(player.face,1);
-// CRUST_AI_STABILIZED_V3: clean atlas and per-state animation clocks.
+// CRUST_AI_CURATED_V5: only use stable, complete frames from the AI-generated atlas.
+// The diagnostic confirmed ghosting stops on a fixed image; suspect inconsistent in-between art.
 const ai=assets.bakerAI;
 if(ai&&ai.complete&&ai.naturalWidth){
- // Stable action mapping: old physics states -> AI atlas rows.
- // 0 idle, 1 run, 2 jump, 3 fall, 4 land, 5 hang, 6 pogo, 7 hurt
- const aiRowByState=[0,1,4,2,3,5,6,4];
- const aiRow=aiRowByState[row] ?? 0;
- const aiFrameCount=[5,4,4,4,4,4,3,2][aiRow];
- // Reset the animation clock whenever the state changes.
- // Tick-based rather than wall-clock based, so pausing doesn't skip frames.
- const anim=window.__crustAnimState||(window.__crustAnimState={row:-1,start:tick});
- if(anim.row!==aiRow){anim.row=aiRow;anim.start=tick;}
- const elapsed=Math.max(0,tick-anim.start);
- let aiFrame=0;
- if(aiRow===1){
-   // Run sequence loops smoothly at a speed appropriate to movement.
-   const cycle=[0,1,2,3,2,1];
-   aiFrame=cycle[Math.floor(elapsed/Math.max(3,Math.round(8-speed*.5)))%cycle.length];
- }else if(aiRow===0){
-   aiFrame=Math.floor(elapsed/14)%aiFrameCount;
- }else if(aiRow===2){
-   // Jump plays forward once; avoid looping back midair.
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/5));
- }else if(aiRow===3){
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/7));
- }else if(aiRow===4){
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/4));
- }else if(aiRow===5){
-   aiFrame=Math.floor(elapsed/10)%aiFrameCount;
- }else if(aiRow===6){
-   aiFrame=Math.floor(elapsed/7)%aiFrameCount;
- }
- g.imageSmoothingEnabled=false;
- g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,-96,84,96);
+  // Keep the original playback available for a side-by-side preview comparison.
+  // Normal gameplay defaults to curated playback.
+  const useCurated=window.__crustCuratedBaker!==false;
+  let aiRow=0,aiFrame=0,alignX=0;
+  if(useCurated){
+    const action=player.hang?'hang'
+      :pogoOn?'pogo'
+      :!player.ground?(player.vy<0?'jump':'fall')
+      :player.climb>0?'land'
+      :speed>.45?'run':'idle';
+
+    // Hand-selected from baker-ai-stable.png; the later run frames have
+    // inconsistent proportions and visible clipping, so do not play them.
+    // row / frame indices are zero-based within the 96x112 atlas.
+    const curated={
+      idle:{row:0,seq:[0],delay:14},
+      run: {row:1,seq:[0,1],delay:Math.max(8,Math.round(12-speed*.6))},
+      jump:{row:2,seq:[1],delay:9},
+      fall:{row:3,seq:[3],delay:9},
+      land:{row:4,seq:[0,1],delay:5,once:true},
+      hang:{row:5,seq:[1],delay:12},
+      pogo:{row:6,seq:[0],delay:9}
+    };
+    const chosen=curated[action];
+    const anim=window.__crustCuratedAnim||(window.__crustCuratedAnim={action:null,start:tick});
+    if(anim.action!==action){anim.action=action;anim.start=tick;}
+    const elapsed=Math.max(0,tick-anim.start);
+    const step=Math.floor(elapsed/chosen.delay);
+    const frameIndex=chosen.once?Math.min(chosen.seq.length-1,step):step%chosen.seq.length;
+    aiRow=chosen.row;
+    aiFrame=chosen.seq[frameIndex];
+    // Frame 1's face is a few pixels to the right of frame 0's.
+    alignX=action==='run'&&aiFrame===1?-2:0;
+  }else{
+    // Legacy playback for comparison in the preview (V toggle).
+    const oldToAI=[0,1,4,2,3,5,6,4];
+    aiRow=oldToAI[row]??0;
+    const counts=[5,4,4,4,4,4,3,2];
+    const legacy=window.__crustLegacyAnim||(window.__crustLegacyAnim={row:-1,start:tick});
+    if(legacy.row!==aiRow){legacy.row=aiRow;legacy.start=tick;}
+    const elapsed=Math.max(0,tick-legacy.start);
+    if(aiRow===1){
+      const cycle=[0,1,2,3,2,1];
+      aiFrame=cycle[Math.floor(elapsed/Math.max(3,Math.round(8-speed*.5)))%cycle.length];
+    }else if(aiRow===0){aiFrame=Math.floor(elapsed/14)%counts[aiRow];}
+    else if(aiRow===2){aiFrame=Math.min(counts[aiRow]-1,Math.floor(elapsed/5));}
+    else if(aiRow===3){aiFrame=Math.min(counts[aiRow]-1,Math.floor(elapsed/7));}
+    else if(aiRow===4){aiFrame=Math.min(counts[aiRow]-1,Math.floor(elapsed/4));}
+    else if(aiRow===5){aiFrame=Math.floor(elapsed/10)%counts[aiRow];}
+    else if(aiRow===6){aiFrame=Math.floor(elapsed/7)%counts[aiRow];}
+  }
+  // Preview's F toggle can hold row 0/frame 0 without changing physics.
+  if(window.__bakerFrameFrozen){aiRow=0;aiFrame=0;alignX=0;}
+  g.imageSmoothingEnabled=false;
+  g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42+alignX,-96,84,96);
 }else{
 const big=assets.bakerReimagined;
 if(big&&big.complete&&big.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(big,frame*96,row*112,96,112,-42,-96,84,96);}
