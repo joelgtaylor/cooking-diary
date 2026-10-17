@@ -9,6 +9,8 @@ loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
  // File-based images, loaded once; original Phase 3 backgrounds remain fallbacks.
 loadArt('generatedMoonlitBG','art/moonlit-bakery-city.webp');
 loadArt('generatedClockworkBG','art/clockwork-oven.webp');
+// CRUST_ENVIRONMENT_ART_V1: compact 256x256 / 64px-per-cell concept-art atlas.
+loadArt('environmentDecor','art/environment-gameplay-atlas.png');
 // CRUST_DOUGH_GREMLINS_V1: compact transparent 4x4 animation atlases
 // derived from the two approved character sheets. Load asynchronously,
 // preserving the original item tile as a fallback if they are unavailable.
@@ -188,6 +190,12 @@ function drawCodex(){const px=230,py=64,pw=500,ph=412;g.fillStyle='#3a2c18';g.fi
 // CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
 for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'+q,window.__PHASE3_BG[q]);
 function draw(){
+const env=assets.environmentDecor;
+const envReady=window.__crustWorldArtEnabled!==false&&env&&env.complete&&env.naturalWidth===256;
+function drawEnv(cell,x,y,w,h){
+ g.imageSmoothingEnabled=false;
+ g.drawImage(env,(cell%4)*64,Math.floor(cell/4)*64,64,64,x,y,w,h);
+}
 const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
 const p3bg=assets['phase3'+bakery];
 const generatedBackground=bakery===1?assets.generatedMoonlitBG
@@ -202,7 +210,12 @@ else if(assets.background.complete&&assets.background.naturalWidth){g.drawImage(
 else rect(0,0,W,H,'#382c49');
 // Parallax window glow and distant floating flour motes
 for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
-g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),(shake>0.6?(Math.random()-.5)*shake*0.6:0));let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);for(let x=lo;x<hi;x++)for(let y=0;y<rows;y++){let b=map[y][x];if(b==='#'){if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}}// Decorative brick seams and icing along visible solid tile surfaces.
+g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),(shake>0.6?(Math.random()-.5)*shake*0.6:0));let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);for(let x=lo;x<hi;x++)for(let y=0;y<rows;y++){let b=map[y][x];if(b==='#'){if(envReady)drawEnv(10,x*T,y*T,32,32);
+ else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
+ else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
+ if(envReady)drawEnv(bakery===1?15:bakery===2?0:2,x*T,y*T,32,32);
+ else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
+}}// Decorative brick seams and icing along visible solid tile surfaces.
 for(let tx=lo;tx<hi;tx++)for(let ty=0;ty<rows;ty++){
  if(map[ty][tx]!=='#')continue;
  const xx=tx*T,yy=ty*T;
@@ -221,18 +234,21 @@ for(let tx=lo;tx<hi;tx++){
     if(map[ty][tx]!=='#'||map[ty-1][tx]==='#')continue;
     const py=ty*T;
     if(tx%11===3){
+      if(envReady){drawEnv(4,px+2,py-28,28,28);continue;}
       // Sacks of flour with stitched seams
       g.fillStyle='#332b48';g.fillRect(px+3,py-20,23,21);
       g.fillStyle='#e8d5aa';g.fillRect(px+5,py-19,19,18);
       g.fillStyle='#fff0cd';g.fillRect(px+8,py-16,13,12);
       g.fillStyle='#aa8d80';g.fillRect(px+11,py-12,7,2);
     } else if(tx%13===7){
+      if(envReady){drawEnv(6,px+4,py-36,32,36);continue;}
       // Warm industrial wall lanterns
       g.fillStyle='#2c263c';g.fillRect(px+11,py-34,11,17);
       g.fillStyle='#ffba57';g.fillRect(px+13,py-31,7,11);
       g.fillStyle='#fff3b0';g.fillRect(px+15,py-29,3,6);
       g.fillStyle='#f8bb69';g.fillRect(px+9,py-34,15,3);
     } else if(tx%17===9){
+      if(envReady){drawEnv(3,px+7,py-27,24,27);continue;}
       // Tiny growing starter in a glass jar
       g.fillStyle='#b6e4d9';g.fillRect(px+10,py-16,13,15);
       g.fillStyle='#f7df91';g.fillRect(px+12,py-9,9,7);
@@ -264,6 +280,7 @@ for(let tx=lo;tx<hi;tx++){
    g.fillStyle=trim;g.fillRect(x+8,y-36,19,4);
    g.fillStyle='#f9d68a';g.fillRect(x+14,y-45,6,6);
   }else if(tx%13===6){
+   if(envReady){drawEnv(bakery===2?5:4,x-4,y-36,40,36);continue;}
    // Tall sacks of flour and stamped crate
    g.fillStyle='#33283d';g.fillRect(x-3,y-31,39,32);
    g.fillStyle='#e8d4a4';g.fillRect(x+2,y-29,27,28);
@@ -271,6 +288,7 @@ for(let tx=lo;tx<hi;tx++){
    g.fillStyle='#a77d70';g.fillRect(x+10,y-17,10,3);
    g.fillStyle='#b58153';g.fillRect(x+1,y-4,29,4);
   }else if(tx%15===10){
+   if(envReady){drawEnv(bakery===2?14:3,x-4,y-43,39,43);continue;}
    // Glowing glass fermentation vat
    g.fillStyle=dark;g.fillRect(x-3,y-45,39,47);
    g.fillStyle='#9dd8c8';g.fillRect(x+1,y-40,31,34);
@@ -298,10 +316,12 @@ for(let k=0;k<18;k++){
 }
 g.restore();
 for(const gem of gems)if(!gem.got){const cy=gem.y+Math.sin(tick*.09)*5;
-if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,gem.x-9,cy-13,32,32);
+if(envReady)drawEnv(3,gem.x-13,cy-23,30,34);
+else if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,gem.x-9,cy-13,32,32);
 else rect(gem.x,cy,18,18,'#f8d994')}
 for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
-if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
+if(envReady){drawEnv(u.kind==='kefir'?14:u.kind==='rye'?8:13,u.x-19,uy-23,38,38);}
+else if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
 else if(u.kind==='rye'){g.fillStyle='#a06830';g.beginPath();g.ellipse(u.x,uy,13,9,0,0,7);g.fill();g.fillStyle='#d8a860';g.beginPath();g.ellipse(u.x,uy-3,8,5,0,0,7);g.fill()}
 else{rect(u.x-11,uy-8,22,14,'#c9a06a');rect(u.x-11,uy-8,22,4,'#a87f4e');for(let qi=-8;qi<=8;qi+=8)rect(u.x+qi-1,uy-8,2,14,'#a87f4e')}}
 // CRUST_DOUGH_GREMLINS_V1: art-only integration. No changes to AI,
