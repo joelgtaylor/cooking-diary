@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Night Bakery</title><style>html,body{margin:0;height:100%;background:#101426;color:white;font-family:monospace;display:grid;place-items:center}#wrap{width:min(100vw,1040px);text-align:center}canvas{width:100%;image-rendering:pixelated;border:4px solid #6d78bd;box-sizing:border-box;background:#111}p{line-height:1.5}button{border:0;border-radius:6px;background:#dd5d90;color:white;padding:10px 20px;font-weight:bold;cursor:pointer}#touch{display:flex;gap:10px;justify-content:center;margin:10px;touch-action:none}#touch button{min-width:54px;font-size:19px;padding:12px 9px;user-select:none;touch-action:none}#status{color:#b9ffda;font-size:13px}</style></head><body><div id="wrap"><h2>🥖 CRUST QUEST: Rise of the Starter</h2><canvas id="c" width="960" height="540" aria-label="Retro platform video game">Your browser does not support canvas.</canvas><p>← → / A D move · Space / W / ↑ jump · C toggle pogo · X / K shoot · P pause · M mute · R restart · T recipes · TAP/ENTER next bakery</p><button id="restartBtn" type="button">Restart Mission</button> <button id="codexBtn" type="button">📖 Recipes</button> <button id="audioBtn" type="button">♫ Music: ON</button><p id="status">Controls ready. Gather wild yeast, grab ledges, and reach the bakery oven!</p><div id="touch"><button data-key="left">◀</button><button data-key="jump">⬆</button><button id="pogoBtn" type="button">🥣 Mixer OFF</button><button data-key="shoot">✦</button><button data-key="right">▶</button></div><p>Collect 5 wild yeast cultures, dodge the sourdough gremlins, and reach the glowing oven to bake the legendary loaf! Clear all 3 bakeries to unlock real recipes in the 📖 codex.</p></div><script src="art/phase3-bg.js"></script>
 <script src="art/baker-reimagined.js"></script>
+<script src="art/environment-gameplay-atlas.js"></script>
 <script>
 'use strict';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
@@ -10,7 +11,7 @@ loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
 loadArt('generatedMoonlitBG','art/moonlit-bakery-city.webp');
 loadArt('generatedClockworkBG','art/clockwork-oven.webp');
 // CRUST_ENVIRONMENT_ART_V1: compact 256x256 / 64px-per-cell concept-art atlas.
-loadArt('environmentDecor','art/environment-gameplay-atlas.png');
+loadArt('environmentDecor',window.__CRUST_ENVIRONMENT_ATLAS);
 // CRUST_DOUGH_GREMLINS_V1: compact transparent 4x4 animation atlases
 // derived from the two approved character sheets. Load asynchronously,
 // preserving the original item tile as a fallback if they are unavailable.
