@@ -319,13 +319,18 @@ for(const e of enemies)if(e.alive){
    }else{
      row=0;frame=Math.floor((tick+e.x*.1)/18)%4;
    }
-   // 32x32 art is visually larger than the 25x25 collision box;
-   // feet still meet the same world-space enemy ground line.
+   // CRUST_GREMLIN_SCALE_V2: enlarge only the visual sprite; keep the
+   // original 25x25 enemy hitbox, velocity, AI and ground contact untouched.
+   // The source 32x32 cells contain a few transparent pixels under the boots.
+   // At 42px display size, -37 places the visible feet on the original floor.
+   const large=window.__crustLargeGremlins!==false;
+   const drawSize=large?42:32;
+   const drawTop=large?-37:-32;
    g.save();
    g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h+bob));
    g.scale(e.vx<0?-1:1,1);
    g.imageSmoothingEnabled=false;
-   g.drawImage(atlas,frame*32,row*32,32,32,-16,-32,32,32);
+   g.drawImage(atlas,frame*32,row*32,32,32,-drawSize/2,drawTop,drawSize,drawSize);
    g.restore();
  }else{
    if(assets.items.complete&&assets.items.naturalWidth){
