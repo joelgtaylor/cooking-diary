@@ -107,19 +107,23 @@ function buildRunning(img){
   return atlas;
 }
 function buildFlight(img,row,col,fall){
-  // Unlike sequential AI poses, rotating one original painting by a few degrees
-  // never changes the face, hat, or proportions. Kept intentionally subtle.
-  const source=sourceTile(img,row,col),atlas=makeCanvas(4*W,H);
-  const g=pixelContext(atlas);
-  const angles=fall?[2,0,-1.5,-3]:[-3,-1.2,1,2.5];
-  const xs=fall?[1,0,0,-1]:[-1,0,0,1];
-  const ys=fall?[0,0,1,1]:[1,0,-1,-1];
+  // Four poses from ONE painting: the beautiful original face/hat/upper body
+  // never changes. Only the lower legs tuck and extend beneath the jacket.
+  const source=sourceTile(img,row,col);
+  const feet=makeCanvas(W,H);
+  const fg=pixelContext(feet);
+  // Two-pixel overlap at the waist prevents visible seams.
+  fg.drawImage(source,0,80,W,H-80,0,80,W,H-80);
+  const atlas=makeCanvas(4*W,H),g=pixelContext(atlas);
+  const angles=fall?[12,5,-4,-12]:[-12,-4,6,13];
   for(let i=0;i<4;i++){
     g.save();
-    g.translate(i*W+48+xs[i],78+ys[i]);
+    g.translate(i*W+48,80);
     g.rotate(angles[i]*Math.PI/180);
-    g.drawImage(source,-48,-78);
+    g.drawImage(feet,-48,-80);
     g.restore();
+    // Paint the identical upper character OVER the limb joint to hide the seam.
+    g.drawImage(source,0,0,W,83,i*W,0,W,83);
   }
   return atlas;
 }
