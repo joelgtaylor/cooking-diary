@@ -334,10 +334,37 @@ for(let k=0;k<18;k++){
  }
 }
 g.restore();
-for(const gem of gems)if(!gem.got){const cy=gem.y+Math.sin(tick*.09)*5;
-if(envReady)drawEnv(3,gem.x-13,cy-23,30,34);
-else if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,gem.x-9,cy-13,32,32);
-else rect(gem.x,cy,18,18,'#f8d994')}
+// CRUST_PICKUP_READABILITY_V1: collectible yeast jars are deliberately
+// distinguishable from identical decorative jars. The effect is visual only.
+for(const gem of gems)if(!gem.got){
+ const cy=gem.y+Math.sin(tick*.09)*5;
+ const cx=gem.x+2, pulse=(Math.sin(tick*.09)+1)*.5;
+ g.save();
+ // Warm halo behind the collectible, not behind decorative scenery.
+ const halo=g.createRadialGradient(cx,cy-6,3,cx,cy-6,26);
+ halo.addColorStop(0,'rgba(255,244,151,'+(0.28+pulse*.16)+')');
+ halo.addColorStop(1,'rgba(255,210,95,0)');
+ g.fillStyle=halo;g.beginPath();g.arc(cx,cy-6,26,0,Math.PI*2);g.fill();
+ if(envReady)drawEnv(3,gem.x-13,cy-23,30,34);
+ else if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,gem.x-9,cy-13,32,32);
+ else rect(gem.x,cy,18,18,'#f8d994');
+ // Four-point twinkles move with the collectible. Avoid additional
+ // game objects, hitboxes or camera-dependent effects.
+ g.strokeStyle='#fff6bc';g.lineWidth=2;
+ for(let j=0;j<3;j++){
+   const a=tick*.035+j*Math.PI*2/3;
+   const sx=Math.round(cx+Math.cos(a)*22);
+   const sy=Math.round(cy-7+Math.sin(a)*14);
+   const size=j===0?5:3;
+   g.beginPath();g.moveTo(sx-size,sy);g.lineTo(sx+size,sy);
+   g.moveTo(sx,sy-size);g.lineTo(sx,sy+size);g.stroke();
+ }
+ // Stable, crisp objective marker above the jar, independent of frame art.
+ g.font='bold 10px monospace';g.textAlign='center';
+ g.fillStyle='#31243a';g.fillText('YEAST',cx+1,cy-31+1);
+ g.fillStyle='#fff1a8';g.fillText('YEAST',cx,cy-31);
+ g.restore();
+}
 for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
 if(envReady){drawEnv(u.kind==='kefir'?14:u.kind==='rye'?8:13,u.x-19,uy-23,38,38);}
 else if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
