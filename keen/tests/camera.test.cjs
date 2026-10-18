@@ -3,19 +3,15 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'), vm=require('node:vm'), path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../camera.js'),'utf8');
 function follow(overrides={}) {
- const state={window:{__crustCameraDemo:true},W:960,H:540,world:3360,rows:56,T:32,camera:0,cameraY:0,player:{x:96,y:1690,w:28,h:38,vy:0},...overrides};
+ const state={window:{},W:960,H:540,world:3360,rows:56,T:32,camera:0,cameraY:0,player:{x:96,y:1690,w:28,h:38,vy:0},...overrides};
  vm.runInNewContext(source+'\nupdateViewCamera();',state);
  return [state.camera,state.cameraY];
 }
-test('classic follow clamps horizontally and resets vertical offset',()=>{
- assert.deepEqual(follow({window:{__crustCameraDemo:false},cameraY:400,player:{x:1000}}),[750,0]);
- assert.deepEqual(follow({window:{__crustCameraDemo:false},player:{x:4000}}),[2400,0]);
-});
 test('vertical dead zone leaves the camera still',()=>{
  assert.deepEqual(follow({player:{x:400,y:240,w:28,h:38,vy:0}}),[0,0]);
 });
 test('snap follow clamps to world edges',()=>{
- const window={__crustCameraDemo:true,__crustCameraSnap:true};
+ const window={__crustCameraSnap:true};
  assert.deepEqual(follow({window,player:{x:4000,y:2000,w:28,h:38,vy:0}}),[2400,1252]);
  assert.deepEqual(follow({window,camera:300,cameraY:300,player:{x:-100,y:-100,w:28,h:38,vy:0}}),[0,0]);
 });

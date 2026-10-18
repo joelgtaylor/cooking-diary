@@ -6,11 +6,11 @@
 ## Shipped entry point
 
 - `keen/index.html` is the production game loaded by `/cooking-diary/keen/`.
-- Production defaults to `window.__crustCameraDemo = true`, which currently selects the 105-column × 56-row vertical levels (32 px tiles). The variable name is historical; this is **not** merely a demo.
+- Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
 - `keen/index.html` still embeds renderer, physics, camera, state, input and codex together. Audio and camera follow are external scripts.
-- Horizontal/classic comparison mode is still selectable in the UI. Do **not** remove `bakery1-layout.js`, `authored-bakeries-2-3.js`, or horizontal-mode logic before explicitly retiring that mode.
+- Classic mode was explicitly retired after the vertical-world playtest. `bakery1-layout.js` and `authored-bakeries-2-3.js` are no longer production dependencies; retained historical preview pages still reference them. Keep those snapshot dependencies until their preview pages are retired together.
 
 ## Files directly loaded by production
 
@@ -18,13 +18,11 @@
 
 ```
 art/phase3-bg.js
-art/bakery1-layout.js
 art/vertical-bakery1-layout.js
 art/vertical-bakery2-layout.js
 art/vertical-bakery3-layout.js
 art/checkpoint-flags-generated.js
 art/vertical-parallax.js
-art/authored-bakeries-2-3.js
 art/baker-reimagined.js
 art/environment-gameplay-atlas.js
 audio.js
@@ -50,20 +48,18 @@ Some `art/` JavaScript files are not directly loaded by `keen/index.html`, inclu
 1. Establish a production baseline: desktop keyboard + touch input, three bakery transitions, five required yeast pickups per world, ledge grab, pogo, shooting, hazards, enemies, checkpoints/respawn, map, codex unlock persistence, mute, and game restart.
 2. **Completed (static extraction):** Audio now lives in `keen/audio.js` behind the existing `AudioKit.start/effect/toggle` API. Browser regression testing is still required to confirm first-user-gesture initialization and mute semantics.
 3. Extract camera/parallax orchestration, then HUD/menus/rendering, then player physics and state. Small changes with a playable preview after each commit.
-4. Retire horizontal/classic comparison mode only as an explicit decision and after replacements for any still-used logic are confirmed.
+4. **Completed:** retire classic mode, its selector, generation, camera, completion path and exclusive scenery. Historical preview snapshots remain separate.
 5. Update level-design plans against the vertical data models, then improve gameplay in separate feature branches.
 
 ## Known technical debt
 
-- The term `CameraDemo` names the shipping vertical mode and misleads maintainers.
-- Classic/horizontal map generation and authored vertical maps coexist in one entry point.
 - There is one global 148 BPM, 32-step procedural composition across all three worlds; no stage-specific soundtrack yet.
 - The three vertical layouts share an intentionally similar ascent–crest–descent structure. A future design pass should diversify them, **not** silently do so during refactoring.
 - The Web Audio engine has now been extracted to `keen/audio.js`, retaining its existing API. The production HTML still carries substantial embedded artwork, making reviews and diffs harder than necessary.
 
 ## Regression gate
 
-For each refactoring pull request: compare against `main`, load the game from an isolated branch preview, confirm no missing assets or console errors, exercise all three vertical stages and classic mode (while supported), and verify recipe/codex persistence. No gameplay balance or visual design changes in maintenance-only PRs.
+For each refactoring pull request: compare against `main`, load the game from an isolated branch preview, confirm no missing assets or console errors, exercise all three vertical stages , and verify recipe/codex persistence. No gameplay balance or visual design changes in maintenance-only PRs.
 
 ## Branch preview and camera checks
 
@@ -71,4 +67,6 @@ Branch preview: https://raw.githack.com/joelgtaylor/cooking-diary/refactor/keen-
 
 This third-party proxy serves the branch independently of production. It may show an initial “Open the page” interstitial and cache files; use a commit-specific URL for reproducible reviews. Its origin has separate recipe/best-score storage from production.
 
-Camera follow was extracted verbatim into `camera.js`; it deliberately retains shared game-state bindings until state ownership is refactored. Run `node --test keen/tests/camera.test.cjs` from the repository root. Browser rendering was confirmed for production and the branch baseline; full control, audio and progression regression remains pending after the cloud-browser transport disconnected.
+Camera follow lives in `camera.js`; it deliberately retains shared game-state bindings until state ownership is refactored. Run `node --test keen/tests/*.test.cjs` from the repository root. The headless harness checks initialization and render execution for all three worlds, checkpoint activation/recovery, actual collectible pickup logic, completion, and persisted recipe unlocks. Canvas and audio are stubbed: these checks do not replace browser/visual/audio playtesting. Browser rendering was confirmed for production and the branch baseline; full control, audio and progression regression remains pending after the cloud-browser transport disconnected.
+
+Classic retirement does not change authored vertical layouts, physics constants, musical compositions, artwork, controls, or recipe storage keys.

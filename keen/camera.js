@@ -1,14 +1,9 @@
-/* Camera follow for vertical and classic levels.
+/* Camera follow for the three vertical bakeries.
  * Uses the shared game state in index.html; call after player/world initialization.
  * Physics stays subpixel; the renderer owns pixel rounding.
  */
 'use strict';
 function updateViewCamera(){
- if(!window.__crustCameraDemo){
-   // Keep the shipped horizontal camera exactly as it was.
-   camera=Math.max(0,Math.min(world-W,player.x-250));
-   cameraY=0;return;
- }
  const px=player.x+player.w/2,py=player.y+player.h/2;
  const x=px-camera,y=py-cameraY;
  const left=W*.28,right=W*.64,upper=H*.32,lower=H*.68;
