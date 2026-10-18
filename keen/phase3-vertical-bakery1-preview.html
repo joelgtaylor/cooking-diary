@@ -439,6 +439,7 @@ for(let tx=lo;tx<hi;tx++){
   }
  }
 }
+g.restore(); // Match the legacy architecture g.save() before exiting the disabled pass.
 } // End legacy factory-scenery passes; atmospheric motes remain below.
 // Clockwork machinery, magical cave motes, or rooftop steam: visual only.
 for(let k=0;k<18;k++){
@@ -455,7 +456,6 @@ for(let k=0;k<18;k++){
   g.fillRect(x+drift,y+Math.sin(tick*.035+k)*9,3,3);
  }
 }
-g.restore();
 // CRUST_PICKUP_READABILITY_V1: collectible yeast jars are deliberately
 // distinguishable from identical decorative jars. The effect is visual only.
 for(const gem of gems)if(!gem.got){
