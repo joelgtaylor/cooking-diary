@@ -19,7 +19,7 @@ const checkpoints=[[9,51],[37,35],[71,18],[89,38]];
 const hazards=[[24,53],[48,53],[78,53],[91,53]];
 const enemies=[[27,45,'walker'],[50,28,'walker'],[81,30,'walker']];
 const oven={x:102,y:52};
-const altitudeTargets=[[4,54],[43,32],[71,18]];
+const altitudeTargets=[[4,54],[45,32],[71,18]];
 const sections=[
  {name:'Mycelium Foothills',start:0,end:23,description:'gentle footholds and the first starter culture'},
  {name:'Sporelit Stairways',start:24,end:51,description:'branching terraces above the glowing grotto'},
