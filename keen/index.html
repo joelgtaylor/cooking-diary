@@ -21,6 +21,7 @@
 <script src="art/environment-gameplay-atlas.js"></script>
 <script src="audio.js"></script>
 <script src="camera.js"></script>
+<script src="world.js"></script>
 <script>
 'use strict';window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
@@ -84,73 +85,11 @@ const THEMES=[
 {name:'Rye Dawn',tint:'rgba(255,140,50,0.10)',mote:'#ffd0a0'},
 {name:'Midnight Patisserie',tint:'rgba(200,80,160,0.12)',mote:'#ffc0e0'}
 ];
-function saveCodex(){try{localStorage.setItem('crustQuestCodex',JSON.stringify(unlocked))}catch(e){}}
-function saveBest(){try{localStorage.setItem('crustQuestBest',String(best))}catch(e){}}
 function floater(x,y,txt,color){floaters.push({x,y,txt,color,life:70})}
 function toggleCodex(){if(state==='codex')state=codexFrom;else{codexFrom=state;state='codex';codexPage=0}}
 // Self-contained chiptune soundtrack and effects: Web Audio, no downloads required.
 const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;const rect=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)};
 
-// CRUST_PHASE3_WORLD — tall authored map and recoverable checkpoint progress.
-let phase3State={current:-1,spawns:[],complete:false};
-// PHASE4_CHECKPOINT_SUPPORT: checkpoint metadata may describe the platform
-// row itself or the row directly above it. Determine the actual solid top
-// rather than assuming every marker is one tile above a walkway.
-// Three authored worlds share camera, collision, collectibles and physics.
-function currentVerticalLayout(){
- return [window.CrustVerticalBakery1,window.CrustVerticalBakery2,window.CrustVerticalBakery3][bakery-1];
-}
-function checkpointSupportRow(tx,ty){
- for(let y=Math.max(0,ty);y<Math.min(rows,ty+7);y++){
-  if(map[y]&&(map[y][tx]==='='||map[y][tx]==='#'))return y;
- }
- return Math.min(rows-1,ty+1);
-}
-function initVerticalWorld(){
- const layout=currentVerticalLayout();
- rows=layout.rows;
- map=Array.from({length:rows},()=>Array(cols).fill('.'));
- const data=layout.apply({map});
- gems=data.gems;enemies=data.enemies;powerups=data.powerups;
- shots=[];particles=[];floaters=[];
- player={x:3*T,y:54*T-38,w:29,h:38,vx:0,vy:0,ground:true,
- health:3,inv:0,face:1,ammo:35,score:0,hang:null,climb:0,speedT:0,shield:false};
- camera=0;cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.6));
- collected=0;combo=0;comboT=0;shake=0;hitStop=0;
- state='play';tick=0;prevJump=false;pogoOn=false;
- phase3State={current:-1,spawns:layout.checkpoints.map(([x,y])=>({x:x*T+3,y:checkpointSupportRow(x,y)*T-38})),complete:false};
- document.getElementById('pogoBtn').textContent='Mixer OFF';
-}
-function respawnCheckpoint(){
- const cp=phase3State.spawns[Math.max(0,phase3State.current)] || {x:3*T,y:54*T-38};
- player.x=cp.x;player.y=cp.y;player.vx=0;player.vy=0;player.ground=false;
- player.hang=null;player.health=3;player.inv=90;player.shield=false;
- shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
-}
-function tickPhase3(){
- if(state!=='play')return;
- const layout=currentVerticalLayout();
- for(let i=0;i<layout.checkpoints.length;i++){
-  const [x,y]=layout.checkpoints[i];
-  if(i>phase3State.current&&Math.abs(player.x+14-x*T-12)<52&&Math.abs(player.y+22-y*T)<62){
-    phase3State.current=i;
-    floater(player.x,player.y-12,'CHECKPOINT '+(i+1),'#a5ffdc');
-    AudioKit.effect('collect');
-  }
- }
- if(player.health<=0){respawnCheckpoint();return;}
- const target=layout.oven;
- if(collected===5&&Math.abs(player.x+14-(target.x*T+12))<53&&
-    Math.abs(player.y+22-(target.y*T+25))<85){
-    phase3State.complete=true;
-    if(player.score>best){best=player.score;saveBest();}
-    const ri=bakery-1;
-    if(!unlocked.includes(ri)){unlocked.push(ri);saveCodex();}
-    state='clear';AudioKit.effect('win');
- }
-}
-
-function init(b){if(b)bakery=b;initVerticalWorld();}
 function tile(x,y){if(x<0||x>=cols||y>=rows)return'#';if(y<0)return'.';return map[y][x]}
 // CRUST_ONE_WAY_PLATFORMS_V1: '=' blocks downward foot crossings only.
 function oneWayTop(x,foot,nextFoot,w){
@@ -475,7 +414,7 @@ rect(ex+1,currentVerticalLayout().oven.y*T+9,47,8,'#fff0cd');
 {
  for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
   const [xx,yy]=currentVerticalLayout().checkpoints[i];
-  const activated=i<=phase3State.current;
+  const activated=i<=checkpointState.current;
   // CRUST_CHECKPOINT_FLAG_ANIM_V1: game-art banner frames.
   const flag=assets.checkpointFlags;
   if(flag&&flag.complete&&flag.naturalWidth===320){
@@ -515,9 +454,9 @@ rect(ex+1,currentVerticalLayout().oven.y*T+9,47,8,'#fff0cd');
     g.beginPath();g.arc(xx*T+16,yy*T+4,7,0,Math.PI*2);g.fill();
   }
  }
-}g.restore();rect(0,0,W,42,'#0b0c25');g.fillStyle='#fff';g.font='bold 20px monospace';g.fillText('♥ '.repeat(Math.max(0,player.health))+(player.shield?'◈':''),18,28);g.fillText('YEAST '+collected+'/5',190,28);g.fillText('✦ '+player.ammo,360,28);g.fillText('SCORE '+player.score,500,28);g.fillText('BEST '+best,690,28);g.fillText('BAKERY '+bakery+'/3',845,28);if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else{g.font='bold 52px monospace';const ttl=state==='win'?'PERFECT BAKE!':state==='clear'?'BAKERY CLEARED!':'PAUSED';g.fillText(ttl,W/2,H/2-60);g.font='22px monospace';if(state==='clear'){const r=RECIPES[bakery-1];g.fillStyle='#ffd75e';g.fillText('Recipe unlocked: '+r.name,W/2,H/2-8);g.fillStyle='#fff';g.fillText(bakery<MAXBAKERY?'TAP or ENTER for Bakery '+(bakery+1)+' - '+THEMES[bakery].name:'TAP or ENTER for the final rise',W/2,H/2+32)}else if(state==='win'){g.fillText('All 3 bakeries conquered - Crust Master!',W/2,H/2);g.fillStyle='#ffd75e';g.fillText('BEST SCORE: '+best,W/2,H/2+44)}else g.fillText('Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}}function loop(){try{if(hitStop>0)hitStop--;else update();tickPhase3();updateViewCamera();draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}function restart(){init(bakery)}document.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();keys[e.key]=true;AudioKit.start();if(e.key.toLowerCase()==='m'&&!e.repeat)AudioKit.toggle();statusEl.textContent='Keyboard input: '+e.key;if(e.key.toLowerCase()==='r')restart();if(e.key.toLowerCase()==='p')state=state==='play'?'pause':state==='pause'?'play':state;if(e.key.toLowerCase()==='t'&&!e.repeat)toggleCodex();if(e.key==='Enter'&&state==='clear'){if(bakery<MAXBAKERY)init(bakery+1);else state='win'}if(state==='codex'&&!e.repeat){const ck=e.key.toLowerCase();if(ck==='arrowleft'||ck==='a')codexFlip(-1);else if(ck==='arrowright'||ck==='d')codexFlip(1)}});document.addEventListener('keyup',e=>keys[e.key]=false);function togglePogo(){pogoOn=!pogoOn;document.getElementById('pogoBtn').textContent=pogoOn?'🥣 Mixer ON':'🥣 Mixer OFF';if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false}}
+}g.restore();rect(0,0,W,42,'#0b0c25');g.fillStyle='#fff';g.font='bold 20px monospace';g.fillText('♥ '.repeat(Math.max(0,player.health))+(player.shield?'◈':''),18,28);g.fillText('YEAST '+collected+'/5',190,28);g.fillText('✦ '+player.ammo,360,28);g.fillText('SCORE '+player.score,500,28);g.fillText('BEST '+best,690,28);g.fillText('BAKERY '+bakery+'/3',845,28);if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else{g.font='bold 52px monospace';const ttl=state==='win'?'PERFECT BAKE!':state==='clear'?'BAKERY CLEARED!':'PAUSED';g.fillText(ttl,W/2,H/2-60);g.font='22px monospace';if(state==='clear'){const r=RECIPES[bakery-1];g.fillStyle='#ffd75e';g.fillText('Recipe unlocked: '+r.name,W/2,H/2-8);g.fillStyle='#fff';g.fillText(bakery<MAXBAKERY?'TAP or ENTER for Bakery '+(bakery+1)+' - '+THEMES[bakery].name:'TAP or ENTER for the final rise',W/2,H/2+32)}else if(state==='win'){g.fillText('All 3 bakeries conquered - Crust Master!',W/2,H/2);g.fillStyle='#ffd75e';g.fillText('BEST SCORE: '+best,W/2,H/2+44)}else g.fillText('Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}}function loop(){try{if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}document.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();keys[e.key]=true;AudioKit.start();if(e.key.toLowerCase()==='m'&&!e.repeat)AudioKit.toggle();statusEl.textContent='Keyboard input: '+e.key;if(e.key.toLowerCase()==='r')restart();if(e.key.toLowerCase()==='p')state=state==='play'?'pause':state==='pause'?'play':state;if(e.key.toLowerCase()==='t'&&!e.repeat)toggleCodex();if(e.key==='Enter'&&state==='clear'){advanceBakery()}if(state==='codex'&&!e.repeat){const ck=e.key.toLowerCase();if(ck==='arrowleft'||ck==='a')codexFlip(-1);else if(ck==='arrowright'||ck==='d')codexFlip(1)}});document.addEventListener('keyup',e=>keys[e.key]=false);function togglePogo(){pogoOn=!pogoOn;document.getElementById('pogoBtn').textContent=pogoOn?'🥣 Mixer ON':'🥣 Mixer OFF';if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false}}
 document.getElementById('pogoBtn').addEventListener('click',()=>{AudioKit.start();togglePogo();AudioKit.effect('pogo')});document.getElementById('codexBtn').addEventListener('click',()=>{AudioKit.start();toggleCodex()});
-c.addEventListener('pointerdown',e=>{AudioKit.start();if(state==='clear'){if(bakery<MAXBAKERY)init(bakery+1);else state='win'}else if(state==='codex'){const rc=c.getBoundingClientRect(),tx=(e.clientX-rc.left)*960/rc.width;if(tx<211)codexFlip(-1);else if(tx>749)codexFlip(1);else toggleCodex()}});
+c.addEventListener('pointerdown',e=>{AudioKit.start();if(state==='clear'){advanceBakery()}else if(state==='codex'){const rc=c.getBoundingClientRect(),tx=(e.clientX-rc.left)*960/rc.width;if(tx<211)codexFlip(-1);else if(tx>749)codexFlip(1);else toggleCodex()}});
 document.getElementById('restartBtn').addEventListener('click',()=>{AudioKit.start();restart()});document.getElementById('audioBtn').addEventListener('click',()=>AudioKit.toggle());
 const statusEl=document.getElementById('status');
 const minimap=document.getElementById('verticalMap');
@@ -546,7 +485,7 @@ function drawPhase3Map(){
  for(const gem of gems)if(!gem.got){g.fillStyle='#ffe689';g.fillRect(Math.floor(gem.x/T)*10,Math.floor(gem.y/T)*sy+offset,9,8)}
  for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
   const [x,y]=currentVerticalLayout().checkpoints[i];
-  g.fillStyle=i<=phase3State.current?'#82ffbf':'#5ba887';g.fillRect(x*10,y*sy+offset,10,9);
+  g.fillStyle=i<=checkpointState.current?'#82ffbf':'#5ba887';g.fillRect(x*10,y*sy+offset,10,9);
  }
  g.fillStyle='#ff985e';g.fillRect(currentVerticalLayout().oven.x*10,currentVerticalLayout().oven.y*sy+offset,16,12);
  g.fillStyle='#56f4f3';g.fillRect(Math.floor(player.x/T)*10,Math.floor(player.y/T)*sy+offset,10,10);

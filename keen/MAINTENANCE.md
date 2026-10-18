@@ -9,7 +9,7 @@
 - Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` still embeds renderer, physics, camera, state, input and codex together. Audio and camera follow are external scripts.
+- `keen/index.html` still embeds renderer, physics, shared game state, input and codex together. Audio, camera follow and world lifecycle are external scripts.
 - Classic mode was explicitly retired after the vertical-world playtest. `bakery1-layout.js` and `authored-bakeries-2-3.js` are no longer production dependencies; retained historical preview pages still reference them. Keep those snapshot dependencies until their preview pages are retired together.
 
 ## Files directly loaded by production
@@ -27,6 +27,7 @@ art/baker-reimagined.js
 art/environment-gameplay-atlas.js
 audio.js
 camera.js
+world.js
 ```
 
 **Runtime images:** `bioluminescent-mushroom-city.webp`, `moonlit-bakery-city.webp`, `clockwork-oven.webp`; `bakery{1,2,3}-parallax-{far,mid,near}.webp`; `dough-gremlins-primary.png`, `dough-gremlins-expressions.png`, and `baker-ai-stable.png`, all under `keen/art/`.
@@ -59,7 +60,7 @@ Some `art/` JavaScript files are not directly loaded by `keen/index.html`, inclu
 
 ## Regression gate
 
-For each refactoring pull request: compare against `main`, load the game from an isolated branch preview, confirm no missing assets or console errors, exercise all three vertical stages , and verify recipe/codex persistence. No gameplay balance or visual design changes in maintenance-only PRs.
+For each refactoring pull request: compare against `main`, load the game from an isolated branch preview, confirm no missing assets or console errors, exercise all three vertical stages, and verify recipe/codex persistence. No gameplay balance or visual design changes in maintenance-only PRs.
 
 ## Branch preview and camera checks
 
@@ -70,3 +71,9 @@ This third-party proxy serves the branch independently of production. It may sho
 Camera follow lives in `camera.js`; it deliberately retains shared game-state bindings until state ownership is refactored. Run `node --test keen/tests/*.test.cjs` from the repository root. The headless harness checks initialization and render execution for all three worlds, checkpoint activation/recovery, actual collectible pickup logic, completion, and persisted recipe unlocks. Canvas and audio are stubbed: these checks do not replace browser/visual/audio playtesting. Browser rendering was confirmed for production and the branch baseline; full control, audio and progression regression remains pending after the cloud-browser transport disconnected.
 
 Classic retirement does not change authored vertical layouts, physics constants, musical compositions, artwork, controls, or recipe storage keys.
+
+## World lifecycle
+
+`world.js` owns initialization/restart, authored-layout selection, checkpoint support and recovery, completion, recipe/best-score writes, and advancement to the next bakery or final win. Keyboard Enter and canvas tap share `advanceBakery()`; only the clear state permits advancement. The render/update loop calls `updateWorldProgress()`, and rendering reads `checkpointState` for flags/map markers. These replace the historical `tickPhase3` and `phase3State` names in production.
+
+This is a classic-script extraction, like `camera.js`: functions use the existing shared lexical game state, and are invoked only after setup. Storage loading and codex presentation remain in `index.html`; storage keys and save-failure behavior are unchanged. The authored layouts, collision routines, input mappings and audio engine are unchanged.
