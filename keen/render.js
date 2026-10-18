@@ -78,6 +78,29 @@ function drawCavernTerrain(tx,ty,b){
  if(tile(tx-1,ty)!==b)g.fillRect(x,y+7,2,b==='='?19:25);
  if(tile(tx+1,ty)!==b)g.fillRect(x+30,y+7,2,b==='='?19:25);
 }
+const forge=assets.forgeTerrain;
+const forgeReady=bakery===3&&forge&&forge.complete&&forge.naturalWidth===256&&forge.naturalHeight===96;
+function drawForgeTerrain(tx,ty,b){
+ const x=tx*T,y=ty*T,variant=(tx+ty*3)%8;
+ const surface=tile(tx,ty-1)!=='#'&&tile(tx,ty-1)!=='=';
+ g.imageSmoothingEnabled=false;
+ g.drawImage(forge,variant*32,b==='='?32:64,32,32,x,y,32,32);
+ if(b==='='||surface){
+  // Flat steel tread sits on the existing collision top, with no railing.
+  g.drawImage(forge,variant*32,0,32,32,x,y,32,7);
+  g.fillStyle='#282435';g.fillRect(x,y+7,32,2);
+ }
+ if(b==='='){
+  g.fillStyle='#211e2c';g.fillRect(x,y+30,32,2);
+ }
+ // Flush copper end plates remain inside the original platform footprint.
+ for(const edge of [0,1])if(tile(tx+(edge?1:-1),ty)!==b){
+  const ex=x+(edge?28:0);
+  g.fillStyle='#5e3c37';g.fillRect(ex,y+7,4,23);
+  g.fillStyle='#b67850';g.fillRect(ex+1,y+8,2,21);
+  g.fillStyle='#e7b57a';g.fillRect(ex+1,y+11,1,1);g.fillRect(ex+1,y+25,1,1);
+ }
+}
 const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
 const p3bg=assets['phase3'+bakery];
 const generatedBackground=bakery===1?assets.generatedMoonlitBG
@@ -108,6 +131,7 @@ let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
 for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
  else if(cavernReady)drawCavernTerrain(x,y,b);
+ else if(forgeReady)drawForgeTerrain(x,y,b);
  else if(envReady)drawEnv(10,x*T,y*T,32,32);
  else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
  else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
@@ -115,7 +139,7 @@ for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='
  else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
 }}// Decorative brick seams and icing along visible solid tile surfaces.
 for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
- if(moonlitReady||cavernReady)continue;
+ if(moonlitReady||cavernReady||forgeReady)continue;
  if(map[ty][tx]!=='#'&&map[ty][tx]!=='=')continue;
  const xx=tx*T,yy=ty*T;
  g.fillStyle=bakery===2?'#443452':bakery===3?'#603b43':'#56405c';
@@ -124,8 +148,8 @@ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
 }
 
-// PHASE 5: copper gear-tooth highlights on pass-through ledges.
-if(bakery===3){
+// Original copper highlights are retained only for the load-failure fallback.
+if(bakery===3&&!forgeReady){
  g.save();g.imageSmoothingEnabled=false;
  for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
   if(map[ty][tx]!=='='||tile(tx,ty-1)==='^')continue;
