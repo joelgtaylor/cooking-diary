@@ -13,7 +13,7 @@ const branches=[[13,46,8],[20,43,9],[28,39,9],[35,36,10],
 [22,50,7],[36,46,8],[52,40,7],[67,35,8],[80,45,8],[95,50,10]];
 const platforms=[[0,54,105],...rise,...ridge,...descent,...branches];
 const cultures=[[12,49],[34,37],[62,20],[83,27],[99,45]];
-const checkpoints=[[9,51],[39,35],[71,18],[90,38]];
+const checkpoints=[[9,51],[39,35],[71,18],[90,36]];
 const hazards=[[24,53],[50,53],[80,53],[93,53]];
 const enemies=[[26,46,'walker'],[53,30,'walker'],[81,33,'walker']];
 const oven={x:102,y:52};
