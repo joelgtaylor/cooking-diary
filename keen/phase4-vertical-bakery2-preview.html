@@ -146,6 +146,15 @@ const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;const rect=(x,y,w,h,col
  */
 // CRUST_PHASE3_WORLD — tall authored map and recoverable checkpoint progress.
 let phase3State={current:-1,spawns:[],complete:false};
+// PHASE4_CHECKPOINT_SUPPORT: checkpoint metadata may describe the platform
+// row itself or the row directly above it. Determine the actual solid top
+// rather than assuming every marker is one tile above a walkway.
+function checkpointSupportRow(tx,ty){
+ for(let y=Math.max(0,ty);y<Math.min(rows,ty+7);y++){
+  if(map[y]&&(map[y][tx]==='='||map[y][tx]==='#'))return y;
+ }
+ return Math.min(rows-1,ty+1);
+}
 function initCameraDemo(){
  const layout=window.CrustVerticalBakery2;
  rows=layout.rows;
@@ -158,7 +167,7 @@ function initCameraDemo(){
  camera=0;cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.6));
  collected=0;combo=0;comboT=0;shake=0;hitStop=0;
  state='play';tick=0;prevJump=false;pogoOn=false;
- phase3State={current:-1,spawns:layout.checkpoints.map(([x,y])=>({x:x*T+3,y:(y+1)*T-38})),complete:false};
+ phase3State={current:-1,spawns:layout.checkpoints.map(([x,y])=>({x:x*T+3,y:checkpointSupportRow(x,y)*T-38})),complete:false};
  document.getElementById('pogoBtn').textContent='Mixer OFF';
 }
 function respawnCheckpoint(){
@@ -639,7 +648,7 @@ if(window.__crustCameraDemo){
     const frame=Math.floor(tick/(activated?8:10))%4;
     const row=activated?1:0;
     const dw=66,dh=99;
-    const centerX=xx*T+16,groundY=(yy+1)*T;
+    const centerX=xx*T+16,groundY=checkpointSupportRow(xx,yy)*T;
     // CRUST_CHECKPOINT_STABLE_POLE_V3: freeze the rigid structure at frame 0.
     // Generated art varies the stone pedestal and pole by a few pixels,
     // which can't be fixed perfectly by moving the entire waving sprite.
