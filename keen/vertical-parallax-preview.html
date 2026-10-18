@@ -18,7 +18,7 @@
 <script src="art/baker-reimagined.js"></script>
 <script src="art/environment-gameplay-atlas.js"></script>
 <script>
-'use strict';window.__crustCameraDemo=true;window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='balanced';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
+'use strict';window.__crustCameraDemo=true;window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
 // Kept separate from Phase3 art so it can fall back safely if not loaded.
 loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
@@ -26,6 +26,10 @@ loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
  // File-based images, loaded once; original Phase 3 backgrounds remain fallbacks.
 loadArt('generatedMoonlitBG','art/moonlit-bakery-city.webp');
 loadArt('generatedClockworkBG','art/clockwork-oven.webp');
+ // PHASE2_1_BAKERY1_ART: authentic rendered transparency; no procedural scenery.
+ loadArt('bakery1ParallaxFar','art/bakery1-parallax-far.webp');
+ loadArt('bakery1ParallaxMid','art/bakery1-parallax-mid.webp');
+ loadArt('bakery1ParallaxNear','art/bakery1-parallax-near.webp');
 // CRUST_ENVIRONMENT_ART_V1: compact 256x256 / 64px-per-cell concept-art atlas.
 loadArt('environmentDecor',window.__CRUST_ENVIRONMENT_ATLAS);
 // CRUST_DOUGH_GREMLINS_V1: compact transparent 4x4 animation atlases
@@ -286,8 +290,10 @@ const generatedBackground=bakery===1?assets.generatedMoonlitBG
  :assets.generatedClockworkBG;
 if(window.__crustCameraDemo&&window.CrustParallax&&window.__crustParallaxEnabled!==false){
  window.CrustParallax.render(g,{width:W,height:H,cameraX:camera,cameraY:cameraY,
-  worldHeight:rows*T,background:generatedBackground,stage:bakery,
-  profile:window.__crustParallaxProfile||'balanced',enabled:true});
+  worldHeight:rows*T,worldWidth:world,
+  background:generatedBackground,stage:bakery,
+  layers:{far:assets.bakery1ParallaxFar,mid:assets.bakery1ParallaxMid,near:assets.bakery1ParallaxNear},
+  profile:window.__crustParallaxProfile||'dramatic',enabled:true});
 }else if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
  g.imageSmoothingEnabled=false;
  g.drawImage(generatedBackground,0,0,W,H);
