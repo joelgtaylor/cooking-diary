@@ -93,6 +93,50 @@ function render(g,opt){
      const y=Math.round(-padY/2-offsetY);
      g.drawImage(item.image,x,y,W+padX,H+padY);
    }
+ }else if(stage===2&&opt.fungalCavern){
+   // Fungal Caverns: layered mushroom silhouettes, rather than the skyline
+   // prototype used for the city. These are illustration-only parallax props.
+   const layers=[
+     {rate:speeds.distant*.29,base:H*.81,step:174,scale:.86,
+      cap:'#1c465b',stem:'#183748',gill:'#487a88',seed:3},
+     {rate:speeds.middle*.51,base:H*.96,step:213,scale:1.16,
+      cap:'#2a5365',stem:'#274653',gill:'#73a6ad',seed:8},
+     {rate:speeds.near*.69,base:H*1.22,step:289,scale:1.4,
+      cap:'#244a50',stem:'#213941',gill:'#5c8d81',seed:13}
+   ];
+   const mushroom=(x,y,size,cap,stem,gill)=>{
+     const h=size*.75,w=size*1.2;
+     g.fillStyle=stem;
+     g.fillRect(Math.round(x-size*.11),Math.round(y-h),Math.round(size*.22),Math.round(h));
+     g.fillStyle=cap;
+     g.beginPath();g.ellipse(Math.round(x),Math.round(y-h),w*.51,size*.30,0,Math.PI,2*Math.PI);g.fill();
+     g.fillRect(Math.round(x-w*.52),Math.round(y-h),Math.round(w*1.04),Math.round(size*.1));
+     g.fillStyle=gill;
+     g.fillRect(Math.round(x-w*.46),Math.round(y-h+size*.08),Math.round(w*.92),Math.max(2,Math.round(size*.035)));
+     for(let k=-1;k<=1;k++){
+       g.fillStyle='rgba(160,255,221,.24)';
+       g.fillRect(Math.round(x+k*size*.28),Math.round(y-h-size*.13+(k%2)*size*.07),3,3);
+     }
+   };
+   for(const l of layers){
+     const drift=cx*l.rate,vertical=(cy/Math.max(1,opt.worldHeight-H)-.5)*l.rate*90;
+     const first=Math.floor(drift/l.step)-2;
+     for(let i=first;i<first+Math.ceil(W/l.step)+5;i++){
+       const variance=((i*17+l.seed*23)%7+7)%7;
+       const size=(75+variance*13)*l.scale;
+       const x=i*l.step-drift+l.step/2;
+       mushroom(x,l.base+vertical+variance*6,size,l.cap,l.stem,l.gill);
+     }
+   }
+   // Floating spores suggest motion and height without covering collision
+   // silhouettes or obscuring collectible yeast jars.
+   for(let i=0;i<35;i++){
+     const x=((i*173+41-cx*.035)%W+W)%W;
+     const y=((i*113+27-cy*.023)%H+H)%H;
+     const r=i%5===0?3:2;
+     g.fillStyle=i%4===0?'rgba(169,255,225,.42)':'rgba(154,219,255,.24)';
+     g.fillRect(Math.round(x),Math.round(y),r,r);
+   }
  }else if(stage!==1){
    // Other bakeries keep Phase 2 prototype architecture for now; their
    // corresponding detailed art passes are separate work.
