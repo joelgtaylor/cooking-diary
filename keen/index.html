@@ -160,6 +160,7 @@ function updateViewCamera(){
  const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
  targetX=clamp(targetX,0,world-W);
  targetY=clamp(targetY,0,rows*T-H);
+ if(window.__crustCameraSnap){camera=targetX;cameraY=targetY;return;}
  // Physics remains subpixel; rounding happens only at canvas translation.
  camera+=clamp((targetX-camera)*.13,-14,14);
  cameraY+=clamp((targetY-cameraY)*(player.vy>3?.18:.14),-18,18);
