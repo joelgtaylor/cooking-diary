@@ -11,7 +11,7 @@ function renderCases(options={}){
   const {run,trace}=game({},options);
   run(`init(${stage});tick=47;`);
   if(mode!=='fallback')run(`for(const a of Object.values(assets)){a.complete=true;a.naturalWidth=960;a.naturalHeight=540;}assets.environmentDecor.naturalWidth=256;assets.checkpointFlags.naturalWidth=320;`);
-  if(options.polishedTerrain&&mode!=='fallback')run(`assets.grandOvens.naturalWidth=288;assets.grandOvens.naturalHeight=176;assets.bakerAI.naturalHeight=896;assets.gremlinRun.naturalWidth=128;assets.gremlinExpressions.naturalWidth=128;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalWidth=256;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalHeight=96;`);
+  if(options.polishedTerrain&&mode!=='fallback')run(`assets.spikeHazards.naturalWidth=96;assets.spikeHazards.naturalHeight=32;assets.grandOvens.naturalWidth=288;assets.grandOvens.naturalHeight=176;assets.bakerAI.naturalHeight=896;assets.gremlinRun.naturalWidth=128;assets.gremlinExpressions.naturalWidth=128;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalWidth=256;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalHeight=96;`);
   if(mode==='run')run('player.vx=3.6;player.face=-1');
   if(mode==='jump')run('player.ground=false;player.vy=-5');
   if(mode==='fall')run('player.ground=false;player.vy=5');

@@ -6,6 +6,8 @@
 function rect(x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)}
 function draw(){drawWorld();drawHUD();}
 function drawWorld(){
+const hazardArt=assets.spikeHazards;
+const hazardsReady=hazardArt&&hazardArt.complete&&hazardArt.naturalWidth===96&&hazardArt.naturalHeight===32;
 const env=assets.environmentDecor;
 const envReady=window.__crustWorldArtEnabled!==false&&env&&env.complete&&env.naturalWidth===256;
 function drawEnv(cell,x,y,w,h){
@@ -135,8 +137,22 @@ for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='
  else if(envReady)drawEnv(10,x*T,y*T,32,32);
  else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
  else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
- if(envReady)drawEnv(bakery===1?15:bakery===2?0:2,x*T,y*T,32,32);
- else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
+ if(hazardsReady){
+  g.imageSmoothingEnabled=false;
+  g.drawImage(hazardArt,(bakery-1)*32,0,32,32,x*T,y*T,32,32);
+ }else if(envReady)drawEnv(bakery===1?15:bakery===2?0:2,x*T,y*T,32,32);
+ else{
+  // Load-failure spikes must sit in the actual hazard cell, not legacy row 14.
+  const hx=x*T,hy=y*T;
+  rect(hx,hy+24,32,8,'#17192e');
+  for(const [left,tip,right,top]of [[0,6,13,12],[7,16,25,0],[20,26,32,12]]){
+   g.fillStyle='#111326';g.beginPath();g.moveTo(hx+left,hy+25);
+   g.lineTo(hx+tip,hy+top);g.lineTo(hx+right,hy+25);g.closePath();g.fill();
+   g.fillStyle='#f1e7cf';g.beginPath();g.moveTo(hx+left+3,hy+23);
+   g.lineTo(hx+tip,hy+top+4);g.lineTo(hx+right-3,hy+23);g.closePath();g.fill();
+  }
+ }
+
 }}// Decorative brick seams and icing along visible solid tile surfaces.
 for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(moonlitReady||cavernReady||forgeReady)continue;
