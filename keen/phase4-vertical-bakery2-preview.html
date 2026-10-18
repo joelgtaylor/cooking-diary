@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Phase 3 — Bakery 2 Fungal Caverns</title><style>html,body{margin:0;height:100%;background:#101426;color:white;font-family:monospace;display:grid;place-items:center}#wrap{width:min(100vw,1040px);text-align:center}canvas{width:100%;image-rendering:pixelated;border:4px solid #6d78bd;box-sizing:border-box;background:#111}p{line-height:1.5}button{border:0;border-radius:6px;background:#dd5d90;color:white;padding:10px 20px;font-weight:bold;cursor:pointer}#touch{display:flex;gap:10px;justify-content:center;margin:10px;touch-action:none}#touch button{min-width:54px;font-size:19px;padding:12px 9px;user-select:none;touch-action:none}#status{color:#b9ffda;font-size:13px}</style></head><body><div id="wrap"><h2>🥖 CRUST QUEST: Rise of the Starter</h2><canvas id="c" width="960" height="540" aria-label="Retro platform video game">Your browser does not support canvas.</canvas><p>← → / A D move · Space / W / ↑ jump · C toggle pogo · X / K shoot · P pause · M mute · R restart · T recipes · TAP/ENTER next bakery</p><button id="restartBtn" type="button">Restart Mission</button> <button id="codexBtn" type="button">📖 Recipes</button> <button id="audioBtn" type="button">♫ Music: ON</button>
-<p style="color:#b8eedf;margin:12px 0">PHASE 4 · FUNGAL PROOFING CAVERNS 🍄 Explore glowing mushroom terraces, climb the spore canopy, and descend to the ancient proofing oven. Checkpoints and one-way platforms enabled.</p>
+<p style="margin:8px 0"><a href="phase3-vertical-bakery1-preview.html" style="color:#aef2ff">← Return to Bakery 1 city preview</a></p><p style="color:#b8eedf;margin:12px 0">PHASE 4 · FUNGAL PROOFING CAVERNS 🍄 Explore glowing mushroom terraces, climb the spore canopy, and descend to the ancient proofing oven. Checkpoints and one-way platforms enabled.</p>
 <button id="cameraDemoBtn" type="button">🍄 56-ROW FUNGAL CAVERNS</button>
 <button id="cameraNormalBtn" type="button">🍄 ORIGINAL BAKERY 2</button>
 <button id="cameraSmoothBtn" type="button">🎥 SMOOTH FOLLOW (V)</button>
@@ -356,6 +356,25 @@ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
 }
 
+// PHASE 4 FUNGAL LEDGES: subtle mushroom-cap highlights on the physical
+// jump-through surfaces. Cosmetic only: collision remains unchanged.
+if(window.__crustCameraDemo&&bakery===2){
+ g.save();g.imageSmoothingEnabled=false;
+ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
+   if(map[ty][tx]!=='='||tile(tx,ty-1)==='^')continue;
+   const x=tx*T,y=ty*T;
+   const cap=tx%4===0?'#6dc9bb':tx%4===1?'#aa7dcd':'#7da7c7';
+   // Raised soft mushroom cap rim and small luminescent gill markings.
+   g.fillStyle='#292746';g.fillRect(x+1,y+3,30,6);
+   g.fillStyle=cap;g.fillRect(x+2,y+1,28,4);
+   g.fillStyle='#d1ffe3';g.fillRect(x+6,y+1,6,2);
+   if(tx%5===1){
+     g.fillStyle='rgba(155,255,225,.40)';
+     g.fillRect(x+13,y-9,3,3);g.fillRect(x+20,y-14,2,2);
+   }
+ }
+ g.restore();
+}
 // CRUST_PHASE3_OUTDOOR_COHESION_V1: legacy factories placed rigid right-angle
 // pipes, wall lanterns and crate decorations on every repeated tile. In this
 // outdoor city their artificial outlines obscure the detailed parallax art.
