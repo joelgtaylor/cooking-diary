@@ -217,7 +217,7 @@ function tile(x,y){if(x<0||x>=cols||y>=rows)return'#';if(y<0)return'.';return ma
 function hit(x,y,w,h){let x0=Math.floor(x/T),x1=Math.floor((x+w-1)/T),y0=Math.floor(y/T),y1=Math.floor((y+h-1)/T);for(let a=x0;a<=x1;a++)for(let b=y0;b<=y1;b++)if(tile(a,b)==='#')return true;return false}
 function spike(x,y,w,h){let x0=Math.floor(x/T),x1=Math.floor((x+w-1)/T),y0=Math.floor(y/T),y1=Math.floor((y+h-1)/T);for(let a=x0;a<=x1;a++)for(let b=y0;b<=y1;b++)if(tile(a,b)==='^')return true;return false}
 function collide(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}function burst(x,y,color,n=10){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,life:25,color})}
-function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){if(player.score>best){best=player.score;saveBest()}state='lose'}}
+function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){if(window.__crustCameraDemo){respawnCheckpoint()}else{if(player.score>best){best=player.score;saveBest()}state='lose'}}}
 function update(){if(state!=='play')return;tick++;
 if(player.hang){
  const h=player.hang;player.x=h.x;player.y=h.y;player.vx=0;player.vy=0;player.ground=false;
@@ -665,7 +665,7 @@ function switchMode(demo){
 function moveToAltitude(index){
  if(!window.__crustCameraDemo)switchMode(true);
  // Anchored to the physical floor, middle rooftop or summit rooftop.
- const targets=[[2,46],[49,25],[94,7]];
+ const targets=[[3,54],[44,32],[72,18]];
  const [tx,top]=targets[index];
  player.x=tx*T+6;player.y=top*T-player.h;
  player.vx=0;player.vy=0;player.ground=true;player.hang=null;
