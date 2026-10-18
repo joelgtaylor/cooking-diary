@@ -29,7 +29,40 @@ function render(g,opt){
  // Distant illustrated sky drifts only a small amount, allowing us to use
  // the existing 960x540 artwork rather than stretching it to world height.
  g.fillStyle=pal.sky;g.fillRect(0,0,W,H);
- if(background&&background.complete&&background.naturalWidth>0){
+ // Phase 3 outside-world treatment: the original single-screen painting
+ // has indoor ceiling beams and hanging lamps baked into its top 160px.
+ // Replace only that outdated *distant canvas* with open sky. The detailed
+ // generated parallax layers remain untouched and keep their visual depth.
+ if(opt.outdoorCity&&stage===1){
+   const sky=g.createLinearGradient(0,0,0,H);
+   sky.addColorStop(0,'#060c30');
+   sky.addColorStop(.48,'#14236b');
+   sky.addColorStop(1,'#343d94');
+   g.fillStyle=sky;g.fillRect(0,0,W,H);
+   // Star points are deterministic, lightweight, and screen-space distant.
+   const driftX=Math.round(cx*speeds.distant*.018);
+   const driftY=Math.round(cy*speeds.distant*.012);
+   for(let i=0;i<58;i++){
+     const x=((i*197+71-driftX)%W+W)%W;
+     const y=((i*97+37-driftY)%(H*.64)+(H*.64))%(H*.64);
+     const r=i%9===0?2:1;
+     g.fillStyle=i%5===0?'#b8cafa':'#f2eafc';
+     g.fillRect(Math.round(x),Math.round(y),r,r);
+   }
+   // Reuse the original painting's actual pixel-art moon, tightly clipped
+   // so none of the old ceiling beams or suspension columns can appear.
+   if(background&&background.complete&&background.naturalWidth>0){
+     const sx=background.naturalWidth*(1160/1672),
+       sy=background.naturalHeight*(123/941);
+     const sw=background.naturalWidth*(180/1672),
+       sh=background.naturalHeight*(173/941);
+     g.save();
+     const mx=Math.round(W*.75-cx*.008),my=Math.round(105-cy*.005);
+     g.beginPath();g.arc(mx+65,my+63,61,0,Math.PI*2);g.clip();
+     g.drawImage(background,sx,sy,sw,sh,mx,my,130,126);
+     g.restore();
+   }
+ }else if(background&&background.complete&&background.naturalWidth>0){
    const pad=76;
    const sx=-pad/2-(cx*speeds.distant*.032)%38;
    const sy=-pad/2-(cy*speeds.distant*.030)%30;
