@@ -1,5 +1,6 @@
 # Crust Quest — Complete three-bakery background art
 
+> Historical art-integration notes. Standalone comparison pages were retired during maintenance; use [the current game](../index.html) and [MAINTENANCE.md](../MAINTENANCE.md) for current behavior. Earlier verification notes below describe their original integration.
 All three bakeries now use generated pixel-art-inspired backgrounds, without
 altering gameplay or overwriting the previous painted backdrops.
 
@@ -25,7 +26,7 @@ recipes, enemy behavior or audio logic is changed.
 
 ## Live A/B test
 
-Open `keen/trilogy-backgrounds-preview.html` on GitHub Pages.
+Open the current game to review the trilogy backgrounds. The standalone comparison page has been retired.
 
 - Buttons or keys **1 / 2 / 3** jump between bakeries.
 - **B** switches generated vs original background art.

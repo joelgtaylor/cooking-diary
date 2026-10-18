@@ -10,7 +10,7 @@
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
 - `keen/index.html` retains asset loading, recipes, shared game state and startup. Audio, camera follow, world lifecycle, input and rendering are external scripts.
-- Classic mode was explicitly retired after the vertical-world playtest. `bakery1-layout.js` and `authored-bakeries-2-3.js` are no longer production dependencies; retained historical preview pages still reference them. Keep those snapshot dependencies until their preview pages are retired together.
+- Classic mode and its standalone preview dependencies have been retired; production has only the three vertical worlds.
 
 ## Files directly loaded by production
 
@@ -44,20 +44,16 @@ The embedded data-URI images and script-generated image atlases also belong to t
 
 ## Historical preview inventory
 
-There were 27 standalone HTML preview / diagnostic pages at the start of this branch; four superseded sprite/animation previews have since been retired. None is referenced by a direct script/image load in the production `keen/index.html`. That alone does **not** rule out external deep links or historical value.
+All 23 remaining standalone preview/diagnostic pages were retired after the gameplay/rendering extractions. They contained divergent copies of the game, including horizontal-mode and early vertical prototypes. Six preview-only scripts were removed with them: `authored-bakeries-2-3.js`, `bakery1-layout.js`, `background-polish.js`, `baker-outline-polish.js`, `baker-rig-clean.js`, and `baker-rig.js`.
 
-- **Keep during refactoring:** `phase3-vertical-bakery1-preview.html`, `phase4-vertical-bakery2-preview.html`, `phase5-vertical-bakery3-preview.html`. These are comparison snapshots for regression testing, not sources of truth.
-- **Candidates for retirement:** older sprite iteration, animation cadence, ghosting, floor-contact, pixel-scaling, background, and horizontal-layout previews. They should not be merged back over current production code.
-- Git history preserves deleted prototypes. Do not move or rename the live `keen/index.html`; keep production URLs stable.
-
-Some `art/` JavaScript files are not directly loaded by `keen/index.html`, including `background-polish.js`, `baker-outline-polish.js`, `baker-rig-clean.js`, and `baker-rig.js`. Keep these until references in surviving preview pages and scripts have been checked.
+The pre-cleanup snapshots remain in Git history at `b481e2b`. Use the commit-specific playable previews and automated baseline checks instead of copying old HTML back over production. Existing deep links to retired pages will no longer resolve after merge. `keen/index.html` and its production URL are unchanged.
 
 ## Refactoring sequence (behavior-preserving)
 
 1. Establish a production baseline: desktop keyboard + touch input, three bakery transitions, five required yeast pickups per world, ledge grab, pogo, shooting, hazards, enemies, checkpoints/respawn, map, codex unlock persistence, mute, and game restart.
 2. **Completed (static extraction):** Audio now lives in `keen/audio.js` behind the existing `AudioKit.start/effect/toggle` API. Browser regression testing is still required to confirm first-user-gesture initialization and mute semantics.
 3. Extract camera/parallax orchestration, then HUD/menus/rendering, then player physics and state. Small changes with a playable preview after each commit.
-4. **Completed:** retire classic mode, its selector, generation, camera, completion path and exclusive scenery. Historical preview snapshots remain separate.
+4. **Completed:** retire classic mode, its selector, generation, camera, completion path and exclusive scenery. Historical previews and their exclusive dependencies were subsequently retired.
 5. Update level-design plans against the vertical data models, then improve gameplay in separate feature branches.
 
 ## Known technical debt
