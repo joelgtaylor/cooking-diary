@@ -257,12 +257,7 @@ for(const e of enemies)if(e.alive){
  }
 }
 for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';drawPlayer();
-const ex=currentVerticalLayout().oven.x*T;
-rect(ex-8,currentVerticalLayout().oven.y*T,65,115,'#6b4945');rect(ex-3,currentVerticalLayout().oven.y*T+6,55,106,'#c0aaa0');rect(ex+3,currentVerticalLayout().oven.y*T+23,43,70,'#523a3c');
-rect(ex+7,currentVerticalLayout().oven.y*T+27,35,62,collected===5?'#ffb54e':'#7a5252');
-rect(ex+13,currentVerticalLayout().oven.y*T+49,23,15,'#b46c36');
-rect(ex+17,currentVerticalLayout().oven.y*T+46,15,6,'#f2cd8c');
-rect(ex+1,currentVerticalLayout().oven.y*T+9,47,8,'#fff0cd');
+drawGrandOven();
 {
  for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
   const [xx,yy]=currentVerticalLayout().checkpoints[i];
