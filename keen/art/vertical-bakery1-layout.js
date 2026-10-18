@@ -26,7 +26,10 @@ const oven={x:102,y:52};
 function apply({map}){
  if(!map||map.length!==rows||map[0].length!==cols)throw Error('Phase 3 expects 105x56 map');
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)map[y][x]=y>=54?'#':'.';
- for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)map[y][xx]='#';
+ // '=' denotes an open-top platform: pass through from below and land on top.
+ // Keep the ground at row 54+ as '#', which remains fully solid.
+ for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)
+   if(map[y][xx]!== '#')map[y][xx]='=';
  // Ensure low shortcut and final oven surface are well supported.
  for(const [x,y] of hazards){
    // Hazard must be exposed and backed by solid geometry.
@@ -44,6 +47,6 @@ function apply({map}){
 }
 window.CrustVerticalBakery1=Object.freeze({
  rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,
- apply,version:'phase3-authored-pilot-v1'
+ apply,version:'phase3-oneway-platforms-v2'
 });
 })();
