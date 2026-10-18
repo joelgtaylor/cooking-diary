@@ -3,11 +3,6 @@
  * Pointer capture covers touch, pen and mouse without duplicate event streams.
  */
 'use strict';
-function togglePogo(){
- pogoOn=!pogoOn;
- document.getElementById('pogoBtn').textContent=pogoOn?'🥣 Mixer ON':'🥣 Mixer OFF';
- if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false;}
-}
 function toggleMap(){
  const open=minimap.style.display==='none';
  minimap.style.display=open?'block':'none';

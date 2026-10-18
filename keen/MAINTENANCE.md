@@ -9,7 +9,7 @@
 - Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` retains asset loading, recipes, shared game state, physics and startup. Audio, camera follow, world lifecycle, input and rendering are external scripts.
+- `keen/index.html` retains asset loading, recipes, shared game state and startup. Audio, camera follow, world lifecycle, input and rendering are external scripts.
 - Classic mode was explicitly retired after the vertical-world playtest. `bakery1-layout.js` and `authored-bakeries-2-3.js` are no longer production dependencies; retained historical preview pages still reference them. Keep those snapshot dependencies until their preview pages are retired together.
 
 ## Files directly loaded by production
@@ -29,6 +29,10 @@ audio.js
 camera.js
 world.js
 input.js
+collision.js
+physics.js
+combat.js
+gameplay.js
 characters.js
 hud.js
 render.js
@@ -95,3 +99,12 @@ Held on-screen controls use Pointer Events with pointer capture and per-button p
 - `hud.js`: HUD and pause/clear/win overlays, recipe codex, world map, camera diagnostic grid/readout and camera/parallax button presentation. Input and gameplay logic remain separate.
 
 The renderer still reads shared state; this extraction does not introduce an ES-module migration or a new render model. `tests/render-baseline.json` contains SHA-256 hashes of canvas-command traces captured from commit `0d4c399` before extraction: 39 cases covering all three bakeries, loaded/fallback artwork, baker animation states, menus, map and diagnostic overlays. `rendering.test.cjs` verifies exact command ordering/arguments against that baseline. These are command-level checks with stubbed canvas/images, not pixel comparisons or a substitute for visual playtesting. Existing gameplay/input tests use the shared `tests/game-harness.cjs`.
+
+## Physics and combat
+
+- `collision.js`: tile queries, solid/spike tests, one-way platform crossings and rectangle overlap.
+- `physics.js`: `updatePlayer()` owns movement, acceleration, gravity, buffered/coyote jumps, ground support, ledge grabs/climbs and pogo. `togglePogo()` is also here; input only requests it. A ledge-handling frame returns without updating timers, combat, effects or pickups, preserving the original early returns.
+- `combat.js`: `damage()`, hazard checks, projectile updates, enemy movement and pogo stomps. Original constants and enemy behavior are retained, including existing height-dependent rules.
+- `gameplay.js`: `update()` preserves frame order: player movement, timers, hazards/projectiles, enemies, particles/floaters and pickups. Shared particle/floater creation helpers live here too. World completion, camera and drawing still follow in the outer loop.
+
+The modules continue using shared classic-script state; this pass changes ownership/location, not gameplay rules. `tests/physics-baseline.json` was captured from `c871345` before extraction: 18 deterministic simulations, 240 frames each, across all three bakeries. The comparison includes player/enemy/projectile state, effects, pickups, timers, checkpoint/progression state, camera and audio-effect events. Additional checks cover one-way crossings, ledge early returns/climb timing, shields, invulnerability and ammunition. Run all checks with `node --test keen/tests/*.test.cjs`.

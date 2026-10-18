@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..');
 function game(saved={},options={}) {
  const html=options.html??fs.readFileSync(path.join(root,'index.html'),'utf8');
- const storage=new Map(Object.entries(saved)),elements=new Map(),listeners={},windowListeners={},audio={toggles:0};
+ const storage=new Map(Object.entries(saved)),elements=new Map(),listeners={},windowListeners={},audio={toggles:0,effects:[]};
  const trace=[];
  const clean=v=>v&&typeof v==='object'?(v.src?{image:require('node:crypto').createHash('sha256').update(v.src).digest('hex')}:'gradient'):v;
  const gradient={addColorStop(...args){trace.push(['addColorStop',...args])}};
@@ -11,7 +11,7 @@ function game(saved={},options={}) {
  for(const [,id] of html.matchAll(/id="([^"]+)"/g))elements.set(id,{style:{display:id==='verticalMap'?'none':''},textContent:'',listeners:{},getContext:()=>g,addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}});
  const touch=[...html.matchAll(/<button data-key="([^"]+)"/g)].map(([,key])=>({dataset:{key},style:{},listeners:{},setPointerCapture(){},addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}}));
  const event=(target,type,props={})=>{for(const fn of target[type]??[])fn({key:'',button:0,pointerId:1,repeat:false,preventDefault(){},stopImmediatePropagation(){},...props})};
- const context={console,Math:Object.create(Math),Image:class {complete=false;naturalWidth=0},document:{getElementById(id){assert.ok(elements.has(id),'Unknown element '+id);return elements.get(id)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},querySelectorAll(){return touch}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)},requestAnimationFrame(){},addEventListener(type,fn){(windowListeners[type]??=[]).push(fn)},AudioKit:{start(){},effect(){},toggle(){audio.toggles++}}};
+ const context={console,Math:Object.create(Math),Image:class {complete=false;naturalWidth=0},document:{getElementById(id){assert.ok(elements.has(id),'Unknown element '+id);return elements.get(id)},addEventListener(type,fn){(listeners[type]??=[]).push(fn)},querySelectorAll(){return touch}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)},requestAnimationFrame(){},addEventListener(type,fn){(windowListeners[type]??=[]).push(fn)},AudioKit:{start(){},effect(name){audio.effects.push(name)},toggle(){audio.toggles++}}};
  context.Math.random=()=>0.5;context.window=context;vm.createContext(context);
  for(const [,src]of html.matchAll(/<script src="([^"]+)"/g))if(src!=='audio.js')vm.runInContext(fs.readFileSync(path.join(root,src),'utf8'),context,{filename:src});
  vm.runInContext(html.split('<script>').pop().split('</script>')[0],context);

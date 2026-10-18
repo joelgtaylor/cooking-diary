@@ -23,6 +23,10 @@
 <script src="camera.js"></script>
 <script src="world.js"></script>
 <script src="input.js"></script>
+<script src="collision.js"></script>
+<script src="physics.js"></script>
+<script src="combat.js"></script>
+<script src="gameplay.js"></script>
 <script src="characters.js"></script>
 <script src="hud.js"></script>
 <script src="render.js"></script>
@@ -89,102 +93,9 @@ const THEMES=[
 {name:'Rye Dawn',tint:'rgba(255,140,50,0.10)',mote:'#ffd0a0'},
 {name:'Midnight Patisserie',tint:'rgba(200,80,160,0.12)',mote:'#ffc0e0'}
 ];
-function floater(x,y,txt,color){floaters.push({x,y,txt,color,life:70})}
 function toggleCodex(){if(state==='codex')state=codexFrom;else{codexFrom=state;state='codex';codexPage=0}}
 const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;
 
-function tile(x,y){if(x<0||x>=cols||y>=rows)return'#';if(y<0)return'.';return map[y][x]}
-// CRUST_ONE_WAY_PLATFORMS_V1: '=' blocks downward foot crossings only.
-function oneWayTop(x,foot,nextFoot,w){
- if(nextFoot<foot)return null;
- const minY=Math.max(0,Math.floor((foot-1)/T));
- const maxY=Math.min(rows-1,Math.floor(nextFoot/T));
- const x0=Math.max(0,Math.floor(x/T)),x1=Math.min(cols-1,Math.floor((x+w-1)/T));
- for(let ty=minY;ty<=maxY;ty++){
-  const top=ty*T;
-  if(foot>top+1.3||nextFoot<top-.02)continue;
-  for(let tx=x0;tx<=x1;tx++)if(tile(tx,ty)==='=')return top;
- }
- return null;
-}
-function hit(x,y,w,h){let x0=Math.floor(x/T),x1=Math.floor((x+w-1)/T),y0=Math.floor(y/T),y1=Math.floor((y+h-1)/T);for(let a=x0;a<=x1;a++)for(let b=y0;b<=y1;b++)if(tile(a,b)==='#')return true;return false}
-function spike(x,y,w,h){let x0=Math.floor(x/T),x1=Math.floor((x+w-1)/T),y0=Math.floor(y/T),y1=Math.floor((y+h-1)/T);for(let a=x0;a<=x1;a++)for(let b=y0;b<=y1;b++)if(tile(a,b)==='^')return true;return false}
-function collide(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}function burst(x,y,color,n=10){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,life:25,color})}
-function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){respawnCheckpoint()}}
-function update(){if(state!=='play')return;tick++;
-if(player.hang){
- const h=player.hang;player.x=h.x;player.y=h.y;player.vx=0;player.vy=0;player.ground=false;
- h.timer++;
- if(h.timer>11){player.climb=10;player.x=h.destX;player.y=h.top-player.h;player.hang=null;player.vy=0;player.ground=true;AudioKit.effect('climb');}
- return;
-}
-if(player.climb>0)player.climb--;
-let left=keys.left||keys.ArrowLeft||keys.a,right=keys.right||keys.ArrowRight||keys.d,jump=keys.jump||keys[' ']||keys.ArrowUp||keys.w,shoot=keys.shoot||keys.x||keys.k;let pogoKey=!!(keys.c||keys.C);if(pogoKey&&!prevPogo)togglePogo();prevPogo=pogoKey;let spd=player.speedT>0?5.4:3.6;let target=(right?spd:0)-(left?spd:0);player.vx+=(target-player.vx)*(player.ground?.24:.13);if(Math.abs(player.vx)<.035)player.vx=0;if(player.vx)player.face=Math.sign(player.vx);if(player.ground)player.coyote=7;else player.coyote=Math.max(0,(player.coyote||0)-1);if(jump&&!prevJump)player.buffer=9;else player.buffer=Math.max(0,(player.buffer||0)-1);if(player.buffer&&player.coyote){player.vy=pogoOn?-12.8:-10.7;player.ground=false;player.coyote=0;player.buffer=0;AudioKit.effect(pogoOn?'pogo':'jump')}if(jump&&player.vy<0)player.vy-=.16;else if(!jump&&player.vy< -3)player.vy+=.30;prevJump=!!jump;player.vy=Math.min(10.8,player.vy+.49);let nx=player.x+player.vx;
-if(!hit(nx,player.y,player.w,player.h))player.x=nx;
-else if(player.vy>=-1&&!pogoOn&&Math.abs(player.vx)>.4){
- // Catch the upper lip of a wall if the head/raised hand just reaches it.
- const direction=Math.sign(player.vx), edge=direction>0?Math.floor((nx+player.w-1)/T)*T:Math.floor(nx/T)*T+T;
- const tx=direction>0?Math.floor((nx+player.w-1)/T):Math.floor(nx/T);
- const ty=Math.floor((player.y+player.h*.55)/T);
- for(let yy=ty;yy<=Math.min(rows-1,ty+2);yy++){
-   const top=yy*T;
-   if(tile(tx,yy)==='#'&&tile(tx,yy-1)==='.'&&player.y+player.h>top+2&&player.y+5<top+12){
-     const destX=direction>0?edge+3:edge-player.w-3;
-     if(!hit(destX,top-player.h,player.w,player.h)){
-       player.hang={x:direction>0?edge-player.w+5:edge-5,y:top-9,timer:0,top,destX};
-       player.face=direction;player.vx=0;player.vy=0;break;
-     }
-   }
- }
-}if(!player.hang&&player.vy>=0&&!pogoOn){
- for(const direction of [-1,1]){
-  const side=direction>0?player.x+player.w+5:player.x-5;
-  const tx=Math.floor(side/T);
-  const top=Math.floor((player.y+player.h*.55)/T)*T;
-  const ty=Math.floor(top/T);
-  if(tile(tx,ty)==='#'&&tile(tx,ty-1)==='.'&&player.y+player.h>=top+1&&player.y+5<top+10){
-   const edge=direction>0?tx*T:(tx+1)*T;
-   const destX=direction>0?edge+3:edge-player.w-3;
-   if(!hit(destX,top-player.h,player.w,player.h)){
-    player.hang={x:direction>0?edge-player.w+5:edge-5,y:top-9,timer:0,top,destX};
-    player.face=direction;player.vx=0;player.vy=0;break;
-   }
-  }
- }
-}
-if(player.hang)return;
-// CRUST_GROUND_CONTACT_V1: the collision rectangles use (bottom-1).
-// A tiny gravity step therefore alternated supported idle frames with fall
-// frames. Probe just below the feet and stay grounded while supported.
-const wasG=player.ground,fallV=player.vy;
-const foot=player.y+player.h;
-const supportProbe=1.25;
-const floorTop=Math.floor((foot+supportProbe)/T)*T;
-const nearFloor=floorTop>=foot-0.05&&floorTop-foot<=supportProbe;
-const supported=window.__crustGroundFix!==false&&player.vy>=0&&
-  nearFloor&&(hit(player.x,player.y+supportProbe,player.w,player.h)||oneWayTop(player.x,foot,foot+supportProbe,player.w)!==null);
-if(supported){
- player.y=floorTop-player.h;
- player.ground=true;
- player.vy=0;
-}else{
- let ny=player.y+player.vy;
- const ledgeTop=player.vy>=0?oneWayTop(player.x,foot,foot+player.vy,player.w):null;
- if(ledgeTop!==null&&!hit(player.x,ledgeTop-player.h,player.w,player.h)){
-  player.y=ledgeTop-player.h;player.ground=true;player.vy=0;
- }else if(!hit(player.x,ny,player.w,player.h)){
-  player.y=ny;player.ground=false;
- }else{
-  if(player.vy>0)player.y=Math.floor((player.y+player.h+player.vy)/T)*T-player.h;
-  else if(player.vy<0)player.y=Math.floor((player.y+player.vy)/T+1)*T;
-  player.ground=player.vy>0;player.vy=0;
- }
-}if(!wasG&&player.ground&&fallV>6)burst(player.x+14,player.y+player.h,'#e8dcc8',8);if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false;player.coyote=0;burst(player.x+15,player.y+player.h,'#9af3fa',3);AudioKit.effect('pogo')}if(player.inv)player.inv--;if(player.speedT>0)player.speedT--;if(comboT>0&&--comboT===0)combo=0;if(shake>0){shake*=0.85;if(shake<0.6)shake=0}if(spike(player.x,player.y,player.w,player.h))damage();if(shoot&&tick%13===0&&player.ammo>0){shots.push({x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});player.ammo--;AudioKit.effect('shoot')}for(const s of shots){s.x+=s.vx;if(hit(s.x,s.y,s.w,s.h))s.dead=true;for(const e of enemies)if(e.alive&&collide(s,e)){e.alive=false;s.dead=true;player.score+=100;burst(e.x+12,e.y+12,'#ffad57');AudioKit.effect('enemy')}}shots=shots.filter(s=>!s.dead&&s.x>0&&s.x<world);for(const e of enemies){if(!e.alive)continue;
-if(e.type==='hopper'){e.hopT--;const onG=hit(e.x,e.y+e.h+1,e.w,2);if(onG){e.vy=0;const ax=e.x+Math.sign(e.vx||1)*20;if(hit(e.x+e.vx,e.y,e.w,e.h)||!hit(ax,e.y+e.h+8,4,4))e.vx*=-1;if(e.hopT<=0){e.vy=-7.5;e.hopT=50+Math.random()*40}}else e.vy=Math.min(10,(e.vy||0)+0.5);const ny2=e.y+e.vy;if(!hit(e.x,ny2,e.w,e.h))e.y=ny2;else{e.vy=0;e.y=Math.floor((e.y+e.h)/T)*T-e.h}if(e.y>620)e.alive=false;const n2=e.x+e.vx;if(!hit(n2,e.y,e.w,e.h))e.x=n2;else e.vx*=-1}
-else if(e.type==='chaser'){const dx=(player.x+player.w/2)-(e.x+e.w/2);if(Math.abs(dx)<220)e.vx+=(Math.sign(dx)*1.8-e.vx)*0.06;else e.vx+=(Math.sign(e.vx||1)*1.1-e.vx)*0.06;const n3=e.x+e.vx;if(hit(n3,e.y,e.w,e.h)||!hit(n3+Math.sign(e.vx)*14,e.y+e.h+8,4,4))e.vx*=-1;else e.x=n3}
-else{const n=e.x+e.vx;if(hit(n,e.y,e.w,e.h)||!hit(n+Math.sign(e.vx)*14,e.y+e.h+8,4,4))e.vx*=-1;else e.x=n}
-if(collide(player,e)){if(pogoOn&&player.vy>1&&player.y+player.h<e.y+14){e.alive=false;player.vy=-11;player.score+=150;hitStop=4;shake=Math.max(shake,4);burst(e.x+12,e.y+12,'#ffad57',14);floater(e.x+12,e.y-8,'STOMP +150','#ffd75e');AudioKit.effect('enemy')}else damage()}}for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.life--}particles=particles.filter(p=>p.life>0);for(const fl of floaters){fl.y-=0.8;fl.life--}floaters=floaters.filter(fl=>fl.life>0);for(const gem of gems)if(!gem.got&&Math.abs(player.x-gem.x)<25&&Math.abs(player.y-gem.y)<30){gem.got=true;collected++;combo=comboT>0?combo+1:1;comboT=240;const pts=250*combo;player.score+=pts;player.ammo+=5;burst(gem.x,gem.y,'#efff8b',18);floater(gem.x,gem.y-14,'+'+pts+(combo>1?' x'+combo+' COMBO':''),'#efff8b');AudioKit.effect('collect')}for(const u of powerups)if(!u.got&&Math.abs(player.x+14-u.x)<28&&Math.abs(player.y+19-u.y)<30){u.got=true;AudioKit.effect('collect');if(u.kind==='kefir'){player.speedT=480;burst(u.x,u.y,'#ffffff',14);floater(u.x,u.y-14,'KEFIR DASH!','#ffffff')}else if(u.kind==='rye'){player.health=Math.min(5,player.health+1);burst(u.x,u.y,'#c98d4b',14);floater(u.x,u.y-14,'+1 HEART','#ffb54e')}else{player.shield=true;burst(u.x,u.y,'#9af3fa',14);floater(u.x,u.y-14,'BANNETON SHIELD','#9af3fa')}}
-}
 function codexFlip(d){codexPage=(codexPage+d+RECIPES.length)%RECIPES.length;AudioKit.effect('pogo')}
 
 // CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
