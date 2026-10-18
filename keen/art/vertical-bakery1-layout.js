@@ -12,8 +12,8 @@ const lower=[[2,54,103],[24,48,8],[38,42,8],[53,37,8],[68,32,9],[78,43,10],[89,4
 const branches=[[24,40,8],[30,38,8],[36,36,8],[42,34,8],[47,32,8],
  [55,26,7],[60,24,8],[65,22,9],[82,29,7],[90,34,7]];
 const platforms=[...climb,...descent,...lower,...branches];
-const cultures=[[10,49],[30,38],[61,22],[83,25],[97,37]];
-const checkpoints=[[8,50],[40,34],[72,18],[91,34]];
+const cultures=[[10,49],[32,37],[61,22],[83,25],[100,37]];
+const checkpoints=[[8,49],[40,33],[72,17],[91,33]];
 const hazards=[[22,53],[51,53],[84,53],[88,53]]; // ground, not overhead.
 const enemies=[[27,45,'walker'],[50,30,'walker'],[81,39,'walker']];
 const sections=[
