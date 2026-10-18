@@ -13,7 +13,7 @@ function clamp(n,a,b){return Math.max(a,Math.min(b,n));}
 function render(g,opt){
  const W=opt.width,H=opt.height,cx=opt.cameraX,cy=opt.cameraY;
  const maxY=Math.max(1,opt.worldHeight-H);
- const profile=profiles[opt.profile]||profiles.balanced;
+ const profile=profiles[opt.profile]||profiles.dramatic;
  const enabled=opt.enabled!==false;
  const speeds=enabled?profile:{distant:0,middle:0,near:0};
  const t=clamp(cy/maxY,0,1); // 0: upper rooftops, 1: cellar floor
@@ -36,36 +36,57 @@ function render(g,opt){
    g.drawImage(background,Math.round(sx),Math.round(sy),W+pad,H+pad);
  }
  if(!enabled){g.restore();return;}
- // Distant silhouettes are independent of the illustrated backdrop, and
- // are anchored to virtual world positions at two distinct depth ratios.
- function skyline(depth,color,base,spacing,width,height,seed,windowColor){
-   const scrollX=cx*depth, scrollY=cy*depth;
-   const offset=Math.floor(scrollX/spacing);
-   g.fillStyle=color;
-   for(let n=offset-3;n<offset+Math.ceil(W/spacing)+4;n++){
-     const variation=((n*127+seed*43)%11+11)%11;
-     const x=Math.round(n*spacing-scrollX);
-     const y=Math.round(base+variation*11-scrollY*.48);
-     const w=width+((variation*7)%30);
-     const h=height+variation*10;
-     g.fillRect(x,y,w,h);
-     // Slanted roofs and masonry shoulders give silhouette variety.
-     g.fillRect(x+6,y-10,w-12,10);
-     g.fillRect(x+12,y-20,10,12);
-     if(windowColor){
-       for(let wy=y+18;wy<Math.min(H,y+h);wy+=31)
-         for(let wx=x+11;wx<x+w-12;wx+=24){
-           if(((wx+wy+n)&3)===0)continue;
-           g.fillStyle=windowColor;g.fillRect(wx,wy,5,8);g.fillStyle=color;
-         }
+ // Phase 2.1: replace the geometric city silhouettes with the approved
+ // transparent Bakery 1 illustrations. Drawing remains behind the world.
+ const illustration=opt.layers;
+ const hasIllustration=stage===1&&illustration&&
+   ['far','mid','near'].every(key=>{
+     const im=illustration[key];return im&&im.complete&&im.naturalWidth>0;
+   });
+ if(hasIllustration){
+   const maxX=Math.max(1,(opt.worldWidth||3360)-W);
+   const dx=clamp(cx/maxX,0,1)-.5,dy=clamp(cy/maxY,0,1)-.5;
+   const entries=[
+     {image:illustration.far,speed:speeds.distant},
+     {image:illustration.mid,speed:speeds.middle},
+     {image:illustration.near,speed:speeds.near}
+   ];
+   for(const item of entries){
+     // Overscan ensures no black edge during vertical or horizontal travel.
+     const padX=250,padY=146;
+     const offsetX=dx*item.speed*190;
+     const offsetY=dy*item.speed*130;
+     const x=Math.round(-padX/2-offsetX);
+     const y=Math.round(-padY/2-offsetY);
+     g.drawImage(item.image,x,y,W+padX,H+padY);
+   }
+ }else if(stage!==1){
+   // Other bakeries keep Phase 2 prototype architecture for now; their
+   // corresponding detailed art passes are separate work.
+   function skyline(depth,color,base,spacing,width,height,seed,windowColor){
+     const scrollX=cx*depth,scrollY=cy*depth;
+     const offset=Math.floor(scrollX/spacing);
+     g.fillStyle=color;
+     for(let n=offset-3;n<offset+Math.ceil(W/spacing)+4;n++){
+       const variation=((n*127+seed*43)%11+11)%11;
+       const x=Math.round(n*spacing-scrollX),y=Math.round(base+variation*11-scrollY*.48);
+       const w=width+((variation*7)%30),h=height+variation*10;
+       g.fillRect(x,y,w,h);
+       g.fillRect(x+6,y-10,w-12,10);
+       g.fillRect(x+12,y-20,10,12);
+       if(windowColor){
+         for(let wy=y+18;wy<Math.min(H,y+h);wy+=31)
+           for(let wx=x+11;wx<x+w-12;wx+=24){
+             if(((wx+wy+n)&3)===0)continue;
+             g.fillStyle=windowColor;g.fillRect(wx,wy,5,8);g.fillStyle=color;
+           }
+       }
      }
    }
+   skyline(speeds.distant,pal.far,H*.61,136,76,240,3,null);
+   skyline(speeds.middle,pal.mid,H*.76,108,71,260,7,pal.window);
+   skyline(speeds.near,pal.near,H*1.12,182,28,400,11,null);
  }
- // Far city, midground walls, and near columns. Relative movement grows
- // with proximity, in both X and Y, but never affects the collision world.
- skyline(speeds.distant,pal.far,H*.61,136,76,240,3,null);
- skyline(speeds.middle,pal.mid,H*.76,108,71,260,7,pal.window);
- skyline(speeds.near,pal.near,H*1.12,182,28,400,11,null);
  // A height-driven atmosphere wash: cooler near the rooftops, warmer
  // in the cellar. Overlay is deliberately subtle to preserve authored art.
  g.fillStyle=stage===1?'rgba(235,147,85,'+(t*.18).toFixed(3)+')':
@@ -80,5 +101,5 @@ function render(g,opt){
  }
  g.restore();
 }
-window.CrustParallax=Object.freeze({render,profiles,version:'phase2-v1'});
+window.CrustParallax=Object.freeze({render,profiles,version:'phase2-art-cohesion-v1'});
 })();
