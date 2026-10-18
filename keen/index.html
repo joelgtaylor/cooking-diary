@@ -1,10 +1,30 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Night Bakery</title><style>html,body{margin:0;height:100%;background:#101426;color:white;font-family:monospace;display:grid;place-items:center}#wrap{width:min(100vw,1040px);text-align:center}canvas{width:100%;image-rendering:pixelated;border:4px solid #6d78bd;box-sizing:border-box;background:#111}p{line-height:1.5}button{border:0;border-radius:6px;background:#dd5d90;color:white;padding:10px 20px;font-weight:bold;cursor:pointer}#touch{display:flex;gap:10px;justify-content:center;margin:10px;touch-action:none}#touch button{min-width:54px;font-size:19px;padding:12px 9px;user-select:none;touch-action:none}#status{color:#b9ffda;font-size:13px}</style></head><body><div id="wrap"><h2>🥖 CRUST QUEST: Rise of the Starter</h2><canvas id="c" width="960" height="540" aria-label="Retro platform video game">Your browser does not support canvas.</canvas><p>← → / A D move · Space / W / ↑ jump · C toggle pogo · X / K shoot · P pause · M mute · R restart · T recipes · TAP/ENTER next bakery</p><button id="restartBtn" type="button">Restart Mission</button> <button id="codexBtn" type="button">📖 Recipes</button> <button id="audioBtn" type="button">♫ Music: ON</button><p id="status">Controls ready. Gather wild yeast, grab ledges, and reach the bakery oven!</p><div id="touch"><button data-key="left">◀</button><button data-key="jump">⬆</button><button id="pogoBtn" type="button">🥣 Mixer OFF</button><button data-key="shoot">✦</button><button data-key="right">▶</button></div><p>Collect 5 wild yeast cultures, dodge the sourdough gremlins, and reach the glowing oven to bake the legendary loaf! Clear all 3 bakeries to unlock real recipes in the 📖 codex.</p></div><script src="art/phase3-bg.js"></script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Rise of the Starter · Three Vertical Bakeries</title><style>html,body{margin:0;height:100%;background:#101426;color:white;font-family:monospace;display:grid;place-items:center}#wrap{width:min(100vw,1040px);text-align:center}canvas{width:100%;image-rendering:pixelated;border:4px solid #6d78bd;box-sizing:border-box;background:#111}p{line-height:1.5}button{border:0;border-radius:6px;background:#dd5d90;color:white;padding:10px 20px;font-weight:bold;cursor:pointer}#touch{display:flex;gap:10px;justify-content:center;margin:10px;touch-action:none}#touch button{min-width:54px;font-size:19px;padding:12px 9px;user-select:none;touch-action:none}#status{color:#b9ffda;font-size:13px}</style></head><body><div id="wrap"><h2>🥖 CRUST QUEST: Rise of the Starter</h2><canvas id="c" width="960" height="540" aria-label="Retro platform video game">Your browser does not support canvas.</canvas><p>← → / A D move · Space / W / ↑ jump · C toggle pogo · X / K shoot · P pause · M mute · R restart · T recipes · TAP/ENTER next bakery</p><button id="restartBtn" type="button">Restart Mission</button> <button id="codexBtn" type="button">📖 Recipes</button> <button id="audioBtn" type="button">♫ Music: ON</button>
+<p style="color:#b8eedf;margin:12px 0">THREE VERTICAL BAKERIES · Moonlit Bakery → Fungal Caverns → Clockwork Ovens. Find five wild yeast cultures in each towering world, activate checkpoints, and reach the grand oven to unlock recipes.</p>
+<button id="cameraDemoBtn" type="button">🏰 VERTICAL LEVELS (1–3)</button>
+<button id="cameraNormalBtn" type="button">🏙️ CLASSIC LEVEL MODE</button>
+<button id="cameraSmoothBtn" type="button">🎥 SMOOTH FOLLOW (V)</button>
+<button id="parallaxToggleBtn" type="button">🌆 PARALLAX ON (B)</button>
+<button id="parallaxSubtleBtn" type="button">Subtle</button>
+<button id="parallaxBalancedBtn" type="button">Balanced</button>
+<button id="parallaxDramaticBtn" type="button">Dramatic</button>
+<button id="cameraGridBtn" type="button">▦ GRID ON (G)</button>
+<button id="cameraFootBtn" type="button">⬇ START (1)</button>
+<button id="cameraMiddleBtn" type="button">↕ MID (2)</button>
+<button id="cameraTopBtn" type="button">⬆ TOP (3)</button>
+<button id="mapButton" type="button">🗺️ WORLD MAP (M)</button><button id="restartSection" type="button">↻ RESPAWN AT CHECKPOINT</button>
+<canvas id="verticalMap" width="1050" height="360" style="display:none;width:100%;image-rendering:pixelated;background:#101827;border:2px solid #8295ad" aria-label="Current bakery vertical exploration map"></canvas>
+<p id="cameraReadout" style="color:#ccedff;font-size:13px"></p><p id="status">Controls ready. Gather wild yeast, grab ledges, and reach the bakery oven!</p><div id="touch"><button data-key="left">◀</button><button data-key="jump">⬆</button><button id="pogoBtn" type="button">🥣 Mixer OFF</button><button data-key="shoot">✦</button><button data-key="right">▶</button></div><p>Collect 5 wild yeast cultures, dodge the sourdough gremlins, and reach the glowing oven to bake the legendary loaf! Clear all 3 bakeries to unlock real recipes in the 📖 codex.</p></div><script src="art/phase3-bg.js"></script>
 <script src="art/bakery1-layout.js"></script>
+<script src="art/vertical-bakery1-layout.js"></script>
+<script src="art/vertical-bakery2-layout.js"></script>
+<script src="art/vertical-bakery3-layout.js"></script>
+<script src="art/checkpoint-flags-generated.js"></script>
+<script src="art/vertical-parallax.js"></script>
 <script src="art/authored-bakeries-2-3.js"></script>
 <script src="art/baker-reimagined.js"></script>
 <script src="art/environment-gameplay-atlas.js"></script>
 <script>
-'use strict';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
+'use strict';window.__crustCameraDemo=true;window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
 // Kept separate from Phase3 art so it can fall back safely if not loaded.
 loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
@@ -12,8 +32,21 @@ loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');
  // File-based images, loaded once; original Phase 3 backgrounds remain fallbacks.
 loadArt('generatedMoonlitBG','art/moonlit-bakery-city.webp');
 loadArt('generatedClockworkBG','art/clockwork-oven.webp');
+ // PHASE2_1_BAKERY1_ART: authentic rendered transparency; no procedural scenery.
+ loadArt('bakery1ParallaxFar','art/bakery1-parallax-far.webp');
+ loadArt('bakery1ParallaxMid','art/bakery1-parallax-mid.webp');
+ loadArt('bakery1ParallaxNear','art/bakery1-parallax-near.webp');
+ // Bakery 2 approved, generated, three-layer cavern illustrations.
+ // Until all three art files are present, the current cavern remains playable.
+ loadArt('bakery2ParallaxFar','art/bakery2-parallax-far.webp');
+loadArt('bakery2ParallaxMid','art/bakery2-parallax-mid.webp');
+loadArt('bakery2ParallaxNear','art/bakery2-parallax-near.webp');
+loadArt('bakery3ParallaxFar','art/bakery3-parallax-far.webp');
+ loadArt('bakery3ParallaxMid','art/bakery3-parallax-mid.webp');
+ loadArt('bakery3ParallaxNear','art/bakery3-parallax-near.webp');
 // CRUST_ENVIRONMENT_ART_V1: compact 256x256 / 64px-per-cell concept-art atlas.
 loadArt('environmentDecor',window.__CRUST_ENVIRONMENT_ATLAS);
+loadArt('checkpointFlags',window.__CRUST_CHECKPOINT_FLAG_ART);
 // CRUST_DOUGH_GREMLINS_V1: compact transparent 4x4 animation atlases
 // derived from the two approved character sheets. Load asynchronously,
 // preserving the original item tile as a fallback if they are unavailable.
@@ -116,32 +149,63 @@ const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;const rect=(x,y,w,h,col
  * Lives behind window.__crustCameraDemo: production's 3 levels are unaffected.
  * No new physics; pads have real # collision and the regular baker controls.
  */
+// CRUST_PHASE3_WORLD — tall authored map and recoverable checkpoint progress.
+let phase3State={current:-1,spawns:[],complete:false};
+// PHASE4_CHECKPOINT_SUPPORT: checkpoint metadata may describe the platform
+// row itself or the row directly above it. Determine the actual solid top
+// rather than assuming every marker is one tile above a walkway.
+// Three authored worlds share camera, collision, collectibles and physics.
+function currentVerticalLayout(){
+ return [window.CrustVerticalBakery1,window.CrustVerticalBakery2,window.CrustVerticalBakery3][bakery-1];
+}
+function checkpointSupportRow(tx,ty){
+ for(let y=Math.max(0,ty);y<Math.min(rows,ty+7);y++){
+  if(map[y]&&(map[y][tx]==='='||map[y][tx]==='#'))return y;
+ }
+ return Math.min(rows-1,ty+1);
+}
 function initCameraDemo(){
- rows=48;
+ const layout=currentVerticalLayout();
+ rows=layout.rows;
  map=Array.from({length:rows},()=>Array(cols).fill('.'));
- // A safe cellar floor and a long rooftop staircase with 2-tile rises.
- for(let x=0;x<cols;x++)for(let y=46;y<rows;y++)map[y][x]='#';
- const platforms=[];
- for(let i=0;i<19;i++){
-  const x=4+i*5, y=43-i*2;
-  platforms.push({x,y,w:6});
-  for(let tx=x;tx<x+6;tx++)map[y][tx]='#';
- }
- // Mid-height resting balconies permit reverse traversal and a long fall.
- for(const [x,y,w] of [[19,44,9],[42,33,7],[63,27,7],[83,18,9]]){
-  for(let tx=x;tx<x+w;tx++)map[y][tx]='#';
- }
- // Demonstration markers: collect them normally; no recipe unlocks.
- gems=[[9,40],[29,32],[49,24],[69,16],[94,6]]
-  .map(([x,y])=>({x:x*T+12,y:y*T,got:false}));
- enemies=[];powerups=[];shots=[];particles=[];floaters=[];
- player={x:2*T+8,y:46*T-38,w:29,h:38,vx:0,vy:0,ground:true,
-  health:3,inv:0,face:1,ammo:35,score:0,hang:null,climb:0,
-  speedT:0,shield:false};
- camera=0;cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.55));
+ const data=layout.apply({map});
+ gems=data.gems;enemies=data.enemies;powerups=data.powerups;
+ shots=[];particles=[];floaters=[];
+ player={x:3*T,y:54*T-38,w:29,h:38,vx:0,vy:0,ground:true,
+ health:3,inv:0,face:1,ammo:35,score:0,hang:null,climb:0,speedT:0,shield:false};
+ camera=0;cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.6));
  collected=0;combo=0;comboT=0;shake=0;hitStop=0;
  state='play';tick=0;prevJump=false;pogoOn=false;
+ phase3State={current:-1,spawns:layout.checkpoints.map(([x,y])=>({x:x*T+3,y:checkpointSupportRow(x,y)*T-38})),complete:false};
  document.getElementById('pogoBtn').textContent='Mixer OFF';
+}
+function respawnCheckpoint(){
+ const cp=phase3State.spawns[Math.max(0,phase3State.current)] || {x:3*T,y:54*T-38};
+ player.x=cp.x;player.y=cp.y;player.vx=0;player.vy=0;player.ground=false;
+ player.hang=null;player.health=3;player.inv=90;player.shield=false;
+ shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
+}
+function tickPhase3(){
+ if(!window.__crustCameraDemo||state!=='play')return;
+ const layout=currentVerticalLayout();
+ for(let i=0;i<layout.checkpoints.length;i++){
+  const [x,y]=layout.checkpoints[i];
+  if(i>phase3State.current&&Math.abs(player.x+14-x*T-12)<52&&Math.abs(player.y+22-y*T)<62){
+    phase3State.current=i;
+    floater(player.x,player.y-12,'CHECKPOINT '+(i+1),'#a5ffdc');
+    AudioKit.effect('collect');
+  }
+ }
+ if(player.health<=0){respawnCheckpoint();return;}
+ const target=layout.oven;
+ if(collected===5&&Math.abs(player.x+14-(target.x*T+12))<53&&
+    Math.abs(player.y+22-(target.y*T+25))<85){
+    phase3State.complete=true;
+    if(player.score>best){best=player.score;saveBest();}
+    const ri=bakery-1;
+    if(!unlocked.includes(ri)){unlocked.push(ri);saveCodex();}
+    state='clear';AudioKit.effect('win');
+ }
 }
 function updateViewCamera(){
  if(!window.__crustCameraDemo){
@@ -179,10 +243,23 @@ if(bakery>=2&&window.__crustAuthoredOtherBakeries!==false&&window.CrustAuthoredB
 }
 shots=[];particles=[];floaters=[];player={x:75,y:320,w:29,h:38,vx:0,vy:0,ground:false,health:3,inv:0,face:1,ammo:35,score:0,hang:null,climb:0,speedT:0,shield:false};collected=0;combo=0;comboT=0;shake=0;hitStop=0;camera=0;state='play';tick=0;prevJump=false;pogoOn=false;document.getElementById('pogoBtn').textContent='Mixer OFF'}
 function tile(x,y){if(x<0||x>=cols||y>=rows)return'#';if(y<0)return'.';return map[y][x]}
+// CRUST_ONE_WAY_PLATFORMS_V1: '=' blocks downward foot crossings only.
+function oneWayTop(x,foot,nextFoot,w){
+ if(nextFoot<foot)return null;
+ const minY=Math.max(0,Math.floor((foot-1)/T));
+ const maxY=Math.min(rows-1,Math.floor(nextFoot/T));
+ const x0=Math.max(0,Math.floor(x/T)),x1=Math.min(cols-1,Math.floor((x+w-1)/T));
+ for(let ty=minY;ty<=maxY;ty++){
+  const top=ty*T;
+  if(foot>top+1.3||nextFoot<top-.02)continue;
+  for(let tx=x0;tx<=x1;tx++)if(tile(tx,ty)==='=')return top;
+ }
+ return null;
+}
 function hit(x,y,w,h){let x0=Math.floor(x/T),x1=Math.floor((x+w-1)/T),y0=Math.floor(y/T),y1=Math.floor((y+h-1)/T);for(let a=x0;a<=x1;a++)for(let b=y0;b<=y1;b++)if(tile(a,b)==='#')return true;return false}
 function spike(x,y,w,h){let x0=Math.floor(x/T),x1=Math.floor((x+w-1)/T),y0=Math.floor(y/T),y1=Math.floor((y+h-1)/T);for(let a=x0;a<=x1;a++)for(let b=y0;b<=y1;b++)if(tile(a,b)==='^')return true;return false}
 function collide(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}function burst(x,y,color,n=10){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,life:25,color})}
-function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){if(player.score>best){best=player.score;saveBest()}state='lose'}}
+function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){if(window.__crustCameraDemo){respawnCheckpoint()}else{if(player.score>best){best=player.score;saveBest()}state='lose'}}}
 function update(){if(state!=='play')return;tick++;
 if(player.hang){
  const h=player.hang;player.x=h.x;player.y=h.y;player.vx=0;player.vy=0;player.ground=false;
@@ -234,14 +311,17 @@ const supportProbe=1.25;
 const floorTop=Math.floor((foot+supportProbe)/T)*T;
 const nearFloor=floorTop>=foot-0.05&&floorTop-foot<=supportProbe;
 const supported=window.__crustGroundFix!==false&&player.vy>=0&&
-  nearFloor&&hit(player.x,player.y+supportProbe,player.w,player.h);
+  nearFloor&&(hit(player.x,player.y+supportProbe,player.w,player.h)||oneWayTop(player.x,foot,foot+supportProbe,player.w)!==null);
 if(supported){
  player.y=floorTop-player.h;
  player.ground=true;
  player.vy=0;
 }else{
  let ny=player.y+player.vy;
- if(!hit(player.x,ny,player.w,player.h)){
+ const ledgeTop=player.vy>=0?oneWayTop(player.x,foot,foot+player.vy,player.w):null;
+ if(ledgeTop!==null&&!hit(player.x,ledgeTop-player.h,player.w,player.h)){
+  player.y=ledgeTop-player.h;player.ground=true;player.vy=0;
+ }else if(!hit(player.x,ny,player.w,player.h)){
   player.y=ny;player.ground=false;
  }else{
   if(player.vy>0)player.y=Math.floor((player.y+player.h+player.vy)/T)*T-player.h;
@@ -270,26 +350,37 @@ const p3bg=assets['phase3'+bakery];
 const generatedBackground=bakery===1?assets.generatedMoonlitBG
  :bakery===2?assets.generatedMushroomBG
  :assets.generatedClockworkBG;
-if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
+if(window.__crustCameraDemo&&window.CrustParallax&&window.__crustParallaxEnabled!==false){
+ window.CrustParallax.render(g,{width:W,height:H,cameraX:camera,cameraY:cameraY,
+  worldHeight:rows*T,worldWidth:world,
+  background:generatedBackground,stage:bakery,
+  outdoorCity:bakery===1,fungalCavern:bakery===2,clockworkOvens:bakery===3,
+  layers:bakery===1?
+    {far:assets.bakery1ParallaxFar,mid:assets.bakery1ParallaxMid,near:assets.bakery1ParallaxNear}:
+    bakery===2?
+    {far:assets.bakery2ParallaxFar,mid:assets.bakery2ParallaxMid,near:assets.bakery2ParallaxNear}:
+    {far:assets.bakery3ParallaxFar,mid:assets.bakery3ParallaxMid,near:assets.bakery3ParallaxNear},
+  profile:window.__crustParallaxProfile||'dramatic',enabled:true});
+}else if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
  g.imageSmoothingEnabled=false;
  g.drawImage(generatedBackground,0,0,W,H);
 }else if(p3bg&&p3bg.complete&&p3bg.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(p3bg,0,0,W,H)}
 else if(retro&&retro.complete&&retro.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(retro,0,0,W,H)}
 else if(assets.background.complete&&assets.background.naturalWidth){g.drawImage(assets.background,0,0,W,H);if(th.tint)rect(0,0,W,H,th.tint)}
 else rect(0,0,W,H,'#382c49');
-// Parallax window glow and distant floating flour motes
-for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
+// Keep old flour motes only in the flat-background comparison.
+if(!window.__crustCameraDemo||window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
-for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'){if(envReady)drawEnv(10,x*T,y*T,32,32);
+for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(envReady)drawEnv(10,x*T,y*T,32,32);
  else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
  else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
  if(envReady)drawEnv(bakery===1?15:bakery===2?0:2,x*T,y*T,32,32);
  else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
 }}// Decorative brick seams and icing along visible solid tile surfaces.
 for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
- if(map[ty][tx]!=='#')continue;
+ if(map[ty][tx]!=='#'&&map[ty][tx]!=='=')continue;
  const xx=tx*T,yy=ty*T;
  g.fillStyle=bakery===2?'#443452':bakery===3?'#603b43':'#56405c';
  g.fillRect(xx+3,yy+11,26,2);g.fillRect(xx+14,yy+12,2,12);
@@ -297,6 +388,24 @@ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
 }
 
+// PHASE 5: copper gear-tooth highlights on pass-through ledges.
+if(window.__crustCameraDemo&&bakery===3){
+ g.save();g.imageSmoothingEnabled=false;
+ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
+  if(map[ty][tx]!=='='||tile(tx,ty-1)==='^')continue;
+  const x=tx*T,y=ty*T;
+  g.fillStyle='#4b3040';g.fillRect(x+1,y+3,30,6);
+  g.fillStyle=tx%3===0?'#ffa34f':'#c88760';g.fillRect(x+2,y+1,28,4);
+  g.fillStyle='#ffe2a6';g.fillRect(x+5,y+1,5,2);
+  if(tx%5===1){g.fillStyle='rgba(255,160,78,.48)';g.fillRect(x+13,y-9,3,3);g.fillRect(x+21,y-14,2,2);}
+ }
+ g.restore();
+}
+// CRUST_PHASE3_OUTDOOR_COHESION_V1: legacy factories placed rigid right-angle
+// pipes, wall lanterns and crate decorations on every repeated tile. In this
+// outdoor city their artificial outlines obscure the detailed parallax art.
+// Preserve both passes for normal bakeries; suppress in vertical exploration.
+if(!window.__crustCameraDemo){
 // CRUST_PHASE2 scenery: repeating, deterministic bakery props tied to world coordinates.
 g.save();g.imageSmoothingEnabled=false;
 for(let tx=lo;tx<hi;tx++){
@@ -377,6 +486,8 @@ for(let tx=lo;tx<hi;tx++){
   }
  }
 }
+g.restore(); // Match the legacy architecture g.save() before exiting the disabled pass.
+} // End legacy factory-scenery passes; atmospheric motes remain below.
 // Clockwork machinery, magical cave motes, or rooftop steam: visual only.
 for(let k=0;k<18;k++){
  const x=(k*173+37)%(cols*T),y=145+(k*71)%270;
@@ -392,7 +503,6 @@ for(let k=0;k<18;k++){
   g.fillRect(x+drift,y+Math.sin(tick*.035+k)*9,3,3);
  }
 }
-g.restore();
 // CRUST_PICKUP_READABILITY_V1: collectible yeast jars are deliberately
 // distinguishable from identical decorative jars. The effect is visual only.
 for(const gem of gems)if(!gem.got){
@@ -534,11 +644,173 @@ else if(assets.bakerPhase4&&assets.bakerPhase4.complete&&assets.bakerPhase4.natu
 else rect(-13,-38,26,38,'#fff0cd');
 }
 g.restore();}
-let ex=world-95;rect(ex-8,365,65,115,'#6b4945');rect(ex-3,371,55,106,'#c0aaa0');rect(ex+3,388,43,70,'#523a3c');rect(ex+7,392,35,62,collected===5?'#ffb54e':'#7a5252');rect(ex+13,414,23,15,'#b46c36');rect(ex+17,411,15,6,'#f2cd8c');rect(ex+1,374,47,8,'#fff0cd');g.restore();rect(0,0,W,42,'#0b0c25');g.fillStyle='#fff';g.font='bold 20px monospace';g.fillText('♥ '.repeat(Math.max(0,player.health))+(player.shield?'◈':''),18,28);g.fillText('YEAST '+collected+'/5',190,28);g.fillText('✦ '+player.ammo,360,28);g.fillText('SCORE '+player.score,500,28);g.fillText('BEST '+best,690,28);g.fillText('BAKERY '+bakery+'/3',845,28);if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else{g.font='bold 52px monospace';const ttl=state==='win'?'PERFECT BAKE!':state==='lose'?'GAME OVER':state==='clear'?'BAKERY CLEARED!':'PAUSED';g.fillText(ttl,W/2,H/2-60);g.font='22px monospace';if(state==='clear'){const r=RECIPES[bakery-1];g.fillStyle='#ffd75e';g.fillText('Recipe unlocked: '+r.name,W/2,H/2-8);g.fillStyle='#fff';g.fillText(bakery<MAXBAKERY?'TAP or ENTER for Bakery '+(bakery+1)+' - '+THEMES[bakery].name:'TAP or ENTER for the final rise',W/2,H/2+32)}else if(state==='win'){g.fillText('All 3 bakeries conquered - Crust Master!',W/2,H/2);g.fillStyle='#ffd75e';g.fillText('BEST SCORE: '+best,W/2,H/2+44)}else g.fillText(state==='lose'?'Press R to restart':'Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}}function loop(){try{if(hitStop>0)hitStop--;else update();updateViewCamera();draw();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}function restart(){init(bakery)}document.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();keys[e.key]=true;AudioKit.start();if(e.key.toLowerCase()==='m'&&!e.repeat)AudioKit.toggle();statusEl.textContent='Keyboard input: '+e.key;if(e.key.toLowerCase()==='r')restart();if(e.key.toLowerCase()==='p')state=state==='play'?'pause':state==='pause'?'play':state;if(e.key.toLowerCase()==='t'&&!e.repeat)toggleCodex();if(e.key==='Enter'&&state==='clear'){if(bakery<MAXBAKERY)init(bakery+1);else state='win'}if(state==='codex'&&!e.repeat){const ck=e.key.toLowerCase();if(ck==='arrowleft'||ck==='a')codexFlip(-1);else if(ck==='arrowright'||ck==='d')codexFlip(1)}});document.addEventListener('keyup',e=>keys[e.key]=false);function togglePogo(){pogoOn=!pogoOn;document.getElementById('pogoBtn').textContent=pogoOn?'🥣 Mixer ON':'🥣 Mixer OFF';if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false}}
+let ex=world-95;if(window.__crustCameraDemo){ex=currentVerticalLayout().oven.x*T;}
+rect(ex-8,window.__crustCameraDemo?currentVerticalLayout().oven.y*T:365,65,115,'#6b4945');rect(ex-3,window.__crustCameraDemo?currentVerticalLayout().oven.y*T+6:371,55,106,'#c0aaa0');rect(ex+3,window.__crustCameraDemo?currentVerticalLayout().oven.y*T+23:388,43,70,'#523a3c');
+rect(ex+7,window.__crustCameraDemo?currentVerticalLayout().oven.y*T+27:392,35,62,collected===5?'#ffb54e':'#7a5252');
+rect(ex+13,window.__crustCameraDemo?currentVerticalLayout().oven.y*T+49:414,23,15,'#b46c36');
+rect(ex+17,window.__crustCameraDemo?currentVerticalLayout().oven.y*T+46:411,15,6,'#f2cd8c');
+rect(ex+1,window.__crustCameraDemo?currentVerticalLayout().oven.y*T+9:374,47,8,'#fff0cd');
+if(window.__crustCameraDemo){
+ for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
+  const [xx,yy]=currentVerticalLayout().checkpoints[i];
+  const activated=i<=phase3State.current;
+  // CRUST_CHECKPOINT_FLAG_ANIM_V1: game-art banner frames.
+  const flag=assets.checkpointFlags;
+  if(flag&&flag.complete&&flag.naturalWidth===320){
+    const frame=Math.floor(tick/(activated?8:10))%4;
+    const row=activated?1:0;
+    const dw=66,dh=99;
+    const centerX=xx*T+16,groundY=checkpointSupportRow(xx,yy)*T;
+    // CRUST_CHECKPOINT_STABLE_POLE_V3: freeze the rigid structure at frame 0.
+    // Generated art varies the stone pedestal and pole by a few pixels,
+    // which can't be fixed perfectly by moving the entire waving sprite.
+    // Only the cloth (upper-right region) is animated. Its pole, stone
+    // footing, and lantern always come from the identical frame-0 pixels.
+    const footPadding=row===1?10:6;
+    const dx=Math.round(centerX-dw/2)+2;
+    const dy=Math.round(groundY-dh)+2+Math.round(footPadding*dh/120);
+    const splitX=43,splitY=87;
+    const xScale=dw/80,yScale=dh/120;
+    const drawPart=(col,sx,sy,sw,sh,xShift=0)=>{
+      g.drawImage(flag,col*80+sx,row*120+sy,sw,sh,
+        Math.round(dx+sx*xScale)+xShift,Math.round(dy+sy*yScale),
+        Math.round(sw*xScale),Math.round(sh*yScale));
+    };
+    g.save();
+    g.imageSmoothingEnabled=false;
+    // Animated banner; its moving edge is the only part allowed to sway.
+    const sway=[0,2,6,6];
+    drawPart(frame,splitX,0,80-splitX,splitY,
+      Math.round(sway[frame]*xScale));
+    // Fixed lantern, flagpole, finial and mounting hardware.
+    drawPart(0,0,0,splitX,splitY);
+    // Fixed stone base and flowers, even where they extend past the pole.
+    drawPart(0,0,splitY,80,120-splitY);
+    g.restore();
+  }else{
+    // Preload fallback: small marker stays visible on slow connections.
+    g.fillStyle=activated?'#64f2bb':'#ffb976';
+    g.beginPath();g.arc(xx*T+16,yy*T+4,7,0,Math.PI*2);g.fill();
+  }
+ }
+}g.restore();rect(0,0,W,42,'#0b0c25');g.fillStyle='#fff';g.font='bold 20px monospace';g.fillText('♥ '.repeat(Math.max(0,player.health))+(player.shield?'◈':''),18,28);g.fillText('YEAST '+collected+'/5',190,28);g.fillText('✦ '+player.ammo,360,28);g.fillText('SCORE '+player.score,500,28);g.fillText('BEST '+best,690,28);g.fillText('BAKERY '+bakery+'/3',845,28);if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else{g.font='bold 52px monospace';const ttl=state==='win'?'PERFECT BAKE!':state==='lose'?'GAME OVER':state==='clear'?'BAKERY CLEARED!':'PAUSED';g.fillText(ttl,W/2,H/2-60);g.font='22px monospace';if(state==='clear'){const r=RECIPES[bakery-1];g.fillStyle='#ffd75e';g.fillText('Recipe unlocked: '+r.name,W/2,H/2-8);g.fillStyle='#fff';g.fillText(bakery<MAXBAKERY?'TAP or ENTER for Bakery '+(bakery+1)+' - '+THEMES[bakery].name:'TAP or ENTER for the final rise',W/2,H/2+32)}else if(state==='win'){g.fillText('All 3 bakeries conquered - Crust Master!',W/2,H/2);g.fillStyle='#ffd75e';g.fillText('BEST SCORE: '+best,W/2,H/2+44)}else g.fillText(state==='lose'?'Press R to restart':'Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}}function loop(){try{if(hitStop>0)hitStop--;else update();tickPhase3();updateViewCamera();draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}function restart(){init(bakery)}document.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();keys[e.key]=true;AudioKit.start();if(e.key.toLowerCase()==='m'&&!e.repeat)AudioKit.toggle();statusEl.textContent='Keyboard input: '+e.key;if(e.key.toLowerCase()==='r')restart();if(e.key.toLowerCase()==='p')state=state==='play'?'pause':state==='pause'?'play':state;if(e.key.toLowerCase()==='t'&&!e.repeat)toggleCodex();if(e.key==='Enter'&&state==='clear'){if(bakery<MAXBAKERY)init(bakery+1);else state='win'}if(state==='codex'&&!e.repeat){const ck=e.key.toLowerCase();if(ck==='arrowleft'||ck==='a')codexFlip(-1);else if(ck==='arrowright'||ck==='d')codexFlip(1)}});document.addEventListener('keyup',e=>keys[e.key]=false);function togglePogo(){pogoOn=!pogoOn;document.getElementById('pogoBtn').textContent=pogoOn?'🥣 Mixer ON':'🥣 Mixer OFF';if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false}}
 document.getElementById('pogoBtn').addEventListener('click',()=>{AudioKit.start();togglePogo();AudioKit.effect('pogo')});document.getElementById('codexBtn').addEventListener('click',()=>{AudioKit.start();toggleCodex()});
 c.addEventListener('pointerdown',e=>{AudioKit.start();if(state==='clear'){if(bakery<MAXBAKERY)init(bakery+1);else state='win'}else if(state==='codex'){const rc=c.getBoundingClientRect(),tx=(e.clientX-rc.left)*960/rc.width;if(tx<211)codexFlip(-1);else if(tx>749)codexFlip(1);else toggleCodex()}});
 document.getElementById('restartBtn').addEventListener('click',()=>{AudioKit.start();restart()});document.getElementById('audioBtn').addEventListener('click',()=>AudioKit.toggle());
 const statusEl=document.getElementById('status');
+const minimap=document.getElementById('verticalMap');
+const mapButton=document.getElementById('mapButton');
+mapButton.addEventListener('click',()=>{
+ const open=minimap.style.display==='none';
+ minimap.style.display=open?'block':'none';
+ mapButton.textContent=open?'🗺️ HIDE MAP (M)':'🗺️ WORLD MAP (M)';
+});
+document.getElementById('restartSection').addEventListener('click',respawnCheckpoint);
+document.addEventListener('keydown',e=>{
+ if(e.key.toLowerCase()==='m'&&!e.repeat){e.preventDefault();e.stopImmediatePropagation();mapButton.click()}
+},true);
+function drawPhase3Map(){
+ if(minimap.style.display==='none'||!window.__crustCameraDemo)return;
+ const g=minimap.getContext('2d');
+ g.fillStyle='#111a2a';g.fillRect(0,0,1050,360);
+ g.font='bold 14px monospace';g.textAlign='left';g.fillStyle='#dbffdf';
+ g.fillText('BAKERY '+bakery+' · GREEN checkpoints · GOLD jars · PINK spikes · CYAN baker · ORANGE oven',12,17);
+ const sy=6.0,offset=22;
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+   const v=map[y][x];
+   if(v==='.'){continue;}g.fillStyle=v==='#'?'#706f9b':'#fa79a6';
+   g.fillRect(x*10,y*sy+offset,10,Math.ceil(sy));
+ }
+ for(const gem of gems)if(!gem.got){g.fillStyle='#ffe689';g.fillRect(Math.floor(gem.x/T)*10,Math.floor(gem.y/T)*sy+offset,9,8)}
+ for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
+  const [x,y]=currentVerticalLayout().checkpoints[i];
+  g.fillStyle=i<=phase3State.current?'#82ffbf':'#5ba887';g.fillRect(x*10,y*sy+offset,10,9);
+ }
+ g.fillStyle='#ff985e';g.fillRect(currentVerticalLayout().oven.x*10,currentVerticalLayout().oven.y*sy+offset,16,12);
+ g.fillStyle='#56f4f3';g.fillRect(Math.floor(player.x/T)*10,Math.floor(player.y/T)*sy+offset,10,10);
+ g.strokeStyle='#c2fff4';g.lineWidth=2;
+ g.strokeRect(camera/T*10,cameraY/T*sy+offset,W/T*10,H/T*sy);
+}
+
+const demoBtn=document.getElementById('cameraDemoBtn');
+const normalBtn=document.getElementById('cameraNormalBtn');
+const smoothBtn=document.getElementById('cameraSmoothBtn');
+const gridBtn=document.getElementById('cameraGridBtn');
+const readout=document.getElementById('cameraReadout');
+function updateParallaxUI(){
+ const on=window.__crustParallaxEnabled!==false;
+ document.getElementById('parallaxToggleBtn').textContent=on?'⚙️ FORGE DEPTH ON (B)':'⚙️ ORIGINAL PAINTING (B)';
+ document.getElementById('parallaxToggleBtn').style.background=on?'#267c7d':'#78577f';
+ for(const style of ['subtle','balanced','dramatic']){
+  document.getElementById('parallax'+style[0].toUpperCase()+style.slice(1)+'Btn').style.background=
+   window.__crustParallaxProfile===style?'#277d70':'#67638c';
+ }
+}
+document.getElementById('parallaxToggleBtn').addEventListener('click',()=>{
+ window.__crustParallaxEnabled=window.__crustParallaxEnabled===false;updateParallaxUI();
+});
+for(const profile of ['subtle','balanced','dramatic']){
+ document.getElementById('parallax'+profile[0].toUpperCase()+profile.slice(1)+'Btn').addEventListener('click',()=>{
+ window.__crustParallaxProfile=profile;window.__crustParallaxEnabled=true;updateParallaxUI();
+ });
+}
+document.addEventListener('keydown',e=>{
+ if(e.key.toLowerCase()==='b'&&!e.repeat){window.__crustParallaxEnabled=window.__crustParallaxEnabled===false;updateParallaxUI()}
+},true);
+updateParallaxUI();
+function demoUI(){
+ demoBtn.style.background=window.__crustCameraDemo?'#2f8b7a':'#69638d';
+ normalBtn.style.background=window.__crustCameraDemo?'#69638d':'#2f8b7a';
+ smoothBtn.textContent=window.__crustCameraSnap?'🎥 SNAP FOLLOW (V)':'🎥 SMOOTH FOLLOW (V)';
+ gridBtn.textContent=window.__crustCameraDebug?'▦ GRID ON (G)':'▦ GRID OFF (G)';
+}
+function switchMode(demo){
+ window.__crustCameraDemo=demo;init(bakery);updateViewCamera();demoUI();
+}
+function moveToAltitude(index){
+ if(!window.__crustCameraDemo)switchMode(true);
+ // Anchored to the physical floor, middle rooftop or summit rooftop.
+ const targets=currentVerticalLayout().altitudeTargets || [[3,54],[44,32],[72,18]];
+ const [tx,top]=targets[index];
+ player.x=tx*T+6;player.y=top*T-player.h;
+ player.vx=0;player.vy=0;player.ground=true;player.hang=null;
+ state='play';updateViewCamera();
+}
+demoBtn.addEventListener('click',()=>switchMode(true));
+normalBtn.addEventListener('click',()=>switchMode(false));
+smoothBtn.addEventListener('click',()=>{window.__crustCameraSnap=!window.__crustCameraSnap;demoUI()});
+gridBtn.addEventListener('click',()=>{window.__crustCameraDebug=!window.__crustCameraDebug;demoUI()});
+document.getElementById('cameraFootBtn').addEventListener('click',()=>moveToAltitude(0));
+document.getElementById('cameraMiddleBtn').addEventListener('click',()=>moveToAltitude(1));
+document.getElementById('cameraTopBtn').addEventListener('click',()=>moveToAltitude(2));
+document.addEventListener('keydown',e=>{
+ if(e.repeat)return;
+ const k=e.key.toLowerCase();
+ if(k==='g'){window.__crustCameraDebug=!window.__crustCameraDebug;demoUI()}
+ if(k==='v'){window.__crustCameraSnap=!window.__crustCameraSnap;demoUI()}
+ if(k==='1'||k==='2'||k==='3'){e.preventDefault();moveToAltitude(Number(k)-1)}
+},true);
+function diagnosticOverlay(){
+ if(!window.__crustCameraDemo){readout.textContent='Legacy Bakery '+bakery+' · cameraY remains zero · original level physics';return;}
+ readout.textContent='Player ('+Math.round(player.x)+', '+Math.round(player.y)+') · Camera ('+
+ Math.round(camera)+', '+Math.round(cameraY)+') · View '+W+'×'+H+
+ ' · World '+(cols*T)+'×'+(rows*T)+' · '+(window.__crustCameraSnap?'Snap':'Smooth')+' · '+(window.__crustParallaxEnabled?'Parallax '+window.__crustParallaxProfile:'Original backdrop');
+ if(!window.__crustCameraDebug)return;
+ g.save();g.setTransform(1,0,0,1,0,0);
+ g.lineWidth=1;g.strokeStyle='rgba(181,255,231,.18)';
+ for(let x=Math.ceil(camera/T)*T;x<camera+W;x+=T){
+  const sx=Math.round(x-camera)+.5;
+  g.beginPath();g.moveTo(sx,0);g.lineTo(sx,H);g.stroke();
+ }
+ for(let y=Math.ceil(cameraY/T)*T;y<cameraY+H;y+=T){
+  const sy=Math.round(y-cameraY)+.5;
+  g.beginPath();g.moveTo(0,sy);g.lineTo(W,sy);g.stroke();
+ }
+ g.fillStyle='#ddffe4';g.font='bold 14px monospace';
+ g.fillText('CLOCKWORK CAMERA · '+Math.round(cameraY)+' px altitude scroll',18,H-24);
+ g.restore();
+}
+demoUI();
 for(const b of document.querySelectorAll('[data-key]')){
  const k=b.dataset.key;
  function down(e){e.preventDefault();AudioKit.start();if(state==='codex'&&(k==='left'||k==='right')){codexFlip(k==='left'?-1:1);return}keys[k]=true;statusEl.textContent='Input detected: '+k;b.style.background='#58a5a2';}
@@ -554,6 +826,6 @@ for(const b of document.querySelectorAll('[data-key]')){
  b.addEventListener('click',e=>{if(k==='jump'){player.buffer=9;}statusEl.textContent='Button activated: '+k;});
 }
 window.addEventListener('blur',()=>{keys={}});
-try { init(); updateViewCamera(); draw(); requestAnimationFrame(loop); statusEl.textContent='Game ready — tap a control to start the jaunty music!'; }
+try { init(); updateViewCamera(); draw(); diagnosticOverlay(); drawPhase3Map(); requestAnimationFrame(loop); statusEl.textContent='Clockwork Ovens ready — tap a control to start the jaunty music!'; }
 catch(err) { statusEl.textContent='Game error: '+err.message; console.error(err); }
 </script></body></html>
