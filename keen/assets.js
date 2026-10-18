@@ -3,7 +3,17 @@
  */
 'use strict';
 const assets={};
-function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
+function loadArt(name,uri){
+ const img=new Image();
+ if(name==='bakerAI')img.onload=()=>{
+  if(assets[name]!==img)return;
+  try{
+   const repaired=solidBakerAtlas(img);
+   assets.bakerOriginal=img;assets.bakerSolid=repaired;assets[name]=repaired;
+  }catch(error){console.warn('Baker transparency repair unavailable; using original atlas.',error);}
+ };
+ img.src=uri;assets[name]=img;
+}
 function loadGameArt(){
 // Bakery 1 stone coping, slate ledges and opaque masonry (8 variants/row).
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
