@@ -9,7 +9,7 @@
 - Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` still embeds renderer, physics, shared game state, input and codex together. Audio, camera follow and world lifecycle are external scripts.
+- `keen/index.html` still embeds renderer, physics, shared game state and codex together. Audio, camera follow, world lifecycle and input are external scripts.
 - Classic mode was explicitly retired after the vertical-world playtest. `bakery1-layout.js` and `authored-bakeries-2-3.js` are no longer production dependencies; retained historical preview pages still reference them. Keep those snapshot dependencies until their preview pages are retired together.
 
 ## Files directly loaded by production
@@ -28,6 +28,7 @@ art/environment-gameplay-atlas.js
 audio.js
 camera.js
 world.js
+input.js
 ```
 
 **Runtime images:** `bioluminescent-mushroom-city.webp`, `moonlit-bakery-city.webp`, `clockwork-oven.webp`; `bakery{1,2,3}-parallax-{far,mid,near}.webp`; `dough-gremlins-primary.png`, `dough-gremlins-expressions.png`, and `baker-ai-stable.png`, all under `keen/art/`.
@@ -77,3 +78,9 @@ Classic retirement does not change authored vertical layouts, physics constants,
 `world.js` owns initialization/restart, authored-layout selection, checkpoint support and recovery, completion, recipe/best-score writes, and advancement to the next bakery or final win. Keyboard Enter and canvas tap share `advanceBakery()`; only the clear state permits advancement. The render/update loop calls `updateWorldProgress()`, and rendering reads `checkpointState` for flags/map markers. These replace the historical `tickPhase3` and `phase3State` names in production.
 
 This is a classic-script extraction, like `camera.js`: functions use the existing shared lexical game state, and are invoked only after setup. Storage loading and codex presentation remain in `index.html`; storage keys and save-failure behavior are unchanged. The authored layouts, collision routines, input mappings and audio engine are unchanged.
+
+## Input
+
+`input.js` binds keyboard, canvas, touch/pen/mouse controls and UI buttons once via `bindInput()` after UI setup. M controls mute; Q controls the map (the old capture listener intercepted M before mute). Non-movement shortcuts ignore key repeats. Letter controls accept either case, while arrow-key names remain compatible with the physics loop.
+
+Held on-screen controls use Pointer Events with pointer capture and per-button pointer IDs, replacing overlapping pointer/touch/mouse listeners. Release, cancellation, capture loss, window blur and page hiding clear held input. The existing jump click buffer and physics-driven C pogo toggle remain intact. Tests cover these paths with DOM/audio stubs; real touch devices still need playtesting.
