@@ -5,7 +5,14 @@ function game(saved={},options={}) {
  const html=options.html??fs.readFileSync(path.join(root,'index.html'),'utf8');
  const storage=new Map(Object.entries(saved)),elements=new Map(),listeners={},windowListeners={},audio={toggles:0,effects:[]};
  const trace=[];
- const clean=v=>v&&typeof v==='object'?(v.src?{image:require('node:crypto').createHash('sha256').update(v.src).digest('hex')}:'gradient'):v;
+ // Normalize extracted fallback paths to their original data URI identity, so
+ // pre-extraction draw baselines still compare the same image bytes.
+ const clean=v=>{
+  if(!v||typeof v!=='object')return v;
+  if(!v.src)return 'gradient';
+  const src=v.src.startsWith('art/fallback-')?'data:image/png;base64,'+fs.readFileSync(path.join(root,v.src)).toString('base64'):v.src;
+  return {image:require('node:crypto').createHash('sha256').update(src).digest('hex')};
+ };
  const gradient={addColorStop(...args){trace.push(['addColorStop',...args])}};
  const g=new Proxy({}, {get:(o,k)=>o[k]??((...args)=>{trace.push([k,...args.map(clean)]);return gradient}),set:(o,k,v)=>{trace.push(['set',k,clean(v)]);o[k]=v;return true}});
  for(const [,id] of html.matchAll(/id="([^"]+)"/g))elements.set(id,{style:{display:id==='verticalMap'?'none':''},textContent:'',listeners:{},getContext:()=>g,addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}});

@@ -24,13 +24,9 @@ native game viewport) and WebP-encoded for fast browser loading. No game
 physics, hitboxes, camera, level geometry, parallax decoration, collectibles,
 recipes, enemy behavior or audio logic is changed.
 
-## Live A/B test
+## Current preview
 
-Open the current game to review the trilogy backgrounds. The standalone comparison page has been retired.
-
-- Buttons or keys **1 / 2 / 3** jump between bakeries.
-- **B** switches generated vs original background art.
-- All existing gameplay controls continue to work.
+Open the current game to review the trilogy backgrounds. The standalone comparison page and its bakery-switching shortcuts have been retired. Production keys 1/2/3 select altitude positions, not bakeries; B toggles parallax depth.
 
 ## Verification
 

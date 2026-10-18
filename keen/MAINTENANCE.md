@@ -9,7 +9,7 @@
 - Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` retains asset loading, recipes, shared game state and startup. Audio, camera follow, world lifecycle, input and rendering are external scripts.
+- `keen/index.html` retains recipes, shared game state and startup. Image registration lives in `assets.js`. Audio, camera follow, world lifecycle, input and rendering are external scripts.
 - Classic mode and its standalone preview dependencies have been retired; production has only the three vertical worlds.
 
 ## Files directly loaded by production
@@ -36,11 +36,12 @@ gameplay.js
 characters.js
 hud.js
 render.js
+assets.js
 ```
 
 **Runtime images:** `bioluminescent-mushroom-city.webp`, `moonlit-bakery-city.webp`, `clockwork-oven.webp`; `bakery{1,2,3}-parallax-{far,mid,near}.webp`; `dough-gremlins-primary.png`, `dough-gremlins-expressions.png`, and `baker-ai-stable.png`, all under `keen/art/`.
 
-The embedded data-URI images and script-generated image atlases also belong to the production path; avoid deleting them based only on filename search.
+The remaining art scripts still carry embedded fallback images and generated atlases used by production. `index.html` no longer contains image data; its seven retained inline PNGs now live in `art/fallback-*.png`. Do not delete these fallbacks based only on their age.
 
 ## Historical preview inventory
 
@@ -60,7 +61,7 @@ The pre-cleanup snapshots remain in Git history at `b481e2b`. Use the commit-spe
 
 - There is one global 148 BPM, 32-step procedural composition across all three worlds; no stage-specific soundtrack yet.
 - The three vertical layouts share an intentionally similar ascent–crest–descent structure. A future design pass should diversify them, **not** silently do so during refactoring.
-- The Web Audio engine has now been extracted to `keen/audio.js`, retaining its existing API. The production HTML still carries substantial embedded artwork, making reviews and diffs harder than necessary.
+- The Web Audio engine has now been extracted to `keen/audio.js`, retaining its existing API. Image registration now lives in `assets.js`; older fallback art scripts still contain data URIs.
 
 ## Regression gate
 
@@ -104,3 +105,9 @@ The renderer still reads shared state; this extraction does not introduce an ES-
 - `gameplay.js`: `update()` preserves frame order: player movement, timers, hazards/projectiles, enemies, particles/floaters and pickups. Shared particle/floater creation helpers live here too. World completion, camera and drawing still follow in the outer loop.
 
 The modules continue using shared classic-script state; this pass changes ownership/location, not gameplay rules. `tests/physics-baseline.json` was captured from `c871345` before extraction: 18 deterministic simulations, 240 frames each, across all three bakeries. The comparison includes player/enemy/projectile state, effects, pickups, timers, checkpoint/progression state, camera and audio-effect events. Additional checks cover one-way crossings, ledge early returns/climb timing, shields, invulnerability and ammunition. Run all checks with `node --test keen/tests/*.test.cjs`.
+
+## Asset cleanup
+
+`assets.js` registers the same production images in the same order. The fallback PNG files are byte-identical to the former HTML data URIs: three retro-stage backgrounds, the phase-4 baker atlas, tiles, original background and items. The never-read `bakerPhase2` and `baker` registrations were removed. Modern primary artwork and compositions are unchanged.
+
+`tests/fallback-assets.json` records SHA-256 values captured from the embedded bytes before extraction. `assets.test.cjs` verifies those bytes, script paths, registered image paths and the absence of image data in HTML. The render harness normalizes only the newly extracted fallback image paths to their former data-URI identities, so the existing render baseline remains unchanged. External fallback files load asynchronously like the existing file-backed art; the renderer's primitive fallbacks remain available while they load.
