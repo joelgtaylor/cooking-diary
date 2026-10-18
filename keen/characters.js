@@ -2,7 +2,44 @@
  * Reads physics state without changing movement; retains the existing animation clock.
  */
 'use strict';
+// Rendering-only state follows actor identity, so restart cannot reuse an old clock.
+const actorAnimations=new WeakMap();
+function actorAnimation(actor,row){
+ let anim=actorAnimations.get(actor);
+ if(!anim||anim.row!==row||tick<anim.lastTick){
+  anim={row,start:tick,lastTick:tick};actorAnimations.set(actor,anim);
+ }
+ anim.lastTick=tick;
+ return Math.max(0,tick-anim.start);
+}
+function contactSurface(actor){
+ const foot=actor.y+actor.h,ty=Math.round(foot/T);
+ if(Math.abs(foot-ty*T)>1.5)return null;
+ const x0=Math.floor(actor.x/T),x1=Math.floor((actor.x+actor.w-1)/T);
+ for(let tx=x0;tx<=x1;tx++)if(tile(tx,ty)==='#'||tile(tx,ty)==='=')return ty*T;
+ return null;
+}
+function drawContactShadow(actor,width){
+ const surface=contactSurface(actor);if(surface===null)return;
+ const cx=Math.round(actor.x+actor.w/2),left=cx-Math.floor(width/2);
+ // Clip each short pixel shadow to actual support, including platform ends.
+ g.save();g.fillStyle='rgba(15,15,30,.28)';
+ for(let tx=Math.floor(left/T);tx<=Math.floor((left+width-1)/T);tx++){
+  const b=tile(tx,surface/T);if(b!=='#'&&b!=='=')continue;
+  const x=Math.max(left,tx*T),right=Math.min(left+width,(tx+1)*T);
+  g.fillRect(x,surface,right-x,2);
+  const innerLeft=Math.max(x,left+3),innerRight=Math.min(right,left+width-3);
+  if(innerRight>innerLeft)g.fillRect(innerLeft,surface+2,innerRight-innerLeft,1);
+ }
+ g.restore();
+}
+function gremlinAnimation(e){
+ const row=e.type==='hopper'&&Math.abs(e.vy||0)>1?2:Math.abs(e.vx)>0.15?1:0;
+ const duration=row===2?7:row===1?9:18;
+ return {row,frame:Math.floor(actorAnimation(e,row)/duration)%4};
+}
 function drawPlayer(){
+if(player.ground&&!player.hang&&!pogoOn)drawContactShadow(player,25);
 if(!player.inv||tick%8<4){
 // CRUST_PHASE4: animation state selection follows physics without changing it.
 // CRUST_REIMAGINED: state-driven 44-frame character animations
@@ -14,12 +51,17 @@ else if(!player.ground){row=player.vy<0?3:4;n=row===3?5:4;rate=4;}
 else if(player.climb>0){row=7;n=4;rate=2;}
 else if(speed>0.45){row=1;n=10;rate=Math.max(2,7-speed);}
 const frame=Math.floor(tick/rate)%n;
-const bob=row===1?Math.abs(Math.sin(tick*.35))*1.4:row===0?Math.sin(tick*.06)*.7:0;
-g.save();g.translate(player.x+player.w/2,player.y+player.h+2-bob);
+const ai=assets.bakerAI;
+const aiReady=ai&&ai.complete&&ai.naturalWidth;
+// Stable production frames have their grounded foot baseline at source y=100.
+// Retain the fallback's previous origin and the existing hanging hand placement.
+const bob=aiReady?0:row===1?Math.abs(Math.sin(tick*.35))*1.4:row===0?Math.sin(tick*.06)*.7:0;
+const anchorX=aiReady?Math.round(player.x+player.w/2):player.x+player.w/2;
+const anchorY=aiReady&&!player.hang?Math.round(player.y+player.h):player.y+player.h+2-bob;
+g.save();g.translate(anchorX,anchorY);
 g.scale(player.face,1);
 // CRUST_AI_STABILIZED_V3: clean atlas and per-state animation clocks.
-const ai=assets.bakerAI;
-if(ai&&ai.complete&&ai.naturalWidth){
+if(aiReady){
  // Stable action mapping: old physics states -> AI atlas rows.
  // 0 idle, 1 run, 2 jump, 3 fall, 4 land, 5 hang, 6 pogo, 7 hurt
  const aiRowByState=[0,1,4,2,3,5,6,4];
@@ -27,9 +69,7 @@ if(ai&&ai.complete&&ai.naturalWidth){
  const aiFrameCount=[5,4,4,4,4,4,3,2][aiRow];
  // Reset the animation clock whenever the state changes.
  // Tick-based rather than wall-clock based, so pausing doesn't skip frames.
- const anim=window.__crustAnimState||(window.__crustAnimState={row:-1,start:tick});
- if(anim.row!==aiRow){anim.row=aiRow;anim.start=tick;}
- const elapsed=Math.max(0,tick-anim.start);
+ const elapsed=actorAnimation(player,aiRow);
  let aiFrame=0;
  if(aiRow===1){
    // Run sequence loops smoothly at a speed appropriate to movement.
@@ -50,7 +90,8 @@ if(ai&&ai.complete&&ai.naturalWidth){
    aiFrame=Math.floor(elapsed/7)%aiFrameCount;
  }
  g.imageSmoothingEnabled=false;
- g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,-96,84,96);
+ const drawTop=player.hang?-96:-Math.round((aiRow===6?103:100)*96/112);
+ g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,drawTop,84,96);
 }else{
 const big=assets.bakerReimagined;
 if(big&&big.complete&&big.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(big,frame*96,row*112,96,112,-42,-96,84,96);}

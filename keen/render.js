@@ -219,23 +219,17 @@ for(const e of enemies)if(e.alive){
  const atlas=e.type==='hopper'?assets.gremlinExpressions:assets.gremlinRun;
  const newArt=window.__crustGremlinArt!==false&&atlas&&atlas.complete&&atlas.naturalWidth===128;
  if(newArt){
-   let row=0,frame=0;
-   if(e.type==='hopper'&&Math.abs(e.vy||0)>1){
-     row=2;frame=Math.min(3,Math.floor((tick+e.x*.1)/7)%4);
-   }else if(Math.abs(e.vx)>0.15){
-     row=1;frame=Math.floor((tick+e.x*.12)/9)%4;
-   }else{
-     row=0;frame=Math.floor((tick+e.x*.1)/18)%4;
-   }
-   // CRUST_GREMLIN_SCALE_V2: enlarge only the visual sprite; keep the
-   // original 25x25 enemy hitbox, velocity, AI and ground contact untouched.
-   // The source 32x32 cells contain a few transparent pixels under the boots.
-   // At 42px display size, -37 places the visible feet on the original floor.
-   const large=window.__crustLargeGremlins!==false;
-   const drawSize=large?42:32;
-   const drawTop=large?-37:-32;
+   const {row,frame}=gremlinAnimation(e);
+   // Preserve sprite sizes and physics. Only grounded frame padding is aligned.
+   const drawSize=window.__crustLargeGremlins!==false?42:32;
+   const supported=contactSurface(e)!==null&&Math.abs(e.vy||0)<=1;
+   const bottoms=e.type==='hopper'?
+    [[27,28,27,26],[27,26,28,27]]:[[27,28,28,27],[28,29,27,28]];
+   const foot=supported&&row<2?bottoms[row][frame]:28;
+   const drawTop=-Math.round(foot*drawSize/32);
+   if(supported)drawContactShadow(e,22);
    g.save();
-   g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h+bob));
+   g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));
    g.scale(e.vx<0?-1:1,1);
    g.imageSmoothingEnabled=false;
    g.drawImage(atlas,frame*32,row*32,32,32,-drawSize/2,drawTop,drawSize,drawSize);

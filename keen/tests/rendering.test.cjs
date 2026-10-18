@@ -3,15 +3,15 @@ const assert=require('node:assert/strict');
 const {createHash}=require('node:crypto');
 const {game}=require('./game-harness.cjs');
 const expected=require('./render-baseline.json');
-// Golden canvas-command traces captured before splitting the renderer.
-// These verify draw order, transforms, sprite frames and fallback paths, not pixels.
+// Reviewed canvas-command traces verify draw order, transforms, sprite frames
+// and fallback paths, not pixels. Historical pre-refactor traces remain in git.
 function renderCases(options={}){
  const output={};
  for(let stage=1;stage<=3;stage++)for(const mode of ['fallback','idle','run','jump','fall','pogo','hang','hurt','pause','codex','unlocked','clear','win']){
   const {run,trace}=game({},options);
   run(`init(${stage});tick=47;`);
   if(mode!=='fallback')run(`for(const a of Object.values(assets)){a.complete=true;a.naturalWidth=960;a.naturalHeight=540;}assets.environmentDecor.naturalWidth=256;assets.checkpointFlags.naturalWidth=320;`);
-  if(options.polishedTerrain&&mode!=='fallback')run(`assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalWidth=256;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalHeight=96;`);
+  if(options.polishedTerrain&&mode!=='fallback')run(`assets.bakerAI.naturalHeight=896;assets.gremlinRun.naturalWidth=128;assets.gremlinExpressions.naturalWidth=128;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalWidth=256;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalHeight=96;`);
   if(mode==='run')run('player.vx=3.6;player.face=-1');
   if(mode==='jump')run('player.ground=false;player.vy=-5');
   if(mode==='fall')run('player.ground=false;player.vy=5');
@@ -26,7 +26,7 @@ function renderCases(options={}){
  }
  return output;
 }
-test('renderer matches pre-extraction canvas traces across all three worlds',()=>{
+test('renderer matches reviewed character-grounding traces across all three worlds',()=>{
  assert.deepEqual(renderCases(),expected);
 });
 test('loaded terrain atlases match reviewed polished render traces across all worlds',()=>{
