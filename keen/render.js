@@ -192,37 +192,7 @@ for(let k=0;k<18;k++){
   g.fillRect(x+drift,y+Math.sin(tick*.035+k)*9,3,3);
  }
 }
-// CRUST_PICKUP_READABILITY_V1: collectible yeast jars are deliberately
-// distinguishable from identical decorative jars. The effect is visual only.
-for(const gem of gems)if(!gem.got){
- const cy=gem.y+Math.sin(tick*.09)*5;
- const cx=gem.x+2, pulse=(Math.sin(tick*.09)+1)*.5;
- g.save();
- // Warm halo behind the collectible, not behind decorative scenery.
- const halo=g.createRadialGradient(cx,cy-6,3,cx,cy-6,26);
- halo.addColorStop(0,'rgba(255,244,151,'+(0.28+pulse*.16)+')');
- halo.addColorStop(1,'rgba(255,210,95,0)');
- g.fillStyle=halo;g.beginPath();g.arc(cx,cy-6,26,0,Math.PI*2);g.fill();
- if(envReady)drawEnv(3,gem.x-13,cy-23,30,34);
- else if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,gem.x-9,cy-13,32,32);
- else rect(gem.x,cy,18,18,'#f8d994');
- // Four-point twinkles move with the collectible. Avoid additional
- // game objects, hitboxes or camera-dependent effects.
- g.strokeStyle='#fff6bc';g.lineWidth=2;
- for(let j=0;j<3;j++){
-   const a=tick*.035+j*Math.PI*2/3;
-   const sx=Math.round(cx+Math.cos(a)*22);
-   const sy=Math.round(cy-7+Math.sin(a)*14);
-   const size=j===0?5:3;
-   g.beginPath();g.moveTo(sx-size,sy);g.lineTo(sx+size,sy);
-   g.moveTo(sx,sy-size);g.lineTo(sx,sy+size);g.stroke();
- }
- // Stable, crisp objective marker above the jar, independent of frame art.
- g.font='bold 10px monospace';g.textAlign='center';
- g.fillStyle='#31243a';g.fillText('YEAST',cx+1,cy-31+1);
- g.fillStyle='#fff1a8';g.fillText('YEAST',cx,cy-31);
- g.restore();
-}
+drawYeastCollectibles();
 for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
 if(envReady){drawEnv(u.kind==='kefir'?14:u.kind==='rye'?8:13,u.x-19,uy-23,38,38);}
 else if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
@@ -274,48 +244,6 @@ for(const e of enemies)if(e.alive){
 }
 for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';drawPlayer();
 drawGrandOven();
-{
- for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
-  const [xx,yy]=currentVerticalLayout().checkpoints[i];
-  const activated=i<=checkpointState.current;
-  // CRUST_CHECKPOINT_FLAG_ANIM_V1: game-art banner frames.
-  const flag=assets.checkpointFlags;
-  if(flag&&flag.complete&&flag.naturalWidth===320){
-    const frame=Math.floor(tick/(activated?8:10))%4;
-    const row=activated?1:0;
-    const dw=66,dh=99;
-    const centerX=xx*T+16,groundY=checkpointSupportRow(xx,yy)*T;
-    // CRUST_CHECKPOINT_STABLE_POLE_V3: freeze the rigid structure at frame 0.
-    // Generated art varies the stone pedestal and pole by a few pixels,
-    // which can't be fixed perfectly by moving the entire waving sprite.
-    // Only the cloth (upper-right region) is animated. Its pole, stone
-    // footing, and lantern always come from the identical frame-0 pixels.
-    const footPadding=row===1?10:6;
-    const dx=Math.round(centerX-dw/2)+2;
-    const dy=Math.round(groundY-dh)+2+Math.round(footPadding*dh/120);
-    const splitX=43,splitY=87;
-    const xScale=dw/80,yScale=dh/120;
-    const drawPart=(col,sx,sy,sw,sh,xShift=0)=>{
-      g.drawImage(flag,col*80+sx,row*120+sy,sw,sh,
-        Math.round(dx+sx*xScale)+xShift,Math.round(dy+sy*yScale),
-        Math.round(sw*xScale),Math.round(sh*yScale));
-    };
-    g.save();
-    g.imageSmoothingEnabled=false;
-    // Animated banner; its moving edge is the only part allowed to sway.
-    const sway=[0,2,6,6];
-    drawPart(frame,splitX,0,80-splitX,splitY,
-      Math.round(sway[frame]*xScale));
-    // Fixed lantern, flagpole, finial and mounting hardware.
-    drawPart(0,0,0,splitX,splitY);
-    // Fixed stone base and flowers, even where they extend past the pole.
-    drawPart(0,0,splitY,80,120-splitY);
-    g.restore();
-  }else{
-    // Preload fallback: small marker stays visible on slow connections.
-    g.fillStyle=activated?'#64f2bb':'#ffb976';
-    g.beginPath();g.arc(xx*T+16,yy*T+4,7,0,Math.PI*2);g.fill();
-  }
- }
-}g.restore();
+drawCheckpoints();
+g.restore();
 }

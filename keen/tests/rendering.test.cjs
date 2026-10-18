@@ -7,7 +7,7 @@ const expected=require('./render-baseline.json');
 // and fallback paths, not pixels. Historical pre-refactor traces remain in git.
 function renderCases(options={}){
  const output={};
- for(let stage=1;stage<=3;stage++)for(const mode of ['fallback','idle','run','jump','fall','pogo','hang','hurt','pause','codex','unlocked','clear','win',...(options.polishedTerrain?['oven_ready']:[])]){
+ for(let stage=1;stage<=3;stage++)for(const mode of ['fallback','idle','run','jump','fall','pogo','hang','hurt','pause','codex','unlocked','clear','win',...(options.polishedTerrain?['oven_ready','checkpoint_saved','yeast_collected']:[])]){
   const {run,trace}=game({},options);
   run(`init(${stage});tick=47;`);
   if(mode!=='fallback')run(`for(const a of Object.values(assets)){a.complete=true;a.naturalWidth=960;a.naturalHeight=540;}assets.environmentDecor.naturalWidth=256;assets.checkpointFlags.naturalWidth=320;`);
@@ -19,6 +19,8 @@ function renderCases(options={}){
   if(mode==='hang')run('player.hang={};');
   if(mode==='hurt')run('player.inv=20');
   if(['pause','codex','clear','win'].includes(mode))run(`state='${mode}'`);
+  if(mode==='checkpoint_saved')run('drawCheckpoints();checkpointState.current=0;tick=48;');
+  if(mode==='yeast_collected')run('drawYeastCollectibles();gems[0].got=true;collected=1;tick=48;');
   if(mode==='oven_ready')run('collected=5;camera=world-W;cameraY=rows*T-H;');
   if(mode==='unlocked')run("state='codex';unlocked=[0,1,2];codexPage=2");
   trace.length=0;
@@ -27,10 +29,10 @@ function renderCases(options={}){
  }
  return output;
 }
-test('renderer matches reviewed character-grounding traces across all three worlds',()=>{
+test('renderer matches reviewed world-object traces across all three worlds',()=>{
  assert.deepEqual(renderCases(),expected);
 });
-test('loaded terrain atlases match reviewed polished render traces across all worlds',()=>{
+test('loaded world artwork matches reviewed polished render traces across all worlds',()=>{
  assert.deepEqual(renderCases({polishedTerrain:true}),require('./polished-render-baseline.json'));
 });
 module.exports={renderCases};
