@@ -7,6 +7,7 @@ function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 function loadGameArt(){
 // Bakery 1 stone coping, slate ledges and opaque masonry (8 variants/row).
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
+loadArt('cavernTerrain','art/cavern-terrain.png');
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
 // Kept separate from Phase3 art so it can fall back safely if not loaded.
 loadArt('generatedMushroomBG','art/bioluminescent-mushroom-city.webp');

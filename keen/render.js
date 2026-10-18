@@ -49,6 +49,35 @@ function drawMoonlitTerrain(tx,ty,b){
   }
  }
 }
+const cavern=assets.cavernTerrain;
+const cavernReady=bakery===2&&cavern&&cavern.complete&&cavern.naturalWidth===256&&cavern.naturalHeight===96;
+function drawCavernTerrain(tx,ty,b){
+ const x=tx*T,y=ty*T,variant=(tx+ty*3)%8;
+ const surface=tile(tx,ty-1)!=='#'&&tile(tx,ty-1)!=='=';
+ g.imageSmoothingEnabled=false;
+ if(b==='='){
+  // The chipped silhouette is purely visual and contained in this cell.
+  // Shared 26px end heights keep neighbouring ledge samples connected.
+  const tip=26+(variant%3)*2;
+  g.save();g.beginPath();g.moveTo(x,y);g.lineTo(x+32,y);
+  g.lineTo(x+32,y+26);g.lineTo(x+25,y+26);
+  g.lineTo(x+25,y+tip);g.lineTo(x+18,y+tip);
+  g.lineTo(x+18,y+23);g.lineTo(x+10,y+23);
+  g.lineTo(x+10,y+29);g.lineTo(x+5,y+29);
+  g.lineTo(x+5,y+26);g.lineTo(x,y+26);g.closePath();g.clip();
+  g.drawImage(cavern,variant*32,32,32,32,x,y,32,32);
+  g.drawImage(cavern,variant*32,0,32,32,x,y,32,7);
+  g.restore();
+ }else{
+  // Never clip solid ground: every collision cell is fully opaque.
+  g.drawImage(cavern,variant*32,64,32,32,x,y,32,32);
+  if(surface)g.drawImage(cavern,variant*32,0,32,32,x,y,32,7);
+ }
+ // End shading stays below the readable landing line.
+ g.fillStyle='#171d35';
+ if(tile(tx-1,ty)!==b)g.fillRect(x,y+7,2,b==='='?19:25);
+ if(tile(tx+1,ty)!==b)g.fillRect(x+30,y+7,2,b==='='?19:25);
+}
 const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
 const p3bg=assets['phase3'+bakery];
 const generatedBackground=bakery===1?assets.generatedMoonlitBG
@@ -78,6 +107,7 @@ g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
 for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
+ else if(cavernReady)drawCavernTerrain(x,y,b);
  else if(envReady)drawEnv(10,x*T,y*T,32,32);
  else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
  else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
@@ -85,7 +115,7 @@ for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='
  else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
 }}// Decorative brick seams and icing along visible solid tile surfaces.
 for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
- if(moonlitReady)continue;
+ if(moonlitReady||cavernReady)continue;
  if(map[ty][tx]!=='#'&&map[ty][tx]!=='=')continue;
  const xx=tx*T,yy=ty*T;
  g.fillStyle=bakery===2?'#443452':bakery===3?'#603b43':'#56405c';
