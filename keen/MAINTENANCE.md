@@ -9,7 +9,7 @@
 - Production defaults to `window.__crustCameraDemo = true`, which currently selects the 105-column × 56-row vertical levels (32 px tiles). The variable name is historical; this is **not** merely a demo.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` still embeds renderer, physics, camera, state, input, codex and the Web Audio engine together.
+- `keen/index.html` still embeds renderer, physics, camera, state, input and codex together. Audio and camera follow are external scripts.
 - Horizontal/classic comparison mode is still selectable in the UI. Do **not** remove `bakery1-layout.js`, `authored-bakeries-2-3.js`, or horizontal-mode logic before explicitly retiring that mode.
 
 ## Files directly loaded by production
@@ -27,6 +27,8 @@ art/vertical-parallax.js
 art/authored-bakeries-2-3.js
 art/baker-reimagined.js
 art/environment-gameplay-atlas.js
+audio.js
+camera.js
 ```
 
 **Runtime images:** `bioluminescent-mushroom-city.webp`, `moonlit-bakery-city.webp`, `clockwork-oven.webp`; `bakery{1,2,3}-parallax-{far,mid,near}.webp`; `dough-gremlins-primary.png`, `dough-gremlins-expressions.png`, and `baker-ai-stable.png`, all under `keen/art/`.
@@ -62,3 +64,11 @@ Some `art/` JavaScript files are not directly loaded by `keen/index.html`, inclu
 ## Regression gate
 
 For each refactoring pull request: compare against `main`, load the game from an isolated branch preview, confirm no missing assets or console errors, exercise all three vertical stages and classic mode (while supported), and verify recipe/codex persistence. No gameplay balance or visual design changes in maintenance-only PRs.
+
+## Branch preview and camera checks
+
+Branch preview: https://raw.githack.com/joelgtaylor/cooking-diary/refactor/keen-maintenance/keen/index.html
+
+This third-party proxy serves the branch independently of production. It may show an initial “Open the page” interstitial and cache files; use a commit-specific URL for reproducible reviews. Its origin has separate recipe/best-score storage from production.
+
+Camera follow was extracted verbatim into `camera.js`; it deliberately retains shared game-state bindings until state ownership is refactored. Run `node --test keen/tests/camera.test.cjs` from the repository root. Browser rendering was confirmed for production and the branch baseline; full control, audio and progression regression remains pending after the cloud-browser transport disconnected.

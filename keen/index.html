@@ -24,6 +24,7 @@
 <script src="art/baker-reimagined.js"></script>
 <script src="art/environment-gameplay-atlas.js"></script>
 <script src="audio.js"></script>
+<script src="camera.js"></script>
 <script>
 'use strict';window.__crustCameraDemo=true;window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
@@ -156,30 +157,7 @@ function tickPhase3(){
     state='clear';AudioKit.effect('win');
  }
 }
-function updateViewCamera(){
- if(!window.__crustCameraDemo){
-   // Keep the shipped horizontal camera exactly as it was.
-   camera=Math.max(0,Math.min(world-W,player.x-250));
-   cameraY=0;return;
- }
- const px=player.x+player.w/2,py=player.y+player.h/2;
- const x=px-camera,y=py-cameraY;
- const left=W*.28,right=W*.64,upper=H*.32,lower=H*.68;
- let targetX=camera,targetY=cameraY;
- if(x<left)targetX=px-left;
- else if(x>right)targetX=px-right;
- if(y<upper)targetY=py-upper;
- else if(y>lower)targetY=py-lower;
- const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
- targetX=clamp(targetX,0,world-W);
- targetY=clamp(targetY,0,rows*T-H);
- if(window.__crustCameraSnap){camera=targetX;cameraY=targetY;return;}
- // Physics remains subpixel; rounding happens only at canvas translation.
- camera+=clamp((targetX-camera)*.13,-14,14);
- cameraY+=clamp((targetY-cameraY)*(player.vy>3?.18:.14),-18,18);
- camera=clamp(camera,0,world-W);
- cameraY=clamp(cameraY,0,rows*T-H);
-}
+
 function init(b){if(b)bakery=b;if(window.__crustCameraDemo){initCameraDemo();return;}rows=17;cameraY=0;map=Array.from({length:rows},()=>Array(cols).fill('.'));for(let x=0;x<cols;x++){for(let y=15;y<rows;y++)map[y][x]='#';if(bakery===1&&x%17>=9&&x%17<=11&&x>10&&x<95)map[15][x]='.';if(bakery===2&&x%13>=6&&x%13<=8&&x>10&&x<95)map[15][x]='.';if(bakery===3&&((x%11>=5&&x%11<=6)||(x%23>=14&&x%23<=16))&&x>10&&x<95)map[15][x]='.';}const pads=bakery===1?[[6,12,7],[18,11,6],[31,12,7],[43,10,8],[58,12,7],[71,11,8],[87,12,6],[97,11,6]]:bakery===2?[[5,11,6],[16,9,7],[29,12,6],[40,10,7],[52,11,8],[63,9,6],[74,12,7],[86,10,6],[96,11,5]]:[[4,10,6],[14,12,7],[25,9,6],[36,11,7],[47,10,8],[58,12,6],[69,9,7],[80,11,6],[91,12,7]];for(const [sx,sy,n] of pads)for(let x=sx;x<sx+n;x++)map[sy][x]='#';for(let x=0;x<cols;x++)if(x%11===4&&x>13&&x<99)map[14][x]='^';const gemPos=bakery===1?[[9,11],[22,10],[47,9],[75,10],[100,10]]:bakery===2?[[8,10],[20,8],[44,9],[66,8],[98,9]]:[[7,9],[24,8],[46,9],[68,8],[99,10]];gems=gemPos.map(([x,y])=>({x:x*T+12,y:y*T,got:false}));const ePos=bakery===1?[[15,'walker'],[34,'walker'],[52,'walker'],[66,'walker'],[83,'walker'],[92,'walker']]:bakery===2?[[14,'walker'],[30,'hopper'],[48,'walker'],[64,'hopper'],[80,'walker'],[93,'hopper']]:[[13,'chaser'],[28,'hopper'],[44,'chaser'],[60,'walker'],[76,'hopper'],[90,'chaser']];enemies=ePos.map(([x,ty],i)=>({x:x*T,y:14*T,w:25,h:25,vx:i%2?1.1:-1.1,alive:true,type:ty,vy:0,hopT:40+i*13}));const pPos=bakery===1?[[30,'kefir'],[71,'rye']]:bakery===2?[[24,'banneton'],[76,'kefir']]:[[20,'rye'],[55,'kefir'],[88,'banneton']];powerups=pPos.map(([x,k])=>({x:x*T+4,y:14*T-8,kind:k,got:false,ph:Math.random()*6}));// CRUST_AUTHORED_BAKERY_1_V1: authored traversal only for Bakery 1.
 if(bakery===1&&window.__crustAuthoredBakery1!==false&&window.CrustBakery1Layout){
  const layout=window.CrustBakery1Layout.apply({map,cols,rows,T});
