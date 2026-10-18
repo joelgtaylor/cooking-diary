@@ -1,5 +1,6 @@
 # Crust Quest environment art upgrade
 
+> Historical art-integration notes. Standalone comparison pages were retired during maintenance; use [the current game](../index.html) and [MAINTENANCE.md](../MAINTENANCE.md) for current behavior. Earlier verification notes below describe their original integration.
 This feature uses a **256×256 transparent pixel-art atlas** (4 columns × 4 rows, 64×64 per source cell) curated from three generated concept sheets:
 
 - `neon_platformer_hazard_sprite_sheet.png` — pink, blue, iron, and baked-gold spikes
@@ -33,10 +34,7 @@ Source asset sheets and the original environment art remain untouched; the game 
 
 ## Preview
 
-https://joelgtaylor.github.io/cooking-diary/keen/world-elements-preview.html
-
-- **E** toggles new artwork / original (render-only).
-- **B** switches Bakery 1 → 2 → 3 without changing game logic.
+Use the current game; the old standalone E/B comparison controls have been retired.
 
 ## Verification
 

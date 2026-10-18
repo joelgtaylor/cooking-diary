@@ -1,3 +1,9 @@
+# Crust Quest — Level Design Notes (Historical Baseline)
+
+> **Historical design document, originally written October 17, 2026.** This plan describes the old 105 × 17 horizontal levels and the intended future vertical redesign. The vertical bakery worlds were merged on October 18, 2026, and are now the default production mode. The implementation is defined by `art/vertical-bakery1-layout.js`, `art/vertical-bakery2-layout.js`, and `art/vertical-bakery3-layout.js`. For present-day architecture, active dependencies, and regression requirements, see [MAINTENANCE.md](MAINTENANCE.md). **Do not apply the implementation sequence below to the production vertical worlds without revising its assumptions.**
+
+---
+
 # Crust Quest — Level Design Refresh
 
 **Status:** Planning baseline, 2026-10-17. No gameplay modifications in this document.

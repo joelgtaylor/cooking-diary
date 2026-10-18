@@ -1,5 +1,6 @@
 # Crust Quest — Animated Dough Gremlins
 
+> Historical art-integration notes. Standalone comparison pages were retired during maintenance; use [the current game](../index.html) and [MAINTENANCE.md](../MAINTENANCE.md) for current behavior. Earlier verification notes below describe their original integration.
 This update reuses the two AI-generated dough-monster sprite sheets as a compact, transparent, pixel-art gameplay animation atlas. The source images are still available in the project conversation; the files here are **game-ready 128×128 PNG atlases** with 16 frames each (4 columns × 4 rows of 32×32 sprites), extracted from the generated illustrations.
 
 Assets:
@@ -21,10 +22,4 @@ Rendering:
 - The original eyes/blink overlay is only drawn when the new asset is unavailable, avoiding doubled facial features.
 - All enemy AI, spawn logic, collision boxes, damage, physics, levels, collectibles and music are unchanged.
 
-Standalone playable comparison:
-https://joelgtaylor.github.io/cooking-diary/keen/gremlin-animation-preview.html
-
-Press **G** to switch between generated and original enemy appearances.
-Press **B** to cycle Bakery 1/2/3; all three retain their recently upgraded backgrounds.
-
-Do not merge until visually checked in an actual browser. The source atlases remain in GitHub even when game art is disabled, and the original art is always available for fallback.
+The standalone G/B comparison page has been retired. Production enemy rendering is in `../render.js`; the source atlases and fallback art remain available.
