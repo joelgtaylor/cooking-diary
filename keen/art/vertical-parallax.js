@@ -72,11 +72,13 @@ function render(g,opt){
  // Phase 2.1: replace the geometric city silhouettes with the approved
  // transparent Bakery 1 illustrations. Drawing remains behind the world.
  const illustration=opt.layers;
- const hasIllustration=stage===1&&illustration&&
+ const hasIllustration=(stage===1||stage===2)&&illustration&&
    ['far','mid','near'].every(key=>{
      const im=illustration[key];return im&&im.complete&&im.naturalWidth>0;
    });
  if(hasIllustration){
+   // Stage 2 uses genuine generated transparent mushroom landscapes.
+   // As in Stage 1, keep artwork behind actual collidable platforms.
    const maxX=Math.max(1,(opt.worldWidth||3360)-W);
    const dx=clamp(cx/maxX,0,1)-.5,dy=clamp(cy/maxY,0,1)-.5;
    const entries=[
@@ -178,5 +180,5 @@ function render(g,opt){
  }
  g.restore();
 }
-window.CrustParallax=Object.freeze({render,profiles,version:'phase2-art-cohesion-v1'});
+window.CrustParallax=Object.freeze({render,profiles,version:'phase4-fungal-generated-art-v1'});
 })();
