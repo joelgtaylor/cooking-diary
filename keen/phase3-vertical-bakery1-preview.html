@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Phase 3 — Bakery 1 Vertical Exploration</title><style>html,body{margin:0;height:100%;background:#101426;color:white;font-family:monospace;display:grid;place-items:center}#wrap{width:min(100vw,1040px);text-align:center}canvas{width:100%;image-rendering:pixelated;border:4px solid #6d78bd;box-sizing:border-box;background:#111}p{line-height:1.5}button{border:0;border-radius:6px;background:#dd5d90;color:white;padding:10px 20px;font-weight:bold;cursor:pointer}#touch{display:flex;gap:10px;justify-content:center;margin:10px;touch-action:none}#touch button{min-width:54px;font-size:19px;padding:12px 9px;user-select:none;touch-action:none}#status{color:#b9ffda;font-size:13px}</style></head><body><div id="wrap"><h2>🥖 CRUST QUEST: Rise of the Starter</h2><canvas id="c" width="960" height="540" aria-label="Retro platform video game">Your browser does not support canvas.</canvas><p>← → / A D move · Space / W / ↑ jump · C toggle pogo · X / K shoot · P pause · M mute · R restart · T recipes · TAP/ENTER next bakery</p><button id="restartBtn" type="button">Restart Mission</button> <button id="codexBtn" type="button">📖 Recipes</button> <button id="audioBtn" type="button">♫ Music: ON</button>
-<p style="color:#b8eedf;margin:12px 0">PHASE 3 · Jump UP THROUGH rooftop walkways and land ON TOP. Explore from cellars to towers and back down. Checkpoints enabled.</p>
+<p style="color:#b8eedf;margin:12px 0">PHASE 3 · Outdoor city polish: open starry sky, no dangling ceiling lamps or stray pipe brackets. One-way platforms and checkpoints enabled.</p>
 <button id="cameraDemoBtn" type="button">🏰 56-ROW EXPLORATION</button>
 <button id="cameraNormalBtn" type="button">🏙️ ORIGINAL BAKERY 1</button>
 <button id="cameraSmoothBtn" type="button">🎥 SMOOTH FOLLOW (V)</button>
@@ -324,7 +324,7 @@ const generatedBackground=bakery===1?assets.generatedMoonlitBG
 if(window.__crustCameraDemo&&window.CrustParallax&&window.__crustParallaxEnabled!==false){
  window.CrustParallax.render(g,{width:W,height:H,cameraX:camera,cameraY:cameraY,
   worldHeight:rows*T,worldWidth:world,
-  background:generatedBackground,stage:bakery,
+  background:generatedBackground,stage:bakery,outdoorCity:true,
   layers:{far:assets.bakery1ParallaxFar,mid:assets.bakery1ParallaxMid,near:assets.bakery1ParallaxNear},
   profile:window.__crustParallaxProfile||'dramatic',enabled:true});
 }else if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
@@ -354,6 +354,11 @@ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
 }
 
+// CRUST_PHASE3_OUTDOOR_COHESION_V1: legacy factories placed rigid right-angle
+// pipes, wall lanterns and crate decorations on every repeated tile. In this
+// outdoor city their artificial outlines obscure the detailed parallax art.
+// Preserve both passes for normal bakeries; suppress in vertical exploration.
+if(!window.__crustCameraDemo){
 // CRUST_PHASE2 scenery: repeating, deterministic bakery props tied to world coordinates.
 g.save();g.imageSmoothingEnabled=false;
 for(let tx=lo;tx<hi;tx++){
@@ -434,6 +439,7 @@ for(let tx=lo;tx<hi;tx++){
   }
  }
 }
+} // End legacy factory-scenery passes; atmospheric motes remain below.
 // Clockwork machinery, magical cave motes, or rooftop steam: visual only.
 for(let k=0;k<18;k++){
  const x=(k*173+37)%(cols*T),y=145+(k*71)%270;
