@@ -1,0 +1,49 @@
+/* CRUST_PHASE3_AUTHORED_WORLD_V1 — Bakery 1 vertical exploration pilot.
+ * Layout and metadata only; player physics remains in the existing engine.
+ * Routes: cellar entrance -> moonlit ascension -> towers -> descending oven.
+ */
+(function(){
+'use strict';
+const rows=56,cols=105,T=32;
+const climb=Array.from({length:18},(_,i)=>[4+4*i,52-2*i,6]);
+const descent=Array.from({length:7},(_,i)=>[75+4*i,20+3*i,6]);
+const lower=[[2,54,103],[24,48,8],[38,42,8],[53,37,8],[68,32,9],[78,43,10],[89,47,10],[96,52,9]];
+// Upper alternate bridge and lower shortcut. The branches rejoin the main climb.
+const branches=[[24,40,8],[30,38,8],[36,36,8],[42,34,8],[47,32,8],
+ [55,26,7],[60,24,8],[65,22,9],[82,29,7],[90,34,7]];
+const platforms=[...climb,...descent,...lower,...branches];
+const cultures=[[10,49],[32,37],[61,22],[83,25],[100,37]];
+const checkpoints=[[8,49],[40,33],[72,17],[91,33]];
+const hazards=[[22,53],[51,53],[84,53],[88,53]]; // ground, not overhead.
+const enemies=[[27,45,'walker'],[50,30,'walker'],[81,39,'walker']];
+const sections=[
+{name:'Bakery Entry',start:0,end:22,description:'safe ground and first ledges'},
+{name:'Moonlit Ascension',start:23,end:52,description:'forking elevated rooftop routes'},
+{name:'High Towers',start:53,end:77,description:'skyline summit and bridges'},
+{name:'Oven Descent',start:78,end:104,description:'descending ledges and grand oven'}
+];
+const oven={x:102,y:52};
+function apply({map}){
+ if(!map||map.length!==rows||map[0].length!==cols)throw Error('Phase 3 expects 105x56 map');
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)map[y][x]=y>=54?'#':'.';
+ for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)map[y][xx]='#';
+ // Ensure low shortcut and final oven surface are well supported.
+ for(const [x,y] of hazards){
+   // Hazard must be exposed and backed by solid geometry.
+   if(map[y+1][x]!=='#'||map[y][x]==='#')throw Error('Hidden or floating hazard at '+x+','+y);
+   map[y][x]='^';
+ }
+ return {
+  gems:cultures.map(([x,y])=>({x:x*T+12,y:y*T,got:false})),
+  enemies:enemies.map(([x,y,type],i)=>({
+   x:x*T,y:y*T,w:25,h:25,vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:30+i*9
+  })),
+  powerups:[[38,39,'kefir'],[70,17,'banneton'],[92,33,'rye']]
+    .map(([x,y,kind],i)=>({x:x*T+4,y:y*T,kind,got:false,ph:i*1.5}))
+ };
+}
+window.CrustVerticalBakery1=Object.freeze({
+ rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,
+ apply,version:'phase3-authored-pilot-v1'
+});
+})();
