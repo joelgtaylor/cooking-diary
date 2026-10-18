@@ -23,6 +23,9 @@
 <script src="camera.js"></script>
 <script src="world.js"></script>
 <script src="input.js"></script>
+<script src="characters.js"></script>
+<script src="hud.js"></script>
+<script src="render.js"></script>
 <script>
 'use strict';window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';const assets={};function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.
@@ -88,8 +91,7 @@ const THEMES=[
 ];
 function floater(x,y,txt,color){floaters.push({x,y,txt,color,life:70})}
 function toggleCodex(){if(state==='codex')state=codexFrom;else{codexFrom=state;state='codex';codexPage=0}}
-// Self-contained chiptune soundtrack and effects: Web Audio, no downloads required.
-const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;const rect=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)};
+const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;
 
 function tile(x,y){if(x<0||x>=cols||y>=rows)return'#';if(y<0)return'.';return map[y][x]}
 // CRUST_ONE_WAY_PLATFORMS_V1: '=' blocks downward foot crossings only.
@@ -184,320 +186,19 @@ else{const n=e.x+e.vx;if(hit(n,e.y,e.w,e.h)||!hit(n+Math.sign(e.vx)*14,e.y+e.h+8
 if(collide(player,e)){if(pogoOn&&player.vy>1&&player.y+player.h<e.y+14){e.alive=false;player.vy=-11;player.score+=150;hitStop=4;shake=Math.max(shake,4);burst(e.x+12,e.y+12,'#ffad57',14);floater(e.x+12,e.y-8,'STOMP +150','#ffd75e');AudioKit.effect('enemy')}else damage()}}for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.life--}particles=particles.filter(p=>p.life>0);for(const fl of floaters){fl.y-=0.8;fl.life--}floaters=floaters.filter(fl=>fl.life>0);for(const gem of gems)if(!gem.got&&Math.abs(player.x-gem.x)<25&&Math.abs(player.y-gem.y)<30){gem.got=true;collected++;combo=comboT>0?combo+1:1;comboT=240;const pts=250*combo;player.score+=pts;player.ammo+=5;burst(gem.x,gem.y,'#efff8b',18);floater(gem.x,gem.y-14,'+'+pts+(combo>1?' x'+combo+' COMBO':''),'#efff8b');AudioKit.effect('collect')}for(const u of powerups)if(!u.got&&Math.abs(player.x+14-u.x)<28&&Math.abs(player.y+19-u.y)<30){u.got=true;AudioKit.effect('collect');if(u.kind==='kefir'){player.speedT=480;burst(u.x,u.y,'#ffffff',14);floater(u.x,u.y-14,'KEFIR DASH!','#ffffff')}else if(u.kind==='rye'){player.health=Math.min(5,player.health+1);burst(u.x,u.y,'#c98d4b',14);floater(u.x,u.y-14,'+1 HEART','#ffb54e')}else{player.shield=true;burst(u.x,u.y,'#9af3fa',14);floater(u.x,u.y-14,'BANNETON SHIELD','#9af3fa')}}
 }
 function codexFlip(d){codexPage=(codexPage+d+RECIPES.length)%RECIPES.length;AudioKit.effect('pogo')}
-function drawCodex(){const px=230,py=64,pw=500,ph=412;g.fillStyle='#3a2c18';g.fillRect(px-6,py-6,pw+12,ph+12);g.fillStyle='#f5e9c8';g.fillRect(px,py,pw,ph);g.fillStyle='#e8d5a0';g.fillRect(px,py,14,ph);g.fillStyle='#8a6d3b';g.fillRect(px+16,py,2,ph);const cx=px+pw/2,ink='#4a3520',r=RECIPES[codexPage],un=unlocked.includes(codexPage);g.textAlign='center';g.font='bold 15px monospace';g.fillStyle='#8a6d3b';g.fillText('\u{1F4D6} RECIPE CODEX',cx,py+30);if(un){g.fillStyle=ink;g.font='bold 22px monospace';g.fillText(r.name,cx,py+62);g.font='13px monospace';g.fillStyle='#7a5f36';g.fillText(r.sub,cx,py+84);g.fillStyle='#b89b5e';g.fillRect(px+40,py+98,pw-80,2);g.textAlign='left';let y=py+126;g.font='bold 14px monospace';g.fillStyle='#8a6d3b';g.fillText('INGREDIENTS',px+44,y);y+=22;g.font='14px monospace';g.fillStyle=ink;r.ing.forEach(s=>{g.fillText('\u2022 '+s,px+44,y);y+=19});y+=10;g.font='bold 14px monospace';g.fillStyle='#8a6d3b';g.fillText('METHOD',px+44,y);y+=22;g.font='14px monospace';g.fillStyle=ink;r.steps.forEach((s,i)=>{g.fillText((i+1)+'. '+s,px+44,y);y+=19})}else{g.fillStyle=ink;g.font='bold 44px monospace';g.fillText('\u{1F512}',cx,py+150);g.font='bold 20px monospace';g.fillText('RECIPE LOCKED',cx,py+195);g.font='14px monospace';g.fillStyle='#7a5f36';g.fillText('Clear Bakery '+(codexPage+1)+' to unlock',cx,py+225);g.fillText('this page of the codex.',cx,py+247)}g.textAlign='center';g.font='bold 15px monospace';g.fillStyle='#8a6d3b';g.fillText('\u25C0  Page '+(codexPage+1)+' of '+RECIPES.length+'  \u25B6',cx,py+ph-18);g.font='bold 40px monospace';g.fillStyle='#ffd75e';g.fillText('\u25C0',150,H/2);g.fillText('\u25B6',810,H/2);g.font='14px monospace';g.fillStyle='#fff';g.fillText('\u2190 \u2192 / tap edges: turn page \u00B7 T / tap page: close',W/2,H-24)}
+
 // CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
 for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'+q,window.__PHASE3_BG[q]);
-function draw(){
-const env=assets.environmentDecor;
-const envReady=window.__crustWorldArtEnabled!==false&&env&&env.complete&&env.naturalWidth===256;
-function drawEnv(cell,x,y,w,h){
- g.imageSmoothingEnabled=false;
- g.drawImage(env,(cell%4)*64,Math.floor(cell/4)*64,64,64,x,y,w,h);
-}
-const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
-const p3bg=assets['phase3'+bakery];
-const generatedBackground=bakery===1?assets.generatedMoonlitBG
- :bakery===2?assets.generatedMushroomBG
- :assets.generatedClockworkBG;
-if(window.CrustParallax&&window.__crustParallaxEnabled!==false){
- window.CrustParallax.render(g,{width:W,height:H,cameraX:camera,cameraY:cameraY,
-  worldHeight:rows*T,worldWidth:world,
-  background:generatedBackground,stage:bakery,
-  outdoorCity:bakery===1,fungalCavern:bakery===2,clockworkOvens:bakery===3,
-  layers:bakery===1?
-    {far:assets.bakery1ParallaxFar,mid:assets.bakery1ParallaxMid,near:assets.bakery1ParallaxNear}:
-    bakery===2?
-    {far:assets.bakery2ParallaxFar,mid:assets.bakery2ParallaxMid,near:assets.bakery2ParallaxNear}:
-    {far:assets.bakery3ParallaxFar,mid:assets.bakery3ParallaxMid,near:assets.bakery3ParallaxNear},
-  profile:window.__crustParallaxProfile||'dramatic',enabled:true});
-}else if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
- g.imageSmoothingEnabled=false;
- g.drawImage(generatedBackground,0,0,W,H);
-}else if(p3bg&&p3bg.complete&&p3bg.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(p3bg,0,0,W,H)}
-else if(retro&&retro.complete&&retro.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(retro,0,0,W,H)}
-else if(assets.background.complete&&assets.background.naturalWidth){g.drawImage(assets.background,0,0,W,H);if(th.tint)rect(0,0,W,H,th.tint)}
-else rect(0,0,W,H,'#382c49');
-// Keep old flour motes only in the flat-background comparison.
-if(window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
-g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
-let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
-let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
-for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(envReady)drawEnv(10,x*T,y*T,32,32);
- else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
- else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
- if(envReady)drawEnv(bakery===1?15:bakery===2?0:2,x*T,y*T,32,32);
- else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
-}}// Decorative brick seams and icing along visible solid tile surfaces.
-for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
- if(map[ty][tx]!=='#'&&map[ty][tx]!=='=')continue;
- const xx=tx*T,yy=ty*T;
- g.fillStyle=bakery===2?'#443452':bakery===3?'#603b43':'#56405c';
- g.fillRect(xx+3,yy+11,26,2);g.fillRect(xx+14,yy+12,2,12);
- g.fillStyle=bakery===2?'#bb65d6':bakery===3?'#e5a35e':'#e4c1b0';
- if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
-}
-
-// PHASE 5: copper gear-tooth highlights on pass-through ledges.
-if(bakery===3){
- g.save();g.imageSmoothingEnabled=false;
- for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
-  if(map[ty][tx]!=='='||tile(tx,ty-1)==='^')continue;
-  const x=tx*T,y=ty*T;
-  g.fillStyle='#4b3040';g.fillRect(x+1,y+3,30,6);
-  g.fillStyle=tx%3===0?'#ffa34f':'#c88760';g.fillRect(x+2,y+1,28,4);
-  g.fillStyle='#ffe2a6';g.fillRect(x+5,y+1,5,2);
-  if(tx%5===1){g.fillStyle='rgba(255,160,78,.48)';g.fillRect(x+13,y-9,3,3);g.fillRect(x+21,y-14,2,2);}
- }
- g.restore();
-}
-// Clockwork machinery, magical cave motes, or rooftop steam: visual only.
-for(let k=0;k<18;k++){
- const x=(k*173+37)%(cols*T),y=145+(k*71)%270;
- if(x<camera-30||x>camera+W+30)continue;
- const drift=Math.sin(tick*.025+k*2.1)*7;
- if(bakery===3){
-  const r=10+(k%3)*5,spin=tick*.025*(k%2?1:-1);
-  g.strokeStyle='#e3a15f';g.lineWidth=3;
-  g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.stroke();
-  for(let j=0;j<6;j++){const a=spin+j*Math.PI/3;g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);g.stroke();}
- }else{
-  g.fillStyle=bakery===2?'#a2f6e5':'#e8d2aa';
-  g.fillRect(x+drift,y+Math.sin(tick*.035+k)*9,3,3);
- }
-}
-// CRUST_PICKUP_READABILITY_V1: collectible yeast jars are deliberately
-// distinguishable from identical decorative jars. The effect is visual only.
-for(const gem of gems)if(!gem.got){
- const cy=gem.y+Math.sin(tick*.09)*5;
- const cx=gem.x+2, pulse=(Math.sin(tick*.09)+1)*.5;
- g.save();
- // Warm halo behind the collectible, not behind decorative scenery.
- const halo=g.createRadialGradient(cx,cy-6,3,cx,cy-6,26);
- halo.addColorStop(0,'rgba(255,244,151,'+(0.28+pulse*.16)+')');
- halo.addColorStop(1,'rgba(255,210,95,0)');
- g.fillStyle=halo;g.beginPath();g.arc(cx,cy-6,26,0,Math.PI*2);g.fill();
- if(envReady)drawEnv(3,gem.x-13,cy-23,30,34);
- else if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,gem.x-9,cy-13,32,32);
- else rect(gem.x,cy,18,18,'#f8d994');
- // Four-point twinkles move with the collectible. Avoid additional
- // game objects, hitboxes or camera-dependent effects.
- g.strokeStyle='#fff6bc';g.lineWidth=2;
- for(let j=0;j<3;j++){
-   const a=tick*.035+j*Math.PI*2/3;
-   const sx=Math.round(cx+Math.cos(a)*22);
-   const sy=Math.round(cy-7+Math.sin(a)*14);
-   const size=j===0?5:3;
-   g.beginPath();g.moveTo(sx-size,sy);g.lineTo(sx+size,sy);
-   g.moveTo(sx,sy-size);g.lineTo(sx,sy+size);g.stroke();
- }
- // Stable, crisp objective marker above the jar, independent of frame art.
- g.font='bold 10px monospace';g.textAlign='center';
- g.fillStyle='#31243a';g.fillText('YEAST',cx+1,cy-31+1);
- g.fillStyle='#fff1a8';g.fillText('YEAST',cx,cy-31);
- g.restore();
-}
-for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
-if(envReady){drawEnv(u.kind==='kefir'?14:u.kind==='rye'?8:13,u.x-19,uy-23,38,38);}
-else if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
-else if(u.kind==='rye'){g.fillStyle='#a06830';g.beginPath();g.ellipse(u.x,uy,13,9,0,0,7);g.fill();g.fillStyle='#d8a860';g.beginPath();g.ellipse(u.x,uy-3,8,5,0,0,7);g.fill()}
-else{rect(u.x-11,uy-8,22,14,'#c9a06a');rect(u.x-11,uy-8,22,4,'#a87f4e');for(let qi=-8;qi<=8;qi+=8)rect(u.x+qi-1,uy-8,2,14,'#a87f4e')}}
-// CRUST_DOUGH_GREMLINS_V1: art-only integration. No changes to AI,
-// hitboxes, damage, collision, movement speed, or enemy spawn logic.
-for(const e of enemies)if(e.alive){
- const bob=Math.sin(tick*.1+e.x*.02)*2;
- const atlas=e.type==='hopper'?assets.gremlinExpressions:assets.gremlinRun;
- const newArt=window.__crustGremlinArt!==false&&atlas&&atlas.complete&&atlas.naturalWidth===128;
- if(newArt){
-   let row=0,frame=0;
-   if(e.type==='hopper'&&Math.abs(e.vy||0)>1){
-     row=2;frame=Math.min(3,Math.floor((tick+e.x*.1)/7)%4);
-   }else if(Math.abs(e.vx)>0.15){
-     row=1;frame=Math.floor((tick+e.x*.12)/9)%4;
-   }else{
-     row=0;frame=Math.floor((tick+e.x*.1)/18)%4;
-   }
-   // CRUST_GREMLIN_SCALE_V2: enlarge only the visual sprite; keep the
-   // original 25x25 enemy hitbox, velocity, AI and ground contact untouched.
-   // The source 32x32 cells contain a few transparent pixels under the boots.
-   // At 42px display size, -37 places the visible feet on the original floor.
-   const large=window.__crustLargeGremlins!==false;
-   const drawSize=large?42:32;
-   const drawTop=large?-37:-32;
-   g.save();
-   g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h+bob));
-   g.scale(e.vx<0?-1:1,1);
-   g.imageSmoothingEnabled=false;
-   g.drawImage(atlas,frame*32,row*32,32,32,-drawSize/2,drawTop,drawSize,drawSize);
-   g.restore();
- }else{
-   if(assets.items.complete&&assets.items.naturalWidth){
-     g.save();g.translate(e.x+(e.vx>0?0:25),e.y+bob);
-     g.scale(e.vx>0?1:-1,1);
-     g.drawImage(assets.items,32,0,32,32,0,-5,29,32);g.restore();
-   }else rect(e.x,e.y+bob,25,25,'#9c5e42');
-   if(e.type==='hopper')rect(e.x+8,e.y+bob-9,9,5,'#ff9d2e');
-   if(e.type==='chaser')rect(e.x+8,e.y+bob-9,9,5,'#ff4d5e');
-   // Original blinking face drawn only for fallback old sprites.
-   const blink=tick%113<5;
-   g.fillStyle='#2a1d32';
-   g.fillRect(e.x+7,e.y+8+bob,blink?8:4,blink?2:5);
-   g.fillRect(e.x+18,e.y+8+bob,blink?7:4,blink?2:5);
-   g.fillStyle='#fff5d7';
-   if(!blink){
-     g.fillRect(e.x+8,e.y+9+bob,2,2);
-     g.fillRect(e.x+19,e.y+9+bob,2,2);
-   }
-   g.fillStyle='#8d2b46';
-   g.fillRect(e.x+11,e.y+19+bob,8,3);
- }
-}
-for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';if(!player.inv||tick%8<4){
-// CRUST_PHASE4: animation state selection follows physics without changing it.
-// CRUST_REIMAGINED: state-driven 44-frame character animations
-const speed=Math.abs(player.vx);
-let row=0,n=6,rate=10;
-if(player.hang){row=5;n=6;rate=3;}
-else if(pogoOn){row=6;n=6;rate=4;}
-else if(!player.ground){row=player.vy<0?3:4;n=row===3?5:4;rate=4;}
-else if(player.climb>0){row=7;n=4;rate=2;}
-else if(speed>0.45){row=1;n=10;rate=Math.max(2,7-speed);}
-const frame=Math.floor(tick/rate)%n;
-const bob=row===1?Math.abs(Math.sin(tick*.35))*1.4:row===0?Math.sin(tick*.06)*.7:0;
-g.save();g.translate(player.x+player.w/2,player.y+player.h+2-bob);
-g.scale(player.face,1);
-// CRUST_AI_STABILIZED_V3: clean atlas and per-state animation clocks.
-const ai=assets.bakerAI;
-if(ai&&ai.complete&&ai.naturalWidth){
- // Stable action mapping: old physics states -> AI atlas rows.
- // 0 idle, 1 run, 2 jump, 3 fall, 4 land, 5 hang, 6 pogo, 7 hurt
- const aiRowByState=[0,1,4,2,3,5,6,4];
- const aiRow=aiRowByState[row] ?? 0;
- const aiFrameCount=[5,4,4,4,4,4,3,2][aiRow];
- // Reset the animation clock whenever the state changes.
- // Tick-based rather than wall-clock based, so pausing doesn't skip frames.
- const anim=window.__crustAnimState||(window.__crustAnimState={row:-1,start:tick});
- if(anim.row!==aiRow){anim.row=aiRow;anim.start=tick;}
- const elapsed=Math.max(0,tick-anim.start);
- let aiFrame=0;
- if(aiRow===1){
-   // Run sequence loops smoothly at a speed appropriate to movement.
-   const cycle=[0,1,2,3,2,1];
-   aiFrame=cycle[Math.floor(elapsed/Math.max(3,Math.round(8-speed*.5)))%cycle.length];
- }else if(aiRow===0){
-   aiFrame=Math.floor(elapsed/14)%aiFrameCount;
- }else if(aiRow===2){
-   // Jump plays forward once; avoid looping back midair.
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/5));
- }else if(aiRow===3){
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/7));
- }else if(aiRow===4){
-   aiFrame=Math.min(aiFrameCount-1,Math.floor(elapsed/4));
- }else if(aiRow===5){
-   aiFrame=Math.floor(elapsed/10)%aiFrameCount;
- }else if(aiRow===6){
-   aiFrame=Math.floor(elapsed/7)%aiFrameCount;
- }
- g.imageSmoothingEnabled=false;
- g.drawImage(ai,aiFrame*96,aiRow*112,96,112,-42,-96,84,96);
-}else{
-const big=assets.bakerReimagined;
-if(big&&big.complete&&big.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(big,frame*96,row*112,96,112,-42,-96,84,96);}
-else if(assets.bakerPhase4&&assets.bakerPhase4.complete&&assets.bakerPhase4.naturalWidth){g.drawImage(assets.bakerPhase4,0,0,64,80,-29,-67,58,70);}
-else rect(-13,-38,26,38,'#fff0cd');
-}
-g.restore();}
-const ex=currentVerticalLayout().oven.x*T;
-rect(ex-8,currentVerticalLayout().oven.y*T,65,115,'#6b4945');rect(ex-3,currentVerticalLayout().oven.y*T+6,55,106,'#c0aaa0');rect(ex+3,currentVerticalLayout().oven.y*T+23,43,70,'#523a3c');
-rect(ex+7,currentVerticalLayout().oven.y*T+27,35,62,collected===5?'#ffb54e':'#7a5252');
-rect(ex+13,currentVerticalLayout().oven.y*T+49,23,15,'#b46c36');
-rect(ex+17,currentVerticalLayout().oven.y*T+46,15,6,'#f2cd8c');
-rect(ex+1,currentVerticalLayout().oven.y*T+9,47,8,'#fff0cd');
-{
- for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
-  const [xx,yy]=currentVerticalLayout().checkpoints[i];
-  const activated=i<=checkpointState.current;
-  // CRUST_CHECKPOINT_FLAG_ANIM_V1: game-art banner frames.
-  const flag=assets.checkpointFlags;
-  if(flag&&flag.complete&&flag.naturalWidth===320){
-    const frame=Math.floor(tick/(activated?8:10))%4;
-    const row=activated?1:0;
-    const dw=66,dh=99;
-    const centerX=xx*T+16,groundY=checkpointSupportRow(xx,yy)*T;
-    // CRUST_CHECKPOINT_STABLE_POLE_V3: freeze the rigid structure at frame 0.
-    // Generated art varies the stone pedestal and pole by a few pixels,
-    // which can't be fixed perfectly by moving the entire waving sprite.
-    // Only the cloth (upper-right region) is animated. Its pole, stone
-    // footing, and lantern always come from the identical frame-0 pixels.
-    const footPadding=row===1?10:6;
-    const dx=Math.round(centerX-dw/2)+2;
-    const dy=Math.round(groundY-dh)+2+Math.round(footPadding*dh/120);
-    const splitX=43,splitY=87;
-    const xScale=dw/80,yScale=dh/120;
-    const drawPart=(col,sx,sy,sw,sh,xShift=0)=>{
-      g.drawImage(flag,col*80+sx,row*120+sy,sw,sh,
-        Math.round(dx+sx*xScale)+xShift,Math.round(dy+sy*yScale),
-        Math.round(sw*xScale),Math.round(sh*yScale));
-    };
-    g.save();
-    g.imageSmoothingEnabled=false;
-    // Animated banner; its moving edge is the only part allowed to sway.
-    const sway=[0,2,6,6];
-    drawPart(frame,splitX,0,80-splitX,splitY,
-      Math.round(sway[frame]*xScale));
-    // Fixed lantern, flagpole, finial and mounting hardware.
-    drawPart(0,0,0,splitX,splitY);
-    // Fixed stone base and flowers, even where they extend past the pole.
-    drawPart(0,0,splitY,80,120-splitY);
-    g.restore();
-  }else{
-    // Preload fallback: small marker stays visible on slow connections.
-    g.fillStyle=activated?'#64f2bb':'#ffb976';
-    g.beginPath();g.arc(xx*T+16,yy*T+4,7,0,Math.PI*2);g.fill();
-  }
- }
-}g.restore();rect(0,0,W,42,'#0b0c25');g.fillStyle='#fff';g.font='bold 20px monospace';g.fillText('♥ '.repeat(Math.max(0,player.health))+(player.shield?'◈':''),18,28);g.fillText('YEAST '+collected+'/5',190,28);g.fillText('✦ '+player.ammo,360,28);g.fillText('SCORE '+player.score,500,28);g.fillText('BEST '+best,690,28);g.fillText('BAKERY '+bakery+'/3',845,28);if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else{g.font='bold 52px monospace';const ttl=state==='win'?'PERFECT BAKE!':state==='clear'?'BAKERY CLEARED!':'PAUSED';g.fillText(ttl,W/2,H/2-60);g.font='22px monospace';if(state==='clear'){const r=RECIPES[bakery-1];g.fillStyle='#ffd75e';g.fillText('Recipe unlocked: '+r.name,W/2,H/2-8);g.fillStyle='#fff';g.fillText(bakery<MAXBAKERY?'TAP or ENTER for Bakery '+(bakery+1)+' - '+THEMES[bakery].name:'TAP or ENTER for the final rise',W/2,H/2+32)}else if(state==='win'){g.fillText('All 3 bakeries conquered - Crust Master!',W/2,H/2);g.fillStyle='#ffd75e';g.fillText('BEST SCORE: '+best,W/2,H/2+44)}else g.fillText('Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}}function loop(){try{if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}const statusEl=document.getElementById('status');
+function loop(){try{if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}const statusEl=document.getElementById('status');
 const minimap=document.getElementById('verticalMap');
 const mapButton=document.getElementById('mapButton');
-function drawPhase3Map(){
- if(minimap.style.display==='none')return;
- const g=minimap.getContext('2d');
- g.fillStyle='#111a2a';g.fillRect(0,0,1050,360);
- g.font='bold 14px monospace';g.textAlign='left';g.fillStyle='#dbffdf';
- g.fillText('BAKERY '+bakery+' · GREEN checkpoints · GOLD jars · PINK spikes · CYAN baker · ORANGE oven',12,17);
- const sy=6.0,offset=22;
- for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
-   const v=map[y][x];
-   if(v==='.'){continue;}g.fillStyle=v==='#'?'#706f9b':'#fa79a6';
-   g.fillRect(x*10,y*sy+offset,10,Math.ceil(sy));
- }
- for(const gem of gems)if(!gem.got){g.fillStyle='#ffe689';g.fillRect(Math.floor(gem.x/T)*10,Math.floor(gem.y/T)*sy+offset,9,8)}
- for(let i=0;i<currentVerticalLayout().checkpoints.length;i++){
-  const [x,y]=currentVerticalLayout().checkpoints[i];
-  g.fillStyle=i<=checkpointState.current?'#82ffbf':'#5ba887';g.fillRect(x*10,y*sy+offset,10,9);
- }
- g.fillStyle='#ff985e';g.fillRect(currentVerticalLayout().oven.x*10,currentVerticalLayout().oven.y*sy+offset,16,12);
- g.fillStyle='#56f4f3';g.fillRect(Math.floor(player.x/T)*10,Math.floor(player.y/T)*sy+offset,10,10);
- g.strokeStyle='#c2fff4';g.lineWidth=2;
- g.strokeRect(camera/T*10,cameraY/T*sy+offset,W/T*10,H/T*sy);
-}
 
 const smoothBtn=document.getElementById('cameraSmoothBtn');
 const gridBtn=document.getElementById('cameraGridBtn');
 const readout=document.getElementById('cameraReadout');
-function updateParallaxUI(){
- const on=window.__crustParallaxEnabled!==false;
- document.getElementById('parallaxToggleBtn').textContent=on?'⚙️ FORGE DEPTH ON (B)':'⚙️ ORIGINAL PAINTING (B)';
- document.getElementById('parallaxToggleBtn').style.background=on?'#267c7d':'#78577f';
- for(const style of ['subtle','balanced','dramatic']){
-  document.getElementById('parallax'+style[0].toUpperCase()+style.slice(1)+'Btn').style.background=
-   window.__crustParallaxProfile===style?'#277d70':'#67638c';
- }
-}
+
 updateParallaxUI();
-function cameraUI(){
- smoothBtn.textContent=window.__crustCameraSnap?'🎥 SNAP FOLLOW (V)':'🎥 SMOOTH FOLLOW (V)';
- gridBtn.textContent=window.__crustCameraDebug?'▦ GRID ON (G)':'▦ GRID OFF (G)';
-}
+
 function moveToAltitude(index){
  // Anchored to the physical floor, middle rooftop or summit rooftop.
  const targets=currentVerticalLayout().altitudeTargets || [[3,54],[44,32],[72,18]];
@@ -506,25 +207,7 @@ function moveToAltitude(index){
  player.vx=0;player.vy=0;player.ground=true;player.hang=null;
  state='play';updateViewCamera();
 }
-function diagnosticOverlay(){
- readout.textContent='Player ('+Math.round(player.x)+', '+Math.round(player.y)+') · Camera ('+
- Math.round(camera)+', '+Math.round(cameraY)+') · View '+W+'×'+H+
- ' · World '+(cols*T)+'×'+(rows*T)+' · '+(window.__crustCameraSnap?'Snap':'Smooth')+' · '+(window.__crustParallaxEnabled?'Parallax '+window.__crustParallaxProfile:'Original backdrop');
- if(!window.__crustCameraDebug)return;
- g.save();g.setTransform(1,0,0,1,0,0);
- g.lineWidth=1;g.strokeStyle='rgba(181,255,231,.18)';
- for(let x=Math.ceil(camera/T)*T;x<camera+W;x+=T){
-  const sx=Math.round(x-camera)+.5;
-  g.beginPath();g.moveTo(sx,0);g.lineTo(sx,H);g.stroke();
- }
- for(let y=Math.ceil(cameraY/T)*T;y<cameraY+H;y+=T){
-  const sy=Math.round(y-cameraY)+.5;
-  g.beginPath();g.moveTo(0,sy);g.lineTo(W,sy);g.stroke();
- }
- g.fillStyle='#ddffe4';g.font='bold 14px monospace';
- g.fillText('CLOCKWORK CAMERA · '+Math.round(cameraY)+' px altitude scroll',18,H-24);
- g.restore();
-}
+
 cameraUI();
 bindInput();
 try { init(); updateViewCamera(); draw(); diagnosticOverlay(); drawPhase3Map(); requestAnimationFrame(loop); statusEl.textContent='Clockwork Ovens ready — tap a control to start the jaunty music!'; }

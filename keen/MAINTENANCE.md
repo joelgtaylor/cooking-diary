@@ -9,7 +9,7 @@
 - Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
 - `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
 - `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` still embeds renderer, physics, shared game state and codex together. Audio, camera follow, world lifecycle and input are external scripts.
+- `keen/index.html` retains asset loading, recipes, shared game state, physics and startup. Audio, camera follow, world lifecycle, input and rendering are external scripts.
 - Classic mode was explicitly retired after the vertical-world playtest. `bakery1-layout.js` and `authored-bakeries-2-3.js` are no longer production dependencies; retained historical preview pages still reference them. Keep those snapshot dependencies until their preview pages are retired together.
 
 ## Files directly loaded by production
@@ -29,6 +29,9 @@ audio.js
 camera.js
 world.js
 input.js
+characters.js
+hud.js
+render.js
 ```
 
 **Runtime images:** `bioluminescent-mushroom-city.webp`, `moonlit-bakery-city.webp`, `clockwork-oven.webp`; `bakery{1,2,3}-parallax-{far,mid,near}.webp`; `dough-gremlins-primary.png`, `dough-gremlins-expressions.png`, and `baker-ai-stable.png`, all under `keen/art/`.
@@ -84,3 +87,11 @@ This is a classic-script extraction, like `camera.js`: functions use the existin
 `input.js` binds keyboard, canvas, touch/pen/mouse controls and UI buttons once via `bindInput()` after UI setup. M controls mute; Q controls the map (the old capture listener intercepted M before mute). Non-movement shortcuts ignore key repeats. Letter controls accept either case, while arrow-key names remain compatible with the physics loop.
 
 Held on-screen controls use Pointer Events with pointer capture and per-button pointer IDs, replacing overlapping pointer/touch/mouse listeners. Release, cancellation, capture loss, window blur and page hiding clear held input. The existing jump click buffer and physics-driven C pogo toggle remain intact. Tests cover these paths with DOM/audio stubs; real touch devices still need playtesting.
+
+## Rendering
+
+- `render.js`: `draw()` orchestrates world rendering followed by the screen-space HUD. `drawWorld()` draws parallax/backgrounds, terrain, pickups, enemies, particles, the baker, oven and checkpoint flags. It preserves the original camera transform, save/restore ordering and layer order.
+- `characters.js`: `drawPlayer()` retains baker animation state selection, frame timing, mirroring and sprite fallback paths. It runs inside the world transform. Enemy artwork stays with world drawing for now.
+- `hud.js`: HUD and pause/clear/win overlays, recipe codex, world map, camera diagnostic grid/readout and camera/parallax button presentation. Input and gameplay logic remain separate.
+
+The renderer still reads shared state; this extraction does not introduce an ES-module migration or a new render model. `tests/render-baseline.json` contains SHA-256 hashes of canvas-command traces captured from commit `0d4c399` before extraction: 39 cases covering all three bakeries, loaded/fallback artwork, baker animation states, menus, map and diagnostic overlays. `rendering.test.cjs` verifies exact command ordering/arguments against that baseline. These are command-level checks with stubbed canvas/images, not pixel comparisons or a substitute for visual playtesting. Existing gameplay/input tests use the shared `tests/game-harness.cjs`.
