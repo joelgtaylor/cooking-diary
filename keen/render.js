@@ -12,6 +12,43 @@ function drawEnv(cell,x,y,w,h){
  g.imageSmoothingEnabled=false;
  g.drawImage(env,(cell%4)*64,Math.floor(cell/4)*64,64,64,x,y,w,h);
 }
+const terrain=assets.moonlitTerrain;
+const moonlitReady=bakery===1&&terrain&&terrain.complete&&terrain.naturalWidth===256&&terrain.naturalHeight===96;
+function drawMoonlitTerrain(tx,ty,b){
+ const x=tx*T,y=ty*T;
+ const left=tile(tx-1,ty)!==b,right=tile(tx+1,ty)!==b;
+ const surface=tile(tx,ty-1)!=='#'&&tile(tx,ty-1)!=='=';
+ // All pixels stay inside the original 32px cell. The flat coping is
+ // exactly on the collision surface; decorative caps never protrude.
+ g.imageSmoothingEnabled=false;
+ const variant=(tx+ty*3)%8;
+ if(b==='='){
+  g.drawImage(terrain,variant*32,32,32,32,x,y,32,32);
+  g.drawImage(terrain,variant*32,0,32,32,x,y,32,9);
+  g.fillStyle='#30283f';g.fillRect(x,y+30,32,2);
+ }else{
+  // Opaque masonry fills the entire solid cell, including interior rows.
+  g.drawImage(terrain,variant*32,64,32,32,x,y,32,32);
+  if(surface){
+   g.drawImage(terrain,variant*32,0,32,32,x,y,32,9);
+   g.fillStyle='#493542';g.fillRect(x,y+9,32,2);
+   g.fillStyle='#a16c48';g.fillRect(x,y+9,32,1);
+  }
+ }
+ if(left||right){
+  g.fillStyle='#3b3045';
+  if(left)g.fillRect(x,y,2,32);
+  if(right)g.fillRect(x+30,y,2,32);
+  if(b==='='||surface){
+   g.fillStyle='#bd956b';
+   if(left)g.fillRect(x+2,y+2,2,7);
+   if(right)g.fillRect(x+28,y+2,2,7);
+   g.fillStyle='#895a40';
+   if(left)g.fillRect(x+2,y+11,3,17);
+   if(right)g.fillRect(x+27,y+11,3,17);
+  }
+ }
+}
 const th=THEMES[bakery-1];const retro=assets['retroStage'+bakery];
 const p3bg=assets['phase3'+bakery];
 const generatedBackground=bakery===1?assets.generatedMoonlitBG
@@ -40,13 +77,15 @@ if(window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-cam
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
-for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(envReady)drawEnv(10,x*T,y*T,32,32);
+for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
+ else if(envReady)drawEnv(10,x*T,y*T,32,32);
  else if(assets.tiles.complete&&assets.tiles.naturalWidth)g.drawImage(assets.tiles,((x+y*3)%8)*32,0,32,32,x*T,y*T,32,32);
  else rect(x*T,y*T,32,32,'#b47b51')}else if(b==='^'){
  if(envReady)drawEnv(bakery===1?15:bakery===2?0:2,x*T,y*T,32,32);
  else{g.fillStyle='#f47a9e';g.beginPath();g.moveTo(x*T,15*T+0);g.lineTo(x*T+16,14*T);g.lineTo(x*T+32,15*T);g.fill()}
 }}// Decorative brick seams and icing along visible solid tile surfaces.
 for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
+ if(moonlitReady)continue;
  if(map[ty][tx]!=='#'&&map[ty][tx]!=='=')continue;
  const xx=tx*T,yy=ty*T;
  g.fillStyle=bakery===2?'#443452':bakery===3?'#603b43':'#56405c';
