@@ -72,12 +72,12 @@ function render(g,opt){
  // Phase 2.1: replace the geometric city silhouettes with the approved
  // transparent Bakery 1 illustrations. Drawing remains behind the world.
  const illustration=opt.layers;
- const hasIllustration=(stage===1||stage===2)&&illustration&&
+ const hasIllustration=(stage===1||stage===2||stage===3)&&illustration&&
    ['far','mid','near'].every(key=>{
      const im=illustration[key];return im&&im.complete&&im.naturalWidth>0;
    });
  if(hasIllustration){
-   // Stage 2 uses genuine generated transparent mushroom landscapes.
+   // Stages 2 and 3 use their own generated transparent layered artwork.
    // As in Stage 1, keep artwork behind actual collidable platforms.
    const maxX=Math.max(1,(opt.worldWidth||3360)-W);
    const dx=clamp(cx/maxX,0,1)-.5,dy=clamp(cy/maxY,0,1)-.5;
