@@ -616,10 +616,19 @@ if(window.__crustCameraDemo){
     const row=activated?1:0;
     const dw=66,dh=99;
     const centerX=xx*T+16,groundY=(yy+1)*T;
+    // CRUST_CHECKPOINT_ANCHOR_V2: source animation cells have different
+    // transparent margins. Lock the rigid stone pedestal to the same pixel
+    // rather than letting the whole checkpoint sway with its fabric.
+    // Source-space center of pedestal shifts by ~[0,2,6,6] pixels.
+    const poleOffsets=[0,2,6,6];
+    const footPadding=row===1?10:6; // active images have extra bottom alpha
+    const correctionX=2+Math.round(poleOffsets[frame]*dw/80);
+    const correctionY=2+Math.round(footPadding*dh/120);
     g.save();
     g.imageSmoothingEnabled=false;
     g.drawImage(flag,frame*80,row*120,80,120,
-      Math.round(centerX-dw/2),Math.round(groundY-dh),dw,dh);
+      Math.round(centerX-dw/2)+correctionX,
+      Math.round(groundY-dh)+correctionY,dw,dh);
     g.restore();
   }else{
     // Preload fallback: small marker stays visible on slow connections.
