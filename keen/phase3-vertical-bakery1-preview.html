@@ -616,19 +616,31 @@ if(window.__crustCameraDemo){
     const row=activated?1:0;
     const dw=66,dh=99;
     const centerX=xx*T+16,groundY=(yy+1)*T;
-    // CRUST_CHECKPOINT_ANCHOR_V2: source animation cells have different
-    // transparent margins. Lock the rigid stone pedestal to the same pixel
-    // rather than letting the whole checkpoint sway with its fabric.
-    // Source-space center of pedestal shifts by ~[0,2,6,6] pixels.
-    const poleOffsets=[0,2,6,6];
-    const footPadding=row===1?10:6; // active images have extra bottom alpha
-    const correctionX=2+Math.round(poleOffsets[frame]*dw/80);
-    const correctionY=2+Math.round(footPadding*dh/120);
+    // CRUST_CHECKPOINT_STABLE_POLE_V3: freeze the rigid structure at frame 0.
+    // Generated art varies the stone pedestal and pole by a few pixels,
+    // which can't be fixed perfectly by moving the entire waving sprite.
+    // Only the cloth (upper-right region) is animated. Its pole, stone
+    // footing, and lantern always come from the identical frame-0 pixels.
+    const footPadding=row===1?10:6;
+    const dx=Math.round(centerX-dw/2)+2;
+    const dy=Math.round(groundY-dh)+2+Math.round(footPadding*dh/120);
+    const splitX=43,splitY=87;
+    const xScale=dw/80,yScale=dh/120;
+    const drawPart=(col,sx,sy,sw,sh,xShift=0)=>{
+      g.drawImage(flag,col*80+sx,row*120+sy,sw,sh,
+        Math.round(dx+sx*xScale)+xShift,Math.round(dy+sy*yScale),
+        Math.round(sw*xScale),Math.round(sh*yScale));
+    };
     g.save();
     g.imageSmoothingEnabled=false;
-    g.drawImage(flag,frame*80,row*120,80,120,
-      Math.round(centerX-dw/2)+correctionX,
-      Math.round(groundY-dh)+correctionY,dw,dh);
+    // Animated banner; its moving edge is the only part allowed to sway.
+    const sway=[0,2,6,6];
+    drawPart(frame,splitX,0,80-splitX,splitY,
+      Math.round(sway[frame]*xScale));
+    // Fixed lantern, flagpole, finial and mounting hardware.
+    drawPart(0,0,0,splitX,splitY);
+    // Fixed stone base and flowers, even where they extend past the pole.
+    drawPart(0,0,splitY,80,120-splitY);
     g.restore();
   }else{
     // Preload fallback: small marker stays visible on slow connections.
