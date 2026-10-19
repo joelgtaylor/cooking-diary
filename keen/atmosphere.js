@@ -43,18 +43,18 @@ function renderFungal(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
  g.save();
  // Pulses follow the gills of the painted caps rather than covering the scene.
  for(let i=0;i<caps.length;i++){
-  const [cx,cy,rx,ry]=caps[i],pulse=reduced?.5:(1+Math.sin(time*1.1+i*1.6))/2;
+  const [cx,cy,rx,ry]=caps[i],pulse=reduced?.5:(1+Math.sin(time*1.45+i*1.6))/2;
   for(let ring=2;ring>=0;ring--){
-   g.globalAlpha=(.025+pulse*.055)*(1-ring*.2);
+   g.globalAlpha=(reduced?.10:.035+pulse*.28)*(1-ring*.2);
    g.fillStyle=i%2?'#bcfaff':'#f1b6ff';g.beginPath();
    g.ellipse(Math.round(x+cx*sx),Math.round(y+cy*sy),rx*sx*(1+ring*.12),ry*sy*(1+ring*.12),0,0,Math.PI*2);g.fill();
   }
  }
- if(!reduced)for(let i=0;i<(layer==='near'?10:16);i++){
-  const phase=((time/(9+i%4)+i*.381)%1+1)%1;
-  const px=90+(i*157)%1020+Math.sin(time*.35+i)*13,py=570-phase*370;
-  const size=i%5===0?3:2;
-  g.globalAlpha=(layer==='near'?.55:.35)*Math.sin(phase*Math.PI);
+ if(!reduced)for(let i=0;i<(layer==='near'?14:20);i++){
+  const phase=((time/(6+i%3)+i*.381)%1+1)%1;
+  const px=90+(i*157)%1020+Math.sin(time*.5+i)*20,py=570-phase*370;
+  const size=i%4===0?4:3;
+  g.globalAlpha=(layer==='near'?.85:.65)*Math.sin(phase*Math.PI);
   g.fillStyle=i%3?'#b3f3ed':'#e9ceff';
   g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),size,size);
  }
