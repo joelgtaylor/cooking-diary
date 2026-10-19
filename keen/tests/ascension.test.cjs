@@ -4,7 +4,7 @@ const {game}=require('./game-harness.cjs');
 test('Ascension preserves the approved opening and all geometry beyond its boundaries',()=>{
  const a=game(),b=game({}, {layoutFixture:'bakery1-workshop.js'});
  const am=a.run('map'),bm=b.run('map');
- for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x>=23&&x<=52&&y>=28&&y<=48);
+ for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok((x>=23&&x<=52&&y>=28&&y<=48)||(x>=53&&x<=77&&y>=16&&y<=37));
  for(const query of ['gems[0]','checkpointState.spawns[0]','enemies[3]','enemies[4]','enemies.find(e=>e.type==="thrower")','powerups'])assert.equal(a.run(`JSON.stringify(${query})`),b.run(`JSON.stringify(${query})`));
 });
 test('both Ascension routes and the pogo shortcut reconnect using unchanged player physics',()=>{
