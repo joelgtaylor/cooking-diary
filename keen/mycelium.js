@@ -118,13 +118,13 @@ function drawMyceliumUI(){
    meet:['A baker down here? Mind the sleepy roots above.', 'Find their sealed doorway, then come back to me.'],
    clue:['The roots remember: spiral, crescent, fork.', 'Pogo in order; hold jump for height. Watch for the reply.', 'Lower the mixer to pass a cap without waking it.', 'A second phrase will appear among the roots.'],
    echo:['You woke their memory! Now follow the root markings.', 'The second phrase waits inside the chamber.'],
-   solved:['Beautifully risen! The old mycelium still remembers.', 'Your path to the canopy is open, baker.']
+   solved:['Beautifully risen! The old mycelium still remembers.', 'Your path into the cavern is open, baker.']
   }[s.dialogue]||[];
   g.font='15px monospace';g.fillStyle='#e2e7d5';lines.forEach((line,i)=>g.fillText(line,128,381+i*23));
   if(s.dialogue==='clue')relayLayout().sequences[0].forEach((kind,i)=>drawRelaySymbol(kind,650+i*46,340,'#efe6b5',3));
   g.font='12px monospace';g.fillStyle='#c7d4c3';g.fillText('E / Enter / Esc or Continue to return',128,477);g.restore();return;
  }
  if(state!=='play'||!s.discovered||camera>1900||camera+W<880)return;
- const hint=s.solved?'ROOT RELAY · The canopy path is open':!s.clueKnown?'SLEEPING ROOTS · Ask the Sporekeeper to the left':s.wrong?'ROOT RELAY · Listen again; no harm done':s.round===1?'ROOT RELAY · Follow the roots’ reply':'ROOT RELAY · Pogo the remembered order';
+ const hint=s.solved?'ROOT RELAY · The cavern path is open':!s.clueKnown?'SLEEPING ROOTS · Ask the Sporekeeper to the left':s.wrong?'ROOT RELAY · Listen again; no harm done':s.round===1?'ROOT RELAY · Follow the roots’ reply':'ROOT RELAY · Pogo the remembered order';
  rect(14,54,Math.min(620,hint.length*7+24),27,'#142735');g.font='12px monospace';g.textAlign='left';g.fillStyle='#e4e8c7';g.fillText(hint,24,72);
 }

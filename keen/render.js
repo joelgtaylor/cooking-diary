@@ -190,7 +190,8 @@ if(bakery!==3)for(let k=0;k<18;k++){
 }
 drawYeastCollectibles();
 for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
-if(envReady){drawEnv(u.kind==='kefir'?14:u.kind==='rye'?8:13,u.x-19,uy-23,38,38);}
+if(u.kind==='cache'){rect(u.x-13,uy-13,26,24,'#302c38');rect(u.x-11,uy-11,22,20,'#a77d50');rect(u.x-9,uy-8,18,3,'#d6b278');rect(u.x-9,uy+2,18,3,'#d6b278');rect(u.x-4,uy-9,3,16,'#655043');rect(u.x+3,uy-9,3,16,'#655043');rect(u.x-1,uy-3,3,5,'#f8e4a7');}
+else if(envReady){drawEnv(u.kind==='kefir'?14:u.kind==='rye'?8:13,u.x-19,uy-23,38,38);}
 else if(u.kind==='kefir'){rect(u.x-8,uy-10,16,20,'#f4f1ea');rect(u.x-8,uy-10,16,6,'#d23b3b');rect(u.x-3,uy-2,6,8,'#7ec8e3')}
 else if(u.kind==='rye'){g.fillStyle='#a06830';g.beginPath();g.ellipse(u.x,uy,13,9,0,0,7);g.fill();g.fillStyle='#d8a860';g.beginPath();g.ellipse(u.x,uy-3,8,5,0,0,7);g.fill()}
 else{rect(u.x-11,uy-8,22,14,'#c9a06a');rect(u.x-11,uy-8,22,4,'#a87f4e');for(let qi=-8;qi<=8;qi+=8)rect(u.x+qi-1,uy-8,2,14,'#a87f4e')}}
@@ -239,7 +240,7 @@ for(const e of enemies)if(e.alive){
  }
  if(e.type==='thrower')drawThrowerCue(e);
 }
-drawForeman();drawMycelium();if(bakery===2)drawCavernFoothillsTrim();
+drawForeman();drawMycelium();if(bakery===2)drawCavernFoothillsTrim();if(bakery===2)drawPlungeWayfinding();
 drawEnemyShots();
 for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';drawPlayer();
 drawGrandOven();

@@ -1,19 +1,23 @@
-# Bakery 2 layout passes
+# Bakery 2 — descending cavern with optional canopy
 
-The Sporekeeper/Mycelium Relay mission has been playtested and approved. Develop the remaining route in small, separately playable sections; keep the relay stable and do not merge until requested.
+The approved opening and Sporekeeper relay remain intact. The route now pivots downward after the relay instead of repeating Bakery1's mandatory ascent. All five required cultures stay on the main route; the upper middle is an optional enemy gauntlet.
 
-## 1. Mycelium Foothills and keeper approach — implemented for playtest
+## Playtest: relay fork and first plunge
 
-Replace the uniform staircase within columns4–31, rows38–53 with a solid entry step, low root passage under a culture balcony, alternating terraces, and a switchback to the keeper shelf. The first culture retains its location and can be collected from the balcony. The sheltered lower route allows ground traversal and ranged counterplay; the upper route bypasses the lower patroller. A bounded hopper guards an upper shelf with a clear landing margin. The keeper refuge remains peaceful.
+Every map tile west of column56, the keeper/relay metadata, and the first two checkpoints/cultures are unchanged. A permanent labelled fork points down for the main descent and up for BONUS / DANGER. The main route drops from row31 toward row54 (23 tiles /736 pixels), with offset landing shelves and a left-side recovery ladder. The geometry uses the existing jump, ledge and pogo physics; no new fall damage or camera mode.
 
-Replace the old walker at27,45 with a bounded lower walker and upper hopper, using the existing encounter simulation. Preserve the original distant81,30 walker and its direction/timing. No new enemy types, movement constants, music, recipes, hazards, checkpoints or collectible locations. Backing under the balcony is translucent so the detailed cavern remains visible.
+Cultures3 and4 move from the old mandatory canopy to63,38 and72,42. Culture5 remains98,46, above the new lower oven approach. Later checkpoints move to77,46 and90,51, both supported by safe main-route platforms. Remove the two ground spikes below the former descent and retain a visible floor hazard farther along the lower approach. Missed culture3 remains reachable from the floor via recovery ledges.
 
-Validation:116 tests pass. Five new tests verify local geometry bounds, exact preservation of the approved relay/keeper/later route, all eight jump/traversal segments using existing physics, the full-height player through the passage, culture pickup, encounter support/bounds over900 ticks, checkpoint safety, and shooting/pogo counterplay. All4320 historical movement regression frames remain unchanged. Reviewed only Bakery2 render-command differences, including three dedicated foothills views. Native canvas before/after/approach frames and the self-contained ZIP preview are verified.
+## Optional upper loop
 
-## 2. Fungal Canopy — next
+The canopy climb contains three bounded hoppers, one bounded patroller and two existing wind-up throwers. Two supply caches each grant500 score and15 ammo once per level attempt, without changing culture progression. A banneton shield supports the optional route; the health pickup moves onto the lower main approach. The loop descends back to the first main landing, before culture3, so bonus exploration does not strand required collectibles behind the rejoin. Bonus throwers do not target the lower descent.
 
-Shape a distinct ascent after the relay, with broader landing rests, shorter exposed crossings and a more deliberate culture detour. Introduce a complementary encounter pairing using existing enemies. Reuse cavern terrain and root architecture; preserve the tested relay exit connection and third checkpoint. Provide a focused playtest before extending the pass.
+Caches use a small native pixel-art crate with a distinct brass latch. All other enemy art, behaviors, rewards and movement constants are unchanged. The approved cavern backgrounds and parallax remain intact.
 
-## 3. Luminous Descent — later
+## Verification
 
-Vary the descent with sheltered landings, a clear lower route and a more purposeful final culture approach. Build toward the proofing oven without repeating Bakery1's boss. Review encounter intensity and completion pacing separately; a new finale mechanic would need its own proposal.
+123 tests pass. Seven new tests verify exact preservation west of the fork, required culture/checkpoint placement, eight main-route movement segments, four recovery jumps, nine bonus ascent/return segments, the mixed encounter roster, once-only cache rewards and safe checkpoints. Existing mission and foothills tests continue covering the approved local systems. All4320 historical movement regression frames remain unchanged. Only Bakery2 render traces change, including fork/lower/bonus views. Native canvas frames and the standalone ZIP shortcuts/full-level start are verified.
+
+## Next review
+
+Playtest the fork, sense of depth, landing visibility and bonus difficulty first. The lower route is a playable connection to the oven; more cavern-floor architecture and encounter pacing can follow after the descent direction is approved. Do not merge without explicit approval.

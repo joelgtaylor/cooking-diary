@@ -58,3 +58,15 @@ function drawCavernFoothillsTrim(){
  // Small spore nodes mark the passage without implying another rune switch.
  for(const nx of [dx+7,dx+24]){rect(nx,dy+27,2,3,'#91d8ca');}
 }
+
+// A permanent fork sign distinguishes mandatory cultures from optional combat.
+function drawPlungeWayfinding(){
+ const p=currentVerticalLayout().plunge;if(!p||camera>2600||camera+W<1750||cameraY>1150)return;
+ const [x,y]=p.fork,px=x*T,py=y*T;
+ rect(px-2,py-160,4,160,'#6b7560');
+ rect(px-85,py-172,170,30,'#162c37');rect(px-83,py-170,166,2,'#b4d2bd');
+ rect(px-85,py-138,170,30,'#272735');rect(px-83,py-136,166,2,'#d5b487');
+ g.textAlign='center';g.font='bold 11px monospace';g.fillStyle='#d4f2d2';g.fillText('MAIN DESCENT  ↓',px,py-152);
+ g.fillStyle='#f1d2a1';g.fillText('BONUS / DANGER  ↑',px,py-118);
+ g.textAlign='left';
+}
