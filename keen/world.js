@@ -28,7 +28,7 @@ function initVerticalWorld(){
  map=Array.from({length:rows},()=>Array(cols).fill('.'));
  const data=layout.apply({map});
  gems=data.gems;enemies=data.enemies;powerups=data.powerups;
- shots=[];particles=[];floaters=[];
+ enemyShots=[];shots=[];particles=[];floaters=[];
  player={x:3*T,y:54*T-38,w:29,h:38,vx:0,vy:0,ground:true,
  health:3,inv:0,face:1,ammo:35,score:0,hang:null,climb:0,speedT:0,shield:false};
  camera=0;cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.6));
@@ -41,7 +41,7 @@ function respawnCheckpoint(){
  const cp=checkpointState.spawns[Math.max(0,checkpointState.current)] || {x:3*T,y:54*T-38};
  player.x=cp.x;player.y=cp.y;player.vx=0;player.vy=0;player.ground=false;
  player.hang=null;player.health=3;player.inv=90;player.shield=false;
- shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
+ enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
 }
 function updateWorldProgress(){
  if(state!=='play')return;

@@ -34,7 +34,7 @@ function drawContactShadow(actor,width){
  g.restore();
 }
 function gremlinAnimation(e){
- const row=e.type==='hopper'&&Math.abs(e.vy||0)>1?2:Math.abs(e.vx)>0.15?1:0;
+ const row=(e.type==='hopper'&&Math.abs(e.vy||0)>1||e.type==='thrower'&&e.windup>0)?2:Math.abs(e.vx)>0.15?1:0;
  const duration=row===2?7:row===1?9:18;
  return {row,frame:Math.floor(actorAnimation(e,row)/duration)%4};
 }

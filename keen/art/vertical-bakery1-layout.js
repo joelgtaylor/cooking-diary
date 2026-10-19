@@ -53,7 +53,7 @@ function apply({map}){
   gems:cultures.map(([x,y])=>({x:x*T+12,y:y*T,got:false})),
   enemies:enemies.map(([x,y,type],i)=>({
    x:x*T,y:y*T,w:25,h:25,vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:30+i*9
-  })).concat(encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}}))),
+  })).concat(encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}}))).concat([{x:30*T,y:40*T-25,w:25,h:25,vx:0,vy:0,alive:true,type:'thrower',attackT:90,windup:0,face:-1}]),
   powerups:[[38,39,'kefir'],[70,17,'banneton'],[92,33,'rye']]
     .map(([x,y,kind],i)=>({x:x*T+4,y:y*T,kind,got:false,ph:i*1.5}))
  };

@@ -15,3 +15,11 @@ Pending user play-testing. Later phases place and vary encounters; no additional
 Add two enemies without changing the approved geometry: a ground-level patroller in the right-hand workshop bay, and a roof hopper beyond the first landing. Explicit encounter bounds keep them away from the courtyard checkpoint, doorway approach and roof entry. Their original speeds, hopper launch strength/cadence, hitboxes, shooting rewards and pogo-stomp behaviour are retained. Existing enemy placements remain unchanged; Bakery 1 now has five enemies.
 
 The old hopper branch uses a 620px cleanup limit and does not land on one-way platforms. New authored encounters use world-height cleanup and support-aware landing, leaving the legacy path unchanged for the historical regression fixture. Tests run 900 enemy frames for survival/bounds, verify safe checkpoint recovery, shooting from the approach and the existing pogo reward. The preview compares encounters against the approved Phase 1 layout with the two new enemies omitted.
+
+## Phase 3: stationary dough thrower
+
+One thrower stands at column 30 on the existing row-40 ledge, beyond the approved opening. No geometry or earlier encounters change. A blue apron, raised dough ball, warning marker and wind-up meter distinguish it. Its startup delay is 90 simulation ticks, wind-up 36 ticks, cooldown 150 ticks and projectile speed 2.3px/tick (slower than the baker's 3.6px/tick run). Shots travel straight in the direction chosen when the wind-up begins; they do not home.
+
+Attacks require the enemy to be on screen, within 256px horizontally and 55px vertically, with no solid wall between it and the baker. Losing that opportunity cancels the wind-up and restores the startup delay. Shots expire after 150 ticks, stop at solid walls, deal normal damage once, and disappear when their owner is defeated or the baker respawns/restarts. Ordinary shooting and pogo stomps retain their existing rewards. All timing advances in the fixed simulation, not the renderer.
+
+Tests cover full warning duration, locked direction, offscreen/range/cover gating, dodging, single-hit damage, wall collision, cleanup and ordinary defeat. Render snapshots include warning/projectile states. The preview starts at an isolated thrower approach, with an option to play the full level from the beginning. Awaiting difficulty play-test.

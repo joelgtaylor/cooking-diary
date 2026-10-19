@@ -198,7 +198,7 @@ else{rect(u.x-11,uy-8,22,14,'#c9a06a');rect(u.x-11,uy-8,22,4,'#a87f4e');for(let 
 // hitboxes, damage, collision, movement speed, or enemy spawn logic.
 for(const e of enemies)if(e.alive){
  const bob=Math.sin(tick*.1+e.x*.02)*2;
- const atlas=e.type==='hopper'?assets.gremlinExpressions:assets.gremlinRun;
+ const atlas=(e.type==='hopper'||e.type==='thrower')?assets.gremlinExpressions:assets.gremlinRun;
  const newArt=window.__crustGremlinArt!==false&&atlas&&atlas.complete&&atlas.naturalWidth===128;
  if(newArt){
    const {row,frame}=gremlinAnimation(e);
@@ -212,7 +212,7 @@ for(const e of enemies)if(e.alive){
    if(supported)drawContactShadow(e,22);
    g.save();
    g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));
-   g.scale(e.vx<0?-1:1,1);
+   g.scale((e.type==='thrower'?e.face:e.vx)<0?-1:1,1);
    g.imageSmoothingEnabled=false;
    g.drawImage(atlas,frame*32,row*32,32,32,-drawSize/2,drawTop,drawSize,drawSize);
    g.restore();
@@ -237,7 +237,9 @@ for(const e of enemies)if(e.alive){
    g.fillStyle='#8d2b46';
    g.fillRect(e.x+11,e.y+19+bob,8,3);
  }
+ if(e.type==='thrower')drawThrowerCue(e);
 }
+drawEnemyShots();
 for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';drawPlayer();
 drawGrandOven();
 drawCheckpoints();
