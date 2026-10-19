@@ -39,3 +39,18 @@ test('Foreman simulation matches at 30, 60 and 120 render fps',()=>{
   const actual=a.run('JSON.stringify([foremanState,player.health,tick])');if(expected)assert.equal(actual,expected);else expected=actual;
  }
 });
+
+test('defeat lands once, clears attacks and keeps the oven unlocked throughout the animation',()=>{
+ const a=arena();a.run("collected=5;foremanState.health=1;foremanState.phase='recovery';foremanState.projectiles=[{}];hurtForeman();");
+ assert.equal(a.run('foremanState.timer'),96);assert.equal(a.run('foremanState.projectiles.length'),0);
+ assert.equal(a.run('foremanOvenReady()'),true);
+ a.run('for(let i=0;i<14;i++)updateForeman()');assert.equal(a.run('foremanState.defeatImpact'),false);
+ a.run('updateForeman()');assert.equal(a.run('foremanState.defeatImpact'),true);assert.equal(a.run('shake'),7);
+ const score=a.run('player.score');a.run('shake=0;for(let i=0;i<120;i++)updateForeman()');
+ assert.equal(a.run('shake'),0);assert.equal(a.run('player.score'),score);assert.equal(a.run('foremanState.timer'),0);
+ assert.equal(a.run('foremanState.health'),0);assert.equal(a.run('foremanOvenReady()'),true);
+});
+test('reduced motion skips collapse shake and flour impact without changing completion',()=>{
+ const a=arena();a.run("window.matchMedia=()=>({matches:true});foremanState.health=1;foremanState.phase='recovery';hurtForeman();shake=0;for(let i=0;i<100;i++)updateForeman();");
+ assert.equal(a.run('shake'),0);assert.equal(a.run('foremanState.defeatImpact'),true);assert.equal(a.run('foremanState.timer'),0);
+});

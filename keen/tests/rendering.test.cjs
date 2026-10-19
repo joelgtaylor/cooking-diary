@@ -7,10 +7,10 @@ const expected=require('./render-baseline.json');
 // and fallback paths, not pixels. Historical pre-refactor traces remain in git.
 function renderCases(options={}){
  const output={};
- for(let stage=1;stage<=3;stage++)for(const mode of ['fallback','idle','run','jump','fall','pogo','hang','hurt','pause','codex','unlocked','clear','win',...(stage===1?['thrower_windup','thrower_shot','descent_entry','foreman_scale','foreman_windup','foreman_sweep','foreman_recovery','foreman_toss_warning','foreman_projectile','foreman_hurt','foreman_defeated']:[]),...(options.polishedTerrain?['oven_ready','checkpoint_saved','yeast_collected']:[])]){
+ for(let stage=1;stage<=3;stage++)for(const mode of ['fallback','idle','run','jump','fall','pogo','hang','hurt','pause','codex','unlocked','clear','win',...(stage===1?['thrower_windup','thrower_shot','descent_entry','foreman_scale','foreman_windup','foreman_sweep','foreman_recovery','foreman_toss_warning','foreman_projectile','foreman_hurt','foreman_defeated','foreman_defeat_stagger','foreman_defeat_impact','foreman_defeat_settled']:[]),...(options.polishedTerrain?['oven_ready','checkpoint_saved','yeast_collected']:[])]){
   const {run,trace}=game({},options);
   run(`init(${stage});tick=47;`);
-  if(mode!=='fallback')run(`for(const a of Object.values(assets)){a.complete=true;a.naturalWidth=960;a.naturalHeight=540;}assets.foremanSweep.naturalWidth=1536;assets.foremanSweep.naturalHeight=1024;assets.foremanConcept.naturalWidth=1331;assets.foremanConcept.naturalHeight=1182;assets.environmentDecor.naturalWidth=256;assets.checkpointFlags.naturalWidth=320;`);
+  if(mode!=='fallback')run(`for(const a of Object.values(assets)){a.complete=true;a.naturalWidth=960;a.naturalHeight=540;}assets.foremanDefeated.naturalWidth=1536;assets.foremanDefeated.naturalHeight=1024;assets.foremanSweep.naturalWidth=1536;assets.foremanSweep.naturalHeight=1024;assets.foremanConcept.naturalWidth=1331;assets.foremanConcept.naturalHeight=1182;assets.environmentDecor.naturalWidth=256;assets.checkpointFlags.naturalWidth=320;`);
   if(options.polishedTerrain&&mode!=='fallback')run(`assets.spikeHazards.naturalWidth=96;assets.spikeHazards.naturalHeight=32;assets.grandOvens.naturalWidth=288;assets.grandOvens.naturalHeight=176;assets.bakerAI.naturalHeight=896;assets.gremlinRun.naturalWidth=128;assets.gremlinExpressions.naturalWidth=128;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalWidth=256;assets.${['moonlitTerrain','cavernTerrain','forgeTerrain'][stage-1]}.naturalHeight=96;`);
   if(mode==='thrower_windup'||mode==='thrower_shot')run("camera=600;cameraY=1000;var thrower=enemies.find(e=>e.type==='thrower');thrower.windup=18;");
   if(mode==='thrower_shot')run("enemyShots=[{x:thrower.x-70,y:thrower.y+8,w:9,h:9,vx:-2.3,life:100,owner:thrower}]");
@@ -22,6 +22,7 @@ function renderCases(options={}){
   if(mode==='foreman_projectile')run("foremanState.phase='recovery';foremanState.attack='toss';foremanState.timer=90;foremanState.projectiles=[{x:foremanGeometry().cx-110,y:foremanGeometry().base-38,w:18,h:16,vx:-2.6,vy:0,bounces:0,life:100}]");
   if(mode==='foreman_hurt')run("foremanState.phase='recovery';foremanState.timer=60;foremanState.health=3;foremanState.hurtFlash=8;foremanState.inv=20;");
   if(mode==='foreman_defeated')run("foremanState.phase='defeated';foremanState.timer=25;foremanState.health=0;collected=5;");
+  if(mode.startsWith('foreman_defeat_'))run(`foremanState.phase='defeated';foremanState.health=0;foremanState.timer=${({foreman_defeat_stagger:90,foreman_defeat_impact:82,foreman_defeat_settled:0})[mode]};collected=5;`);
   if(mode==='run')run('player.vx=3.6;player.face=-1');
   if(mode==='jump')run('player.ground=false;player.vy=-5');
   if(mode==='fall')run('player.ground=false;player.vy=5');

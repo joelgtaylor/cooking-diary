@@ -1,9 +1,10 @@
 /* Step 3: fixed-tick sweep/toss fight with recovery openings and clean retries. */
 'use strict';
+const FOREMAN_DEFEAT_TICKS=96;
 let foremanState=null;
 function resetForeman(){
  foremanState=bakery===1&&currentVerticalLayout().forecourt?
-  {phase:'idle',timer:90,face:-1,sweepHit:false,cycles:0,attack:'sweep',health:6,maxHealth:6,inv:0,hurtFlash:0,guardCue:0,projectiles:[],engaged:false}:null;
+  {phase:'idle',timer:90,face:-1,sweepHit:false,cycles:0,attack:'sweep',health:6,maxHealth:6,inv:0,hurtFlash:0,guardCue:0,projectiles:[],engaged:false,defeatImpact:false}:null;
 }
 function foremanGeometry(){
  const court=currentVerticalLayout().forecourt;
@@ -28,10 +29,10 @@ function hurtForeman(){
  shake=Math.max(shake,4);hitStop=Math.max(hitStop,3);
  burst(geo.cx,geo.base-64,'#ffe2a0',8);AudioKit.effect('enemy');
  if(f.health===0){
-  f.phase='defeated';f.timer=60;f.projectiles=[];f.inv=0;
+  f.phase='defeated';f.timer=FOREMAN_DEFEAT_TICKS;f.projectiles=[];f.inv=0;f.defeatImpact=false;
   const reward=!checkpointState.foremanRewarded;
   if(reward){player.score+=1000;checkpointState.foremanRewarded=true;}
-  burst(geo.cx,geo.base-45,'#f4e8cf',24);
+  burst(geo.cx,geo.base-45,'#f4e8cf',6);
   floater(geo.cx,geo.base-125,'FOREMAN DEFEATED!'+(reward?' +1000':''),'#ffe2a0');AudioKit.effect('win');
  }
  return true;
@@ -58,7 +59,17 @@ function updateForemanProjectiles(f,geo){
 function updateForeman(){
  const f=foremanState,geo=foremanGeometry();if(!f||!geo||state!=='play')return;
  if(f.inv>0)f.inv--;if(f.hurtFlash>0)f.hurtFlash--;if(f.guardCue>0)f.guardCue--;
- if(f.health<=0){f.projectiles=[];if(f.timer>0)f.timer--;return;}
+ if(f.health<=0){
+  f.projectiles=[];
+  if(!f.defeatImpact&&foremanDefeatAge(f)>=14){
+   f.defeatImpact=true;
+   if(!foremanReducedMotion()){
+    shake=Math.max(shake,7);burst(geo.cx,geo.base-20,'#f4e8cf',24);burst(geo.cx,geo.base-8,'#c58b50',8);
+   }
+   AudioKit.effect('enemy');
+  }
+  if(f.timer>0)f.timer--;return;
+ }
  const pc=player.x+player.w/2;
  const near=Math.abs(pc-geo.cx)<260&&player.y+player.h>geo.base-(f.engaged?448:256)&&
   geo.cx>camera+24&&geo.cx<camera+W-24&&geo.base>cameraY&&geo.base-100<cameraY+H;
@@ -90,6 +101,44 @@ function drawForemanDough(x,y){
  rect(x+2,y,14,16,'#71412c');rect(x,y+3,18,10,'#bc7c3e');rect(x+2,y+1,13,6,'#f2cd88');rect(x+4,y+1,8,2,'#fff0bd');
  for(let i=0;i<3;i++)rect(x+4+i*4,y+7,2,3,'#88502d');
 }
+function foremanReducedMotion(){
+ return typeof window.matchMedia==='function'&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function foremanDefeatAge(f){return Math.max(0,Math.min(FOREMAN_DEFEAT_TICKS,FOREMAN_DEFEAT_TICKS-f.timer));}
+function drawForemanDefeat(geo,f,art){
+ const {cx,base,width,height}=geo,age=foremanDefeatAge(f),reduced=foremanReducedMotion();
+ const fallen=assets.foremanDefeated;
+ if(age<14&&!reduced){
+  // A brief stagger keeps the feet on the floor, with no body transparency.
+  const sway=Math.round(Math.sin(age*1.8)*3);
+  g.save();g.translate(Math.round(cx+sway),base);g.scale(f.face>0?-1:1,1);g.imageSmoothingEnabled=false;
+  g.drawImage(art,16,18,1314,1131,-width*.62,-height,width,height);g.restore();return;
+ }
+ const t=Math.max(0,age-14),bounce=reduced?0:-12*Math.cos(t*.35)*Math.exp(-t/12);
+ const h=84+bounce,w=171*(1-bounce/168),anchor=117*(w/171);
+ g.fillStyle='rgba(12,14,27,.36)';g.beginPath();g.ellipse(cx-3,base,66,5,0,0,Math.PI*2);g.fill();
+ // The flour cloud dissipates around a solid seated pose, never a fading boss.
+ if(!reduced&&t<38){
+  g.save();g.globalAlpha=.36*(1-t/38);g.fillStyle='#f7ead1';
+  for(let i=0;i<9;i++){
+   const angle=i*Math.PI/4,spread=16+t*1.7;
+   const px=Math.round(cx+Math.cos(angle)*spread),py=Math.round(base-15-Math.abs(Math.sin(angle))*spread*.7);
+   g.fillRect(px-8,py-5,16,10);g.fillRect(px-5,py-8,10,16);
+  }
+  g.restore();
+ }
+ g.save();g.translate(Math.round(cx),base);g.scale(f.face>0?-1:1,1);g.imageSmoothingEnabled=false;
+ if(fallen?.complete&&fallen.naturalWidth===1536)g.drawImage(fallen,13,192,1512,744,-anchor,-h,w,h);
+ else g.drawImage(art,16,18,1314,1131,-width*.62,-84,width,84);
+ g.restore();
+ if(age>=28){
+  const phase=reduced?0:Math.min(age,96)*.13;
+  for(let i=0;i<3;i++){
+   const angle=phase+i*Math.PI*2/3,x=Math.round(cx-12+Math.cos(angle)*26),y=Math.round(base-94+Math.sin(angle)*6);
+   rect(x-3,y,7,1,'#ffe1a0');rect(x,y-3,1,7,'#ffe1a0');rect(x,y,2,2,'#fff3d1');
+  }
+ }
+}
 function drawForeman(){
  const geo=foremanGeometry(),art=assets.foremanConcept;
  if(!geo||!art||!art.complete||art.naturalWidth!==1331)return;
@@ -97,12 +146,12 @@ function drawForeman(){
  if(cx+width<camera||cx-width>camera+W||base<cameraY||base-height>cameraY+H)return;
  const attacking=f?.phase==='sweep',defeated=f?.health===0,sweep=assets.foremanSweep;
  g.save();
- if(!defeated||f.timer>0){
+ if(defeated){drawForemanDefeat(geo,f,art);}else{
   g.fillStyle='rgba(12,14,27,.36)';g.beginPath();g.ellipse(cx,base,54,5,0,0,Math.PI*2);g.fill();
   g.save();g.translate(Math.round(cx),base);g.scale(f?.face>0?-1:1,1);g.imageSmoothingEnabled=false;
   if(attacking&&sweep?.complete&&sweep.naturalWidth===1536){g.drawImage(sweep,33,125,1483,787,-149,-114,215,114);}
   else{
-   const h=defeated?height*Math.max(.15,f.timer/60):f?.phase==='windup'?height-2:height;
+   const h=f?.phase==='windup'?height-2:height;
    g.drawImage(art,16,18,1314,1131,-width*.62,-h,width,h);
   }
   g.restore();

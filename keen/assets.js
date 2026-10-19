@@ -9,6 +9,7 @@ function loadGameArt(){
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
 loadArt('cavernTerrain','art/cavern-terrain.png');
 loadArt('forgeTerrain','art/forge-terrain.png');
+loadArt('foremanDefeated','art/foreman-defeated.png');
 loadArt('foremanSweep','art/foreman-sweep.png');
 loadArt('foremanConcept','art/foreman-concept.png');
 loadArt('grandOvens','art/grand-ovens.png');
