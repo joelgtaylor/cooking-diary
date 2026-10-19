@@ -19,7 +19,10 @@ function renderMoonlit(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
   const [cx,cy]=sources[i];
   for(let k=0;k<4;k++){
    const p=((time/4.5+k/4+i*.17)%1+1)%1;
-   const dx=Math.sin(p*3+i)*p*12,dy=p*55,size=5+Math.floor(p*10);
+   // The left-hand painted plumes lean into the wind.
+   const leftward=layer==='near'?i<2:i===0;
+   const dx=leftward?-p*14+Math.sin(p*5)*p*2:Math.sin(p*3+i)*p*12;
+   const dy=p*55,size=5+Math.floor(p*10);
    g.globalAlpha=(layer==='near'?.34:.19)*Math.sin(p*Math.PI);g.fillStyle='#b4bfd7';
    pixel(cx+dx-size/2,cy-dy-size,size,size);
    pixel(cx+dx-size/2+2,cy-dy-size-2,size-1,size+1);
