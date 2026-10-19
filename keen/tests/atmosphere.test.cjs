@@ -34,3 +34,11 @@ test('Clockwork vents and pistons animate deterministically and respect reduced 
  assert.notEqual(render(1,false),render(3,false));assert.equal(render(1,false),render(1,false));assert.equal(render(1,true),render(8,true));
  assert.equal(a.trace[0][0],'save');assert.equal(a.trace.at(-1)[0],'restore');
 });
+test('Clockwork cogs are drawn in illustration layers instead of the legacy world-coordinate loop',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const source=fs.readFileSync(path.join(__dirname,'../render.js'),'utf8');
+ assert.doesNotMatch(source,/spin=tick|r=10\+\(k%3\)/);
+ const a=game();a.run('init(3)');a.trace.length=0;
+ a.run("window.CrustAtmosphere.renderClockwork(g,{x:0,y:0,width:1200,height:676,time:1,layer:'mid'});window.CrustAtmosphere.renderClockwork(g,{x:0,y:0,width:1200,height:676,time:1,layer:'near'});");
+ assert.equal(a.trace.filter(c=>c[0]==='rotate').length,21); // Three cogs, each with six spokes.
+});

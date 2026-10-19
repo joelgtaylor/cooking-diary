@@ -60,9 +60,56 @@ function renderFungal(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
  }
  g.restore();
 }
+function drawClockworkCog(g,cx,cy,r,angle){
+ g.save();g.translate(Math.round(cx),Math.round(cy));g.rotate(angle);
+ // Squared teeth, dark iron body and a narrow copper bevel.
+ g.beginPath();
+ for(let tooth=0;tooth<24;tooth++)for(let corner=0;corner<4;corner++){
+  const a=(tooth+corner/4)*Math.PI/12,rad=r*(corner===1||corner===2?1:.9);
+  const px=Math.round(Math.cos(a)*rad),py=Math.round(Math.sin(a)*rad);
+  if(tooth===0&&corner===0)g.moveTo(px,py);else g.lineTo(px,py);
+ }
+ g.closePath();
+ const iron=g.createLinearGradient(-r,-r,r,r);
+ for(const [stop,color] of [[0,'#75605b'],[.18,'#3d3540'],[.5,'#24212e'],[.78,'#493438'],[1,'#8b6146']])iron.addColorStop(stop,color);
+ g.fillStyle=iron;g.fill();g.strokeStyle='#926b4c';g.lineWidth=2;g.stroke();
+ // Worn tooth faces and small pits break up the otherwise clean geometry.
+ for(let i=0;i<24;i++){
+  const a=(i+.38)*Math.PI/12;
+  g.fillStyle=i%3?'#9d7656':'#d0a16c';
+  g.fillRect(Math.round(Math.cos(a)*r*.94),Math.round(Math.sin(a)*r*.94),2,1);
+ }
+ for(let i=0;i<56;i++){
+  const a=i*2.39996,rad=r*(.34+(i%11)*.052);
+  g.fillStyle=i%3?'#302631':'#97725b';g.fillRect(Math.round(Math.cos(a)*rad),Math.round(Math.sin(a)*rad),1,1);
+ }
+ g.beginPath();g.arc(0,0,r*.79,0,Math.PI*2);g.strokeStyle='#684b42';g.lineWidth=r*.13;g.stroke();
+ g.beginPath();g.arc(0,0,r*.69,0,Math.PI*2);g.strokeStyle='#171c2a';g.lineWidth=2;g.stroke();
+ for(let spoke=0;spoke<6;spoke++){
+  g.save();g.rotate(spoke*Math.PI/3);
+  g.fillStyle='#171a26';g.fillRect(r*.12,-r*.09,r*.6,r*.18);
+  const brass=g.createLinearGradient(0,-r*.07,0,r*.06);brass.addColorStop(0,'#cf9b65');brass.addColorStop(.3,'#795144');brass.addColorStop(1,'#382c33');
+  g.fillStyle=brass;g.fillRect(r*.13,-r*.07,r*.58,r*.12);
+  g.fillStyle='#c58a54';g.fillRect(r*.17,-r*.07,r*.53,2);
+  g.fillStyle='#e1b77e';g.fillRect(r*.73,-1,2,2);g.restore();
+ }
+ g.beginPath();g.arc(0,0,r*.25,0,Math.PI*2);g.fillStyle='#b17a49';g.fill();
+ g.beginPath();g.arc(0,0,r*.16,0,Math.PI*2);g.fillStyle='#322d36';g.fill();
+ g.fillStyle='#ebc990';g.fillRect(-2,-2,4,4);g.restore();
+}
 function renderClockwork(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
  const sx=width/1200,sy=height/676;
  const pixel=(px,py,w,h)=>g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),Math.max(1,Math.round(w*sx)),Math.max(1,Math.round(h*sy)));
+ // Bearing brackets attach the cogs to arch bays and the front bridge.
+ g.save();
+ const mounts=layer==='near'?[[596,554,42,1]]:[[641,453,35,-1],[465,441,24,1]];
+ for(const [mx,my,r,direction] of mounts){
+  g.fillStyle='#252431';pixel(mx-r-7,my+r+9,r*2+14,7);
+  g.fillStyle='#735044';pixel(mx-r-5,my+r+9,r*2+10,2);
+  for(const side of [-1,1]){g.fillStyle='#3f3540';pixel(mx+side*(r+3)-3,my-8,6,r+18);g.fillStyle='#ba8655';pixel(mx+side*(r+3)-1,my-5,2,r+11);}
+  drawClockworkCog(g,x+mx*sx,y+my*sy,r*Math.min(sx,sy),reduced?0:time*.22*direction);
+ }
+ g.restore();
  const furnaces=layer==='near'?[[150,449,59,57],[1090,506,57,59]]:
   [[110,395,30,31],[159,520,31,35],[735,558,28,30],[1108,481,30,33]];
  g.save();

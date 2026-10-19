@@ -179,20 +179,13 @@ if(bakery===3&&!forgeReady){
  }
  g.restore();
 }
-// Clockwork machinery, magical cave motes, or rooftop steam: visual only.
-for(let k=0;k<18;k++){
+// Legacy cave motes and rooftop steam. Clockwork cogs belong to the parallax art.
+if(bakery!==3)for(let k=0;k<18;k++){
  const x=(k*173+37)%(cols*T),y=145+(k*71)%270;
  if(x<camera-30||x>camera+W+30)continue;
  const drift=Math.sin(tick*.025+k*2.1)*7;
- if(bakery===3){
-  const r=10+(k%3)*5,spin=tick*.025*(k%2?1:-1);
-  g.strokeStyle='#e3a15f';g.lineWidth=3;
-  g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.stroke();
-  for(let j=0;j<6;j++){const a=spin+j*Math.PI/3;g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);g.stroke();}
- }else{
   g.fillStyle=bakery===2?'#a2f6e5':'#e8d2aa';
   g.fillRect(x+drift,y+Math.sin(tick*.035+k)*9,3,3);
- }
 }
 drawYeastCollectibles();
 for(const u of powerups)if(!u.got){const uy=u.y+Math.sin(tick*.08+u.ph)*3;
