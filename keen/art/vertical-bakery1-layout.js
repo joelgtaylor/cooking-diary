@@ -5,15 +5,18 @@
 (function(){
 'use strict';
 const rows=56,cols=105,T=32;
-const climb=Array.from({length:18},(_,i)=>[4+4*i,52-2*i,6]);
+// The courtyard replaces only the first five repeated stair ledges.
+const climb=Array.from({length:18},(_,i)=>[4+4*i,52-2*i,6]).slice(5);
 const descent=Array.from({length:7},(_,i)=>[75+4*i,20+3*i,6]);
 const lower=[[2,54,103],[24,48,8],[38,42,8],[53,37,8],[68,32,9],[78,43,10],[89,47,10],[96,52,9]];
 // Upper alternate bridge and lower shortcut. The branches rejoin the main climb.
 const branches=[[24,40,8],[30,38,8],[36,36,8],[42,34,8],[47,32,8],
  [55,26,7],[60,24,8],[65,22,9],[82,29,7],[90,34,7]];
-const platforms=[...climb,...descent,...lower,...branches];
-const cultures=[[10,49],[32,37],[61,22],[83,25],[100,37]];
-const checkpoints=[[8,49],[40,33],[72,17],[91,33]];
+const courtyard=[[4,52,5],[7,50,4],[15,51,4],[22,44,4]];
+const workshop={x:11,y:48,w:11,h:6};
+const platforms=[...courtyard,...climb,...descent,...lower,...branches];
+const cultures=[[16,50],[32,37],[61,22],[83,25],[100,37]];
+const checkpoints=[[8,51],[40,33],[72,17],[91,33]];
 const hazards=[[22,53],[51,53],[84,53],[88,53]]; // ground, not overhead.
 const enemies=[[27,45,'walker'],[50,30,'walker'],[81,39,'walker']];
 const sections=[
@@ -30,6 +33,11 @@ function apply({map}){
  // Keep the ground at row 54+ as '#', which remains fully solid.
  for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)
    if(map[y][xx]!== '#')map[y][xx]='=';
+ // Solid workshop roof, side walls with three-tile-high open doorways,
+ // and a rooftop stair tower. All other geometry remains as authored.
+ for(let x=11;x<=21;x++)map[48][x]='#';
+ for(const x of [11,21])for(let y=49;y<=50;y++)map[y][x]='#';
+ for(let x=19;x<=21;x++)for(let y=44;y<=47;y++)map[y][x]='#';
  // Ensure low shortcut and final oven surface are well supported.
  for(const [x,y] of hazards){
    // Hazard must be exposed and backed by solid geometry.
@@ -46,7 +54,7 @@ function apply({map}){
  };
 }
 window.CrustVerticalBakery1=Object.freeze({
- rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,
- apply,version:'phase3-oneway-platforms-v2'
+ rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,workshop,
+ apply,version:'courtyard-workshop-phase1'
 });
 })();

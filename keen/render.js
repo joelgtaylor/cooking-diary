@@ -131,6 +131,7 @@ else rect(0,0,W,H,'#382c49');
 // Keep old flour motes only in the flat-background comparison.
 if(window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
+drawBakeryArchitecture();
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
 for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
