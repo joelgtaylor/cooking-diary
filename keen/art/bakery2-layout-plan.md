@@ -6,7 +6,7 @@ The approved opening and Sporekeeper relay remain intact. The route now pivots d
 
 Every map tile west of column56, the keeper/relay metadata, and the first two checkpoints/cultures are unchanged. A permanent labelled fork points down for the main descent and up for BONUS / DANGER. The main route drops from row31 toward row54 (23 tiles /736 pixels), with offset landing shelves and a left-side recovery ladder. The geometry uses the existing jump, ledge and pogo physics; no new fall damage or camera mode.
 
-Cultures3 and4 move from the old mandatory canopy to63,38 and72,42. Culture5 remains98,46, above the new lower oven approach. Later checkpoints move to77,46 and90,51, both supported by safe main-route platforms. Remove the two ground spikes below the former descent and retain a visible floor hazard farther along the lower approach. Missed culture3 remains reachable from the floor via recovery ledges.
+Cultures3 and4 move from the old mandatory canopy to63,38 and72,42. Culture5 sits at82,49 on the final approach shelf. Later checkpoints are77,46 and82,53; the latter is outside Bloomrot’s gate and resupplies ammo. The arena floor is free of the old86,53 spike. Missed culture3 remains reachable from the floor via recovery ledges.
 
 ## Optional upper loop
 
@@ -21,3 +21,7 @@ Caches use a small native pixel-art crate with a distinct brass latch. All other
 ## Next review
 
 Playtest the fork, sense of depth, landing visibility and bonus difficulty first. The lower route is a playable connection to the oven; more cavern-floor architecture and encounter pacing can follow after the descent direction is approved. Do not merge without explicit approval.
+
+## Bloomrot ending
+
+The lower route feeds into the approved trial arena: entry84, exit103, floor54; shelves87..90 at50 and97..100 at49. Last culture and checkpoint are before the entry. The gate seals only after entering86 and defeats open it for backtracking. Oven completion requires five cultures and the finished boss defeat. Attack tuning matches the approved playtest. See bloomrot-art.md for presentation and validation.

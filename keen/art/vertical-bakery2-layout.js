@@ -14,9 +14,9 @@ const branches=[[13,46,10],[20,42,9],[27,38,10],[35,34,9],
  [79,30,10],[83,35,9],[89,39,9],[93,45,9],
  [21,50,8],[39,44,8],[55,38,8],[68,33,7],[80,43,7],[95,50,9]];
 const platforms=[[0,54,105],...rise,...crest,...descent,...branches];
-const cultures=[[11,48],[35,34],[63,38],[72,42],[98,46]];
-const checkpoints=[[9,51],[34,35],[77,46],[90,51]];
-const hazards=[[24,53],[48,53],[86,53]];
+const cultures=[[11,48],[35,34],[63,38],[72,42],[82,49]];
+const checkpoints=[[9,51],[34,35],[77,46],[82,53]];
+const hazards=[[24,53],[48,53]];
 const enemies=[];
 const foothills={
  platforms:[[5,52,5],[10,49,6],[17,51,5],[21,48,5],[24,45,5],[27,42,5],[23,40,5],[27,38,6]],
@@ -28,7 +28,7 @@ const foothills={
 };
 // Main route drops 23 tiles from the fork. Upper canopy is optional.
 const plunge={
- main:[[56,31,8],[66,35,6],[60,39,6],[64,43,4],[69,43,6],[76,47,6],[83,51,5],[89,52,4],[94,48,8]],
+ main:[[56,31,8],[66,35,6],[60,39,6],[64,43,4],[69,43,6],[76,47,6],[80,50,4],[87,50,4],[97,49,4]],
  recovery:[[58,51,4],[58,47,4],[58,43,4]],
  bonus:[[58,28,4],[61,25,5],[65,22,5],[70,19,5],[76,22,5],[79,26,5],[74,30,5],[69,31,5]],
  encounters:[
@@ -43,6 +43,7 @@ const plunge={
 const relay={bounds:[32,26,56,36],switches:[[36,33,3],[41,32,3],[46,33,3]],
  sequences:[[2,0,1],[0,2,1]],bloom:[51,31,4],gate:[55,28,7],keeper:[29.4,38]};
 const oven={x:102,y:52};
+const bloomrot={left:85*T+12,right:103*T-12,floor:54*T,entry:84,exit:103};
 const altitudeTargets=[[4,54],[45,32],[77,47]];
 const sections=[
  {name:'Mycelium Foothills',start:0,end:23,description:'gentle footholds and the first starter culture'},
@@ -73,6 +74,8 @@ function apply({map}){
  // Replace the old mandatory canopy with a signed fork and lower route.
  for(let y=16;y<54;y++)for(let x=56;x<105;x++)map[y][x]='.';
  for(const [x,y,len] of [...plunge.main,...plunge.recovery,...plunge.bonus])for(let i=0;i<len;i++)map[y][x+i]='=';
+ // Tall sealing doors prevent bypassing the fight from either shelf.
+ for(let y=42;y<54;y++)map[y][103]='#';
  for(const [x,y] of hazards){
   if(map[y+1][x]!=='#'||map[y][x]==='#')throw Error('Unsafe spore at '+x+','+y);
   map[y][x]='^';
@@ -89,5 +92,5 @@ function apply({map}){
 }
 window.CrustVerticalBakery2=Object.freeze({rows,cols,T,sections,platforms,
  cultures,checkpoints,hazards,enemies,oven,altitudeTargets,relay,foothills,plunge,
- apply,version:'vertical-fungal-deep-plunge-v4'});
+ bloomrot,apply,version:'vertical-fungal-bloomrot-v5'});
 })();

@@ -1,16 +1,19 @@
-/* Alternating dash/volley fight preview. Enabled only by the separate preview arena config.
- * Normal bakery layouts have no Bloomrot or arena gates yet. */
+/* Bloomrot: fixed-tick battle and presentation, shared by the level and isolated trial. */
 'use strict';
 let bloomrotState=null;
-function bloomrotArena(){return bakery===2?window.__crustBloomrotArena||null:null;}
+function bloomrotArena(){return bakery===2?window.__crustBloomrotArena||currentVerticalLayout().bloomrot||null:null;}
 function bloomrotGate(x,closed){for(let y=42;y<54;y++)map[y][x]=closed?'#':'.';}
+function loadBloomrotArt(){
+ for(const [name,file] of [['bloomrotPoses','bloomrot-poses.png'],['bloomrotActions','bloomrot-actions.png'],['bloomrotChamber','bloomrot-chamber.png']])if(!assets[name])loadArt(name,'art/'+file);
+}
+function bloomrotOvenReady(){return !bloomrotArena()||(bloomrotState?.health===0&&bloomrotState.timer===0);}
 function resetBloomrot(){
  const a=bloomrotArena();
  bloomrotState=a?{x:98*T,y:54*T-60,w:52,h:60,vy:0,phase:'idle',timer:75,face:-1,health:10,maxHealth:10,inv:0,dodgeCooldown:0,dashHit:false,engaged:false,dodged:false,attack:'dash',chainsLeft:0,projectiles:[],sporeGap:10,aimX:0,aimY:0,chainSecond:false}:null;
- if(a){bloomrotGate(a.entry,false);bloomrotGate(a.exit,true);if(checkpointState.current===4)player.ammo=Math.max(45,player.ammo);}
+ if(a){loadBloomrotArt();bloomrotGate(a.entry,false);bloomrotGate(a.exit,true);if(checkpointState.current===(window.__crustBloomrotArena?4:3))player.ammo=Math.max(45,player.ammo);}
 }
 function startBloomrotPreview(){
- if(!assets.bloomrotPoses)loadArt('bloomrotPoses','art/bloomrot-poses.png');
+ loadBloomrotArt();
  window.__crustBloomrotArena={left:85*T+12,right:103*T-12,floor:54*T,entry:84,exit:103};
  init(2);
  for(let y=42;y<54;y++)for(let x=80;x<105;x++)map[y][x]='.';
@@ -25,7 +28,7 @@ function hurtBloomrot(){
  const f=bloomrotState;if(!f||f.health<=0||f.inv>0)return false;
  f.health--;f.inv=24;AudioKit.effect('enemy');burst(f.x+f.w/2,f.y+25,'#d8e4b7',6);
  if(f.health===0){
-  f.phase='defeated';f.timer=80;f.vy=0;f.projectiles=[];bloomrotGate(bloomrotArena().entry,false);bloomrotGate(bloomrotArena().exit,false);
+  f.phase='defeated';f.timer=96;f.defeatFoot=f.y+f.h;f.defeatImpact=false;f.vy=0;f.projectiles=[];bloomrotGate(bloomrotArena().entry,false);bloomrotGate(bloomrotArena().exit,false);
   if(!checkpointState.bloomrotRewarded){player.score+=1000;checkpointState.bloomrotRewarded=true;}
   floater(f.x,f.y-30,'BLOOMROT DEFEATED!','#efe3b3');AudioKit.effect('win');
  }
@@ -61,7 +64,11 @@ function updateBloomrotSpores(f){
 function updateBloomrot(){
  const f=bloomrotState,a=bloomrotArena();if(!f||!a||state!=='play')return;
  if(f.inv>0)f.inv--;if(f.dodgeCooldown>0)f.dodgeCooldown--;
- if(f.health<=0){if(f.timer>0)f.timer--;return;}
+ if(f.health<=0){
+  if(f.timer>0)f.timer--;
+  if(!f.defeatImpact&&f.timer<=66){f.defeatImpact=true;shake=Math.max(shake,4);burst(f.x+f.w/2,a.floor-10,'#dfd5aa',18);AudioKit.effect('enemy');}
+  return;
+ }
  if(!f.engaged){
   if(player.x<86*T||player.y+player.h<a.floor-220)return;
   f.engaged=true;f.timer=75;bloomrotGate(a.entry,true);
@@ -94,17 +101,21 @@ function updateBloomrot(){
  if(!stomp&&f.phase==='dash'&&!f.dashHit&&collide(player,f)){f.dashHit=true;damage();if(bloomrotState!==f)return;}
 }
 function drawBloomrot(){
- const f=bloomrotState,a=bloomrotArena();if(!f||!a)return;
+ const f=bloomrotState,a=bloomrotArena();if(!f||!a||camera+W<80*T)return;
  const art=assets.bloomrotPoses,ready=art?.complete&&art.naturalWidth===1254&&art.naturalHeight===1254;
- const cx=f.x+f.w/2,foot=f.y+f.h,low=f.phase==='windup'||f.phase==='dash';
+ const cx=f.x+f.w/2,age=96-f.timer,dead=f.health<=0;
+ const foot=dead?(f.defeatFoot??f.y+f.h)+(a.floor-(f.defeatFoot??f.y+f.h))*Math.min(1,age/30):f.y+f.h,low=f.phase==='windup'||f.phase==='dash';
  g.save();g.fillStyle='rgba(10,18,30,.45)';g.beginPath();g.ellipse(cx,a.floor,43,6,0,0,Math.PI*2);g.fill();
  if(f.phase==='dash'){rect(cx-f.face*65,foot-26,24,3,'#c0ded0');rect(cx-f.face*82,foot-15,17,2,'#a8c8c1');}
  g.translate(Math.round(cx),Math.round(foot));g.scale(f.face>0?-1:1,1);g.imageSmoothingEnabled=false;
  if(ready){
-  // Separate top-row poses have clear gutters. The standing key pose follows
-  // the actual dodge arc; dedicated jump/defeat animation follows this trial.
-  const crop=low?[646,150,600,450]:[55,50,590,544],h=f.health<=0?48:low?72:94,w=low?106:102;
-  g.drawImage(art,...crop,-w/2,-h,w,h);
+  const actions=assets.bloomrotActions,actionsReady=actions?.complete&&actions.naturalWidth===2172;
+  let crop=low?[646,150,600,450]:[55,50,590,544],w=low?106:102,h=low?72:94,image=art;
+  if(actionsReady&&dead&&age>=30){image=actions;crop=[1409,379,735,311];w=122;h=52;}
+  else if(actionsReady&&f.phase==='dodge'){image=actions;crop=[75,93,590,540];w=94;h=86;}
+  else if(actionsReady&&(f.phase==='sporeWindup'||f.phase==='volley')){image=actions;crop=[746,150,625,540];w=108;h=94;}
+  if(dead&&age<30){h=Math.round(94-42*Math.max(0,(age-12)/18));w=102+Math.round(20*Math.max(0,(age-12)/18));g.translate(age<12?(age%4<2?-2:2):0,0);}
+  g.drawImage(image,...crop,-w/2,-h,w,h);
  }else{rect(-26,-60,52,60,'#557e72');rect(-19,-51,7,5,'#ffde78');rect(9,-51,7,5,'#ffde78');}
  g.restore();
  for(const s of f.projectiles){
@@ -125,6 +136,15 @@ function drawBloomrot(){
   for(let i=0;i<3;i++)rect(cx-15+i*12,f.y-12,5,5,'#fff0b2');
  }else if(f.phase==='recovery'){g.font='12px monospace';g.fillStyle='#dce9c7';g.fillText('OPENING',cx,f.y-42);}
  // Retry flag stays outside the sealing gate and uses no normal-play buttons.
- rect(82*T+11,a.floor-65,3,65,'#c8d1ba');rect(82*T+14,a.floor-64,25,18,'#567c80');rect(82*T+17,a.floor-61,19,3,'#e9dca8');
- worldBadge('RETRY CHECKPOINT',82*T+15,a.floor-89,'#b9d8ba');g.textAlign='left';
+ if(window.__crustBloomrotArena){rect(82*T+11,a.floor-65,3,65,'#c8d1ba');rect(82*T+14,a.floor-64,25,18,'#567c80');rect(82*T+17,a.floor-61,19,3,'#e9dca8');
+ worldBadge('RETRY CHECKPOINT',82*T+15,a.floor-89,'#b9d8ba');}g.textAlign='left';
+}
+
+// Back wall stays behind collision terrain; generated plate contains no platforms.
+function drawBloomrotChamber(){
+ const a=bloomrotArena(),art=assets.bloomrotChamber;if(!a||camera+W<80*T)return;
+ if(art?.complete&&art.naturalWidth){g.imageSmoothingEnabled=false;// Blend the portal's left edge into the existing cavern parallax.
+  const width=25*T;
+  for(let i=0;i<6;i++){g.save();g.globalAlpha=(i+.5)/6;g.drawImage(art,art.naturalWidth*i*16/width,0,art.naturalWidth*16/width,art.naturalHeight,80*T+i*16,a.floor-512,16,512);g.restore();}
+  g.drawImage(art,art.naturalWidth*96/width,0,art.naturalWidth*(width-96)/width,art.naturalHeight,80*T+96,a.floor-512,width-96,512);}
 }

@@ -131,6 +131,7 @@ else rect(0,0,W,H,'#382c49');
 // Keep old flour motes only in the flat-background comparison.
 if(window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
+drawBloomrotChamber();
 drawBakeryArchitecture();
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
@@ -243,6 +244,6 @@ for(const e of enemies)if(e.alive){
 drawForeman();drawMycelium();drawBloomrot();if(bakery===2)drawCavernFoothillsTrim();if(bakery===2)drawPlungeWayfinding();
 drawEnemyShots();
 for(const s of shots){rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';drawPlayer();
-if(!bloomrotArena()){drawGrandOven();drawCheckpoints();}
+if(!window.__crustBloomrotArena){drawGrandOven();drawCheckpoints();}
 g.restore();
 }

@@ -6,12 +6,12 @@ test('the plunge redesign preserves every tile and the relay/foothills metadata 
 });
 test('all five required cultures have main-route support; no culture or checkpoint requires the upper bonus route',()=>{
  const a=level();assert.equal(a.run('gems.length'),5);
- assert.deepEqual(JSON.parse(a.run('JSON.stringify(currentVerticalLayout().cultures.slice(2))')),[[63,38],[72,42],[98,46]]);
- for(const [x,y] of [[63,39],[72,43],[98,48]])assert.equal(a.run(`tile(${x},${y})`),'=');
+ assert.deepEqual(JSON.parse(a.run('JSON.stringify(currentVerticalLayout().cultures.slice(2))')),[[63,38],[72,42],[82,49]]);
+ for(const [x,y] of [[63,39],[72,43],[82,50]])assert.equal(a.run(`tile(${x},${y})`),'=');
  assert.ok(a.run('currentVerticalLayout().checkpoints.slice(2).every(([,y])=>y>=46)'));
 });
 test('existing movement descends the main shelves and reaches the lower oven approach',()=>{
- for(const [name,sx,sy,tx,ty,jump] of [['first drop',62,31,67,35,false],['culture shelf',67,35,63,39,false],['lower culture',64,39,71,43,false],['checkpoint',71,43,78,47,false],['lower shelf',78,47,85,51,false],['floor terrace',85,51,90,52,false],['last culture',91,52,96,48,true]]){
+ for(const [name,sx,sy,tx,ty,jump] of [['first drop',62,31,67,35,false],['culture shelf',67,35,63,39,false],['lower culture',64,39,71,43,false],['checkpoint',71,43,78,47,false],['last culture approach',78,47,82,50,false],['retry floor',83,50,84.2,54,false],['arena entry',83,54,87,54,false]]){
   const a=level();a.run(`player.x=${sx}*T;player.y=${sy}*T-player.h;player.ground=true;player.vx=0;player.vy=0;`);let landed=false;
   for(let n=0;n<220;n++){a.run(`keys={jump:${jump},right:player.x<${tx}*T-5,left:player.x>${tx}*T+5};updatePlayer()`);if(n>5&&a.run(`player.ground&&Math.abs(player.y+player.h-${ty}*T)<1&&Math.abs(player.x-${tx}*T)<24`)){landed=true;break;}}
   assert.ok(landed,name);

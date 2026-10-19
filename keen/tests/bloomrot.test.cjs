@@ -1,7 +1,8 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');const {game}=require('./game-harness.cjs');
 function arena(){const a=game();a.run('startBloomrotPreview();updateBloomrot();');return a;}
-test('Bloomrot prototype is absent from all normal worlds and closes entry only after engagement',()=>{
- const a=game();for(const i of [1,2,3]){a.run(`init(${i})`);assert.equal(a.run('bloomrotState'),null);}
+test('Bloomrot guards Bakery 2 only and closes entry only after engagement',()=>{
+ const a=game();for(const i of [1,3]){a.run(`init(${i})`);assert.equal(a.run('bloomrotState'),null);}
+ a.run('init(2)');assert.equal(a.run('bloomrotState.health'),10);assert.equal(a.run('bloomrotState.engaged'),false);
  a.run('startBloomrotPreview()');assert.equal(a.run('tile(84,50)'),'.');a.run('updateBloomrot()');assert.equal(a.run('tile(84,50)'),'#');assert.equal(a.run('bloomrotState.engaged'),true);
 });
 test('dash warns for42 ticks, locks direction, then crosses the lane with a75 tick recovery',()=>{
@@ -32,7 +33,7 @@ test('pogo hits rebound and can defeat the boss; reward is once-only and both ga
 });
 test('checkpoint retry and restart reset fight safely without affecting relay completion',()=>{
  const a=arena();a.run('myceliumState.solved=true;myceliumState.clueKnown=true;collected=1;bloomrotState.health=3;player.ammo=0;respawnCheckpoint()');assert.equal(a.run('player.x'),82*32);assert.equal(a.run('bloomrotState.health'),10);assert.equal(a.run('player.ammo'),45);assert.equal(a.run('collected'),1);assert.equal(a.run('myceliumState.solved'),true);assert.equal(a.run('tile(84,50)'),'.');
- a.run('restart()');assert.equal(a.run('checkpointState.current'),4);assert.equal(a.run('enemies.length'),0);assert.equal(a.run('bloomrotState.health'),10);a.run('leaveBloomrotPreview()');assert.equal(a.run('bloomrotState'),null);
+ a.run('restart()');assert.equal(a.run('checkpointState.current'),4);assert.equal(a.run('enemies.length'),0);assert.equal(a.run('bloomrotState.health'),10);a.run('leaveBloomrotPreview()');assert.equal(a.run('bloomrotState.health'),10);assert.equal(a.run('window.__crustBloomrotArena'),null);
 });
 test('pause and render calls never advance the attack clock',()=>{
  const a=arena();a.run("state='pause';bloomrotState.projectiles=[{x:3000,y:1700,w:10,h:10,vx:4.2,vy:0,life:50}];assets.bloomrotPoses.complete=true;assets.bloomrotPoses.naturalWidth=1254;assets.bloomrotPoses.naturalHeight=1254;");const before=a.run('JSON.stringify(bloomrotState)');a.run('for(let i=0;i<100;i++){updateBloomrot();drawBloomrot()}');assert.equal(a.run('JSON.stringify(bloomrotState)'),before);
@@ -67,4 +68,21 @@ test('spores collide with stone, expire, damage once through player invulnerabil
 });
 test('completed attacks alternate dash and volley while dodge recovery preserves the pending attack',()=>{
  const a=arena();a.run("bloomrotState.phase='dash';bloomrotState.timer=1;updateBloomrot()");assert.equal(a.run('bloomrotState.attack'),'volley');a.run("bloomrotState.phase='dodge';bloomrotState.y=54*T-60;bloomrotState.vy=0;updateBloomrot()");assert.equal(a.run('bloomrotState.attack'),'volley');
+});
+test('integrated ending supplies ammo before sealing and requires cultures plus the finished defeat',()=>{
+ const a=game();a.run('init(2);player.x=82*T;player.y=54*T-player.h;player.ammo=0;updateWorldProgress()');
+ assert.equal(a.run('checkpointState.current'),3);assert.equal(a.run('player.ammo'),45);assert.equal(a.run('bloomrotState.engaged'),false);
+ assert.equal(a.run('gems[4].x<84*T'),true);assert.equal(a.run('tile(86,53)'),'.');
+ a.run('player.x=87*T;updateBloomrot();');assert.equal(a.run('tile(84,50)'),'#');
+ a.run('collected=5;player.x=102*T;player.y=54*T-player.h;updateWorldProgress()');assert.equal(a.run('state'),'play');
+ a.run('bloomrotState.health=1;bloomrotState.inv=0;hurtBloomrot();updateWorldProgress()');assert.equal(a.run('state'),'play');
+ a.run('for(let i=0;i<29;i++)updateBloomrot()');assert.equal(a.run('bloomrotState.defeatImpact'),false);
+ a.run('updateBloomrot()');assert.equal(a.run('bloomrotState.defeatImpact'),true);const count=a.audio.effects.filter(x=>x==='enemy').length;
+ a.run('for(let i=0;i<66;i++)updateBloomrot()');assert.equal(a.audio.effects.filter(x=>x==='enemy').length,count);
+ a.run('collected=4;updateWorldProgress()');assert.equal(a.run('state'),'play');a.run('collected=5;updateWorldProgress()');assert.equal(a.run('state'),'clear');
+});
+test('normal level restart keeps the full route and boss retry preserves mission and cultures',()=>{
+ const a=game();a.run('init(2);checkpointState.current=3;collected=4;myceliumState.solved=true;myceliumState.clueKnown=true;player.ammo=0;respawnCheckpoint();');
+ assert.equal(a.run('bloomrotState.health'),10);assert.equal(a.run('player.ammo'),45);assert.equal(a.run('collected'),4);assert.equal(a.run('myceliumState.solved'),true);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)'),false);
+ a.run('restart()');assert.equal(a.run('player.x'),3*32);assert.equal(a.run('checkpointState.current'),-1);assert.equal(a.run('collected'),0);assert.ok(a.run('enemies.length')>0);assert.equal(a.run('window.__crustBloomrotArena'),undefined);
 });
