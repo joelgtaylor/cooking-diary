@@ -1,0 +1,35 @@
+const{test}=require('node:test'),assert=require('node:assert/strict');const{game}=require('./game-harness.cjs');
+function trial(){const a=game();a.run('startDevourerPreview()');return a;}
+function engage(a){a.run('player.x=91*T;updateDevourer()');}
+test('Devourer trial is isolated, disguised and unannounced until approaching',()=>{
+ const a=game();for(const i of [1,2,3]){a.run(`init(${i})`);assert.equal(a.run('devourerState'),null);}
+ a.run('startDevourerPreview();updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('tile(80,50)'),'.');engage(a);assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.timer'),24);assert.equal(a.run('tile(80,50)'),'#');
+});
+test('first slam has a fixed 24-tick flight and never tracks the player after takeoff',()=>{
+ const a=trial();engage(a);const target=a.run('devourerState.targetX');a.run('player.x+=140;for(let i=0;i<23;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.targetX'),target);a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.foot'),54*32);assert.equal(a.run('devourerState.x'),target);
+});
+test('standing still takes slam damage, running away using real player physics escapes',()=>{
+ const a=trial();engage(a);a.run('for(let i=0;i<24;i++)updateDevourer()');assert.equal(a.run('player.health'),2);
+ const b=trial();engage(b);b.run('keys={left:true};for(let i=0;i<24;i++)update()');assert.equal(b.run('player.health'),3);
+});
+test('five boules fire ten ticks apart, then recovery exposes door for 36 ticks',()=>{
+ const a=trial();engage(a);a.run("devourerState.phase='boules';devourerState.timer=50;");const fire=[];
+ for(let i=0;i<50;i++){const before=a.audio.effects.filter(x=>x==='shoot').length;a.run('updateDevourer()');if(a.audio.effects.filter(x=>x==='shoot').length>before)fire.push(i);}assert.deepEqual(fire,[0,10,20,30,40]);assert.equal(a.run('devourerOpen(devourerState)'),true);
+ a.run('devourerState.projectiles=[];for(let i=0;i<35;i++)updateDevourer()');assert.equal(a.run('devourerOpen(devourerState)'),true);a.run('updateDevourer()');assert.equal(a.run('devourerOpen(devourerState)'),false);
+});
+test('closed door blocks shots; real moving bullets enter the opening from either side',()=>{
+ for(const face of [-1,1]){const a=trial();engage(a);a.run(`devourerState.phase='recovery';devourerState.timer=60;shots=[{x:devourerState.x+${face}*100,y:devourerState.foot-110,w:10,h:6,vx:${-face}*10}];for(let i=0;i<12;i++)updateProjectiles(false);`);assert.equal(a.run('devourerState.health'),11);}
+ const a=trial();engage(a);a.run("devourerState.phase='boules';shots=[{x:devourerState.x-70,y:devourerState.foot-110,w:10,h:6,vx:10}];for(let i=0;i<12;i++)updateProjectiles(false)");assert.equal(a.run('devourerState.health'),12);assert.equal(a.run('shots.length'),0);
+});
+test('boules bounce once, expire, respect stone, and fatal damage stops stale updates',()=>{
+ const a=trial();engage(a);a.run('devourerState.projectiles=[{x:3000,y:54*T-19,w:18,h:18,vx:1,vy:2,bounces:0,life:100}];updateDevourer()');assert.equal(a.run('devourerState.projectiles[0].bounces'),1);assert.ok(a.run('devourerState.projectiles[0].vy')<0);
+ a.run('devourerState.projectiles[0].life=1;updateDevourer()');assert.equal(a.run('devourerState.projectiles.length'),0);
+ a.run('player.health=1;player.inv=0;devourerState.projectiles=[{x:player.x,y:player.y,w:18,h:18,vx:0,vy:0,bounces:0,life:100}];updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('devourerState.projectiles.length'),0);assert.equal(a.run('player.x'),79*32);
+});
+test('retry/restart/defeat safely reset or clear the isolated fight without changing full Bakery 3',()=>{
+ const a=trial();engage(a);a.run('devourerState.health=1;hurtDevourer();hurtDevourer()');assert.equal(a.run('player.score'),2000);assert.equal(a.run('tile(80,50)'),'.');a.run('player.ammo=0;respawnCheckpoint()');assert.equal(a.run('player.ammo'),65);assert.equal(a.run('devourerState.health'),12);a.run('restart()');assert.equal(a.run('player.x'),83*32);a.run('leaveDevourerPreview()');assert.equal(a.run('devourerState'),null);assert.equal(a.run('gems.length'),5);
+});
+test('pause and rendering are pure; timing is identical at 30/60/120 render fps',()=>{
+ const a=trial();engage(a);const before=a.run('JSON.stringify(devourerState)');a.run("state='pause';for(let i=0;i<100;i++){updateDevourer();drawDevourer()}");assert.equal(a.run('JSON.stringify(devourerState)'),before);
+ let expected;for(const fps of [30,60,120]){const b=trial();engage(b);b.run('draw=()=>{};diagnosticOverlay=()=>{};drawPhase3Map=()=>{};');b.run(`for(let i=0;i<=${fps*8};i++)loop(i*1000/${fps})`);const actual=b.run('JSON.stringify([devourerState,player,tick])');if(expected)assert.equal(actual,expected);else expected=actual;}
+});

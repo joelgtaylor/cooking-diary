@@ -9,6 +9,7 @@ function updateCombat(shoot){
  updateEnemyShots();
  updateForeman();
  updateBloomrot();
+ updateDevourer();
 }
 function updateProjectiles(shoot){
  if(shoot&&tick%13===0&&player.ammo>0){shots.push({x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});player.ammo--;AudioKit.effect('shoot')}
@@ -17,6 +18,7 @@ function updateProjectiles(shoot){
   for(const e of enemies)if(e.alive&&collide(s,e)){e.alive=false;s.dead=true;player.score+=100;burst(e.x+12,e.y+12,'#ffad57');AudioKit.effect('enemy')}
   if(!s.dead)hitForemanShot(s);
   if(!s.dead)hitBloomrotShot(s);
+  if(!s.dead)hitDevourerShot(s);
  }
  shots=shots.filter(s=>!s.dead&&s.x>0&&s.x<world);
 }
