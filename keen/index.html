@@ -24,6 +24,7 @@
 <script src="combat.js"></script>
 <script src="gameplay.js"></script>
 <script src="characters.js"></script>
+<script src="celebration.js"></script>
 <script src="hud.js"></script>
 <script src="ovens.js"></script>
 <script src="interactables.js"></script>
@@ -62,6 +63,7 @@ for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'
 const simulationClock=createFixedStepClock();
 function simulationStep(){if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();}
 function loop(now){try{
+ if(Number.isFinite(now))presentationNow=now;
  if(document.hidden){simulationClock.reset();requestAnimationFrame(loop);return;}
  simulationClock.advance(now,simulationStep);
  draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop);
