@@ -36,5 +36,29 @@ function renderMoonlit(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
  }
  g.restore();
 }
-window.CrustAtmosphere={renderMoonlit};
+function renderFungal(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
+ const sx=width/1200,sy=height/676;
+ const caps=layer==='near'?[[168,214,160,35],[1050,226,145,37],[151,345,75,17],[1000,399,79,20]]:
+  [[410,252,92,22],[580,288,55,16],[851,248,46,14],[1054,249,77,20],[292,334,44,12],[891,450,46,14]];
+ g.save();
+ // Pulses follow the gills of the painted caps rather than covering the scene.
+ for(let i=0;i<caps.length;i++){
+  const [cx,cy,rx,ry]=caps[i],pulse=reduced?.5:(1+Math.sin(time*1.1+i*1.6))/2;
+  for(let ring=2;ring>=0;ring--){
+   g.globalAlpha=(.025+pulse*.055)*(1-ring*.2);
+   g.fillStyle=i%2?'#bcfaff':'#f1b6ff';g.beginPath();
+   g.ellipse(Math.round(x+cx*sx),Math.round(y+cy*sy),rx*sx*(1+ring*.12),ry*sy*(1+ring*.12),0,0,Math.PI*2);g.fill();
+  }
+ }
+ if(!reduced)for(let i=0;i<(layer==='near'?10:16);i++){
+  const phase=((time/(9+i%4)+i*.381)%1+1)%1;
+  const px=90+(i*157)%1020+Math.sin(time*.35+i)*13,py=570-phase*370;
+  const size=i%5===0?3:2;
+  g.globalAlpha=(layer==='near'?.55:.35)*Math.sin(phase*Math.PI);
+  g.fillStyle=i%3?'#b3f3ed':'#e9ceff';
+  g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),size,size);
+ }
+ g.restore();
+}
+window.CrustAtmosphere={renderMoonlit,renderFungal};
 })();
