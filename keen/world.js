@@ -35,13 +35,13 @@ function initVerticalWorld(){
  collected=0;combo=0;comboT=0;shake=0;hitStop=0;
  state='play';tick=0;prevJump=false;pogoOn=false;
  checkpointState={current:-1,spawns:layout.checkpoints.map(([x,y])=>({x:x*T+3,y:checkpointSupportRow(x,y)*T-38})),complete:false};
- document.getElementById('pogoBtn').textContent='Mixer OFF';resetForeman();
+ document.getElementById('pogoBtn').textContent='Mixer OFF';resetForeman();resetMycelium();resetBloomrot();
 }
 function respawnCheckpoint(){
  const cp=checkpointState.spawns[Math.max(0,checkpointState.current)] || {x:3*T,y:54*T-38};
  player.x=cp.x;player.y=cp.y;player.vx=0;player.vy=0;player.ground=false;
  player.hang=null;player.health=3;player.inv=90;player.shield=false;
- resetForeman();if(foremanState&&checkpointState.current===3)player.ammo=Math.max(35,player.ammo);enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
+ recoverMycelium();resetForeman();resetBloomrot();if(foremanState&&checkpointState.current===3)player.ammo=Math.max(35,player.ammo);enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
 }
 function updateWorldProgress(){
  if(state!=='play')return;
@@ -50,13 +50,14 @@ function updateWorldProgress(){
   const [x,y]=layout.checkpoints[i];
   if(i>checkpointState.current&&Math.abs(player.x+14-x*T-12)<52&&Math.abs(player.y+22-y*T)<62){
     checkpointState.current=i;
+    if(bakery===2&&bloomrotArena()&&i===3)player.ammo=Math.max(45,player.ammo);
     floater(player.x,player.y-12,'CHECKPOINT '+(i+1),'#a5ffdc');
     AudioKit.effect('collect');
   }
  }
  if(player.health<=0){respawnCheckpoint();return;}
  const target=layout.oven;
- if(foremanOvenReady()&&Math.abs(player.x+14-(target.x*T+12))<53&&
+ if(foremanOvenReady()&&bloomrotOvenReady()&&Math.abs(player.x+14-(target.x*T+12))<53&&
     Math.abs(player.y+22-(target.y*T+25))<85){
     checkpointState.complete=true;
     if(player.score>best){best=player.score;saveBest();}
@@ -73,4 +74,4 @@ function advanceBakery(){
  if(bakery<MAXBAKERY)init(bakery+1);
  else state='win';
 }
-function restart(){init(bakery)}
+function restart(){if(window.__crustBloomrotArena){startBloomrotPreview();return;}init(bakery)}

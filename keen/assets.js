@@ -5,6 +5,7 @@
 const assets={};
 function loadArt(name,uri){const img=new Image();img.src=uri;assets[name]=img}
 function loadGameArt(){
+loadArt('myceliumAtlas','art/mycelium-relay-atlas.png');
 // Bakery 1 stone coping, slate ledges and opaque masonry (8 variants/row).
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
 loadArt('cavernTerrain','art/cavern-terrain.png');

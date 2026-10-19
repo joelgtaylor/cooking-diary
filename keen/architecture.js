@@ -1,6 +1,7 @@
 /* Non-colliding interior backing; all solid geometry is authored in the layout. */
 'use strict';
 function drawBakeryArchitecture(){
+ if(bakery===2){drawCavernFoothills();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
  g.save();
@@ -36,4 +37,36 @@ function drawBakeryArchitecture(){
   for(const dx of [35,44]){rect(dx*T,35*T-5,T,5,'#ba9b70');rect(dx*T+3,35*T-5,T-6,2,'#eddbad');}
   g.restore();
  }
+}
+
+// Visual trim stays inside the authored solid balcony and root lintel.
+function drawCavernFoothills(){
+ const f=currentVerticalLayout().foothills;if(!f||camera>1050||cameraY+H<1200)return;
+ const {x,y,w}=f.balcony;
+ // Dark recess under the balcony gives the lower route a sheltered silhouette.
+ g.save();g.globalAlpha=.32;
+ rect((x+.1)*T,(y+1)*T,(w-.2)*T,4*T,'#182535');g.restore();
+ for(let i=0;i<6;i++){
+  rect((x+i)*T+5,(y+1)*T,3,13+(i%3)*6,'#3f655d');
+  rect((x+i)*T+5,(y+1)*T+10,7,3,'#739681');
+ }
+}
+function drawCavernFoothillsTrim(){
+ const f=currentVerticalLayout().foothills;if(!f||camera>1050||cameraY+H<1200)return;
+ const dx=f.door.x*T,dy=(f.door.opening-1)*T;
+ rect(dx+3,dy+23,26,5,'#527e70');rect(dx+5,dy+24,22,2,'#abd2ab');
+ // Small spore nodes mark the passage without implying another rune switch.
+ for(const nx of [dx+7,dx+24]){rect(nx,dy+27,2,3,'#91d8ca');}
+}
+
+// A permanent fork sign distinguishes mandatory cultures from optional combat.
+function drawPlungeWayfinding(){
+ const p=currentVerticalLayout().plunge;if(!p||camera>2600||camera+W<1750||cameraY>1150)return;
+ const [x,y]=p.fork,px=x*T,py=y*T;
+ rect(px-2,py-160,4,160,'#6b7560');
+ rect(px-85,py-172,170,30,'#162c37');rect(px-83,py-170,166,2,'#b4d2bd');
+ rect(px-85,py-138,170,30,'#272735');rect(px-83,py-136,166,2,'#d5b487');
+ g.textAlign='center';g.font='bold 11px monospace';g.fillStyle='#d4f2d2';g.fillText('MAIN DESCENT  ↓',px,py-152);
+ g.fillStyle='#f1d2a1';g.fillText('BONUS / DANGER  ↑',px,py-118);
+ g.textAlign='left';
 }

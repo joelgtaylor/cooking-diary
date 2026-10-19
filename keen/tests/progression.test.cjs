@@ -17,7 +17,7 @@ test('three vertical bakeries initialize, render, respawn, collect and unlock re
   assert.equal(run('player.x'),run('checkpointState.spawns[1].x'));
   run('enemies=[];for(const gem of gems){player.x=gem.x;player.y=gem.y;player.vx=0;player.vy=0;keys={};update();}');
   assert.equal(run('collected'),5);
-  run("if(foremanState){foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;}");
+  run("if(foremanState){foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;}if(bloomrotState){bloomrotState.health=0;bloomrotState.timer=0;}");
   run('player.x=currentVerticalLayout().oven.x*T;player.y=currentVerticalLayout().oven.y*T;updateWorldProgress();draw();');
   assert.equal(run('state'),'clear');
   assert.ok(JSON.parse(storage.get('crustQuestCodex')).includes(stage-1));
@@ -43,13 +43,13 @@ test('keyboard and canvas advance all bakeries and finish at the final win',()=>
 });
 test('completion requires five cultures and proximity; restart keeps persistent rewards',()=>{
  const {run,storage}=game();
- run("if(foremanState){foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;}");
+ run("if(foremanState){foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;}if(bloomrotState){bloomrotState.health=0;bloomrotState.timer=0;}");
   run('player.x=currentVerticalLayout().oven.x*T;player.y=currentVerticalLayout().oven.y*T;collected=4;updateWorldProgress()');
  assert.equal(run('state'),'play');assert.equal(storage.has('crustQuestCodex'),false);
  run("foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;");
  run('collected=5;player.x=0;player.y=0;updateWorldProgress()');
  assert.equal(run('state'),'play');
- run("if(foremanState){foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;}");
+ run("if(foremanState){foremanState.health=0;foremanState.phase='defeated';foremanState.timer=0;}if(bloomrotState){bloomrotState.health=0;bloomrotState.timer=0;}");
   run('player.x=currentVerticalLayout().oven.x*T;player.y=currentVerticalLayout().oven.y*T;player.score=1234;updateWorldProgress()');
  assert.equal(run('state'),'clear');assert.equal(storage.get('crustQuestBest'),'1234');
  run('updateWorldProgress()');assert.equal(storage.get('crustQuestCodex'),'[0]');

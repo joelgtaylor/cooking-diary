@@ -17,7 +17,7 @@ test('each oven uses its own art and rests on its authored supporting surface',(
 test('ready artwork preserves the structure, game state and completion trigger',()=>{
  const {run,trace}=setup(2);run('collected=4;tick=16;');trace.length=0;run('drawGrandOven()');
  const dormant=trace.find(c=>c[0]==='drawImage'&&c[1]?.image===hash);
- run('collected=5');const before=run('JSON.stringify({player,collected,state,checkpointState,unlocked})');
+ run('collected=5;bloomrotState.health=0;bloomrotState.timer=0;');const before=run('JSON.stringify({player,collected,state,checkpointState,unlocked})');
  trace.length=0;run('drawGrandOven()');
  assert.deepEqual(trace.find(c=>c[0]==='drawImage'&&c[1]?.image===hash),dormant);
  assert.equal(run('JSON.stringify({player,collected,state,checkpointState,unlocked})'),before);
