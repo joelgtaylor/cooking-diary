@@ -94,9 +94,9 @@ function render(g,opt){
      const x=Math.round(-padX/2-offsetX);
      const y=Math.round(-padY/2-offsetY);
      g.drawImage(item.image,x,y,W+padX,H+padY);
-     if(stage===1&&item.image===illustration.mid&&opt.atmosphere!==false&&window.CrustAtmosphere){
+     if(stage===1&&(item.image===illustration.mid||item.image===illustration.near)&&opt.atmosphere!==false&&window.CrustAtmosphere){
        window.CrustAtmosphere.renderMoonlit(g,{x,y,width:W+padX,height:H+padY,
-         time:opt.time||0,reduced:!!opt.reducedMotion});
+         time:opt.time||0,reduced:!!opt.reducedMotion,layer:item.image===illustration.near?'near':'mid'});
      }
    }
  }else if(stage===2&&opt.fungalCavern){
