@@ -4,7 +4,8 @@ let bloomrotState=null;
 function bloomrotArena(){return bakery===2?window.__crustBloomrotArena||currentVerticalLayout().bloomrot||null:null;}
 function bloomrotGate(x,closed){for(let y=42;y<54;y++)map[y][x]=closed?'#':'.';}
 function loadBloomrotArt(){
- for(const [name,file] of [['bloomrotPoses','bloomrot-poses.png'],['bloomrotActions','bloomrot-actions.png'],['bloomrotChamber','bloomrot-chamber.png']])if(!assets[name])loadArt(name,'art/'+file);
+ // Full literal URLs also let the offline preview embed every image.
+ for(const [name,uri] of [['bloomrotPoses','art/bloomrot-poses.png'],['bloomrotActions','art/bloomrot-actions.png'],['bloomrotChamber','art/bloomrot-chamber.png']])if(!assets[name])loadArt(name,uri);
 }
 function bloomrotOvenReady(){return !bloomrotArena()||(bloomrotState?.health===0&&bloomrotState.timer===0);}
 function resetBloomrot(){
