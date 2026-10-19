@@ -7,6 +7,7 @@ function updateCombat(shoot){
  updateProjectiles(shoot);
  updateEnemies();
  updateEnemyShots();
+ updateForeman();
 }
 function updateProjectiles(shoot){
 if(shoot&&tick%13===0&&player.ammo>0){shots.push({x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});player.ammo--;AudioKit.effect('shoot')}for(const s of shots){s.x+=s.vx;if(hit(s.x,s.y,s.w,s.h))s.dead=true;for(const e of enemies)if(e.alive&&collide(s,e)){e.alive=false;s.dead=true;player.score+=100;burst(e.x+12,e.y+12,'#ffad57');AudioKit.effect('enemy')}}shots=shots.filter(s=>!s.dead&&s.x>0&&s.x<world);
