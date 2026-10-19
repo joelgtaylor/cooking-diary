@@ -20,6 +20,7 @@
 <script src="art/baker-reimagined.js"></script>
 <script src="art/environment-gameplay-atlas.js"></script>
 <script src="audio.js"></script>
+<script src="timing.js"></script>
 <script src="camera.js"></script>
 <script src="world.js"></script>
 <script src="input.js"></script>
@@ -29,6 +30,8 @@
 <script src="gameplay.js"></script>
 <script src="characters.js"></script>
 <script src="hud.js"></script>
+<script src="ovens.js"></script>
+<script src="interactables.js"></script>
 <script src="render.js"></script>
 <script src="assets.js"></script>
 <script>
@@ -61,7 +64,14 @@ function codexFlip(d){codexPage=(codexPage+d+RECIPES.length)%RECIPES.length;Audi
 
 // CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
 for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'+q,window.__PHASE3_BG[q]);
-function loop(){try{if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop)}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}const statusEl=document.getElementById('status');
+const simulationClock=createFixedStepClock();
+function simulationStep(){if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();}
+function loop(now){try{
+ if(document.hidden){simulationClock.reset();requestAnimationFrame(loop);return;}
+ simulationClock.advance(now,simulationStep);
+ draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop);
+}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}
+document.addEventListener('visibilitychange',()=>simulationClock.reset());const statusEl=document.getElementById('status');
 const minimap=document.getElementById('verticalMap');
 const mapButton=document.getElementById('mapButton');
 
