@@ -6,28 +6,21 @@
 function toggleMap(){
  const open=minimap.style.display==='none';
  minimap.style.display=open?'block':'none';
- mapButton.textContent=open?'🗺️ HIDE MAP (Q)':'🗺️ WORLD MAP (Q)';
+ mapButton.textContent=open?'Hide map (Q)':'World map (Q)';
 }
-function toggleParallax(){
- window.__crustParallaxEnabled=window.__crustParallaxEnabled===false;
- updateParallaxUI();
-}
+function togglePause(){state=state==='play'?'pause':state==='pause'?'play':state;}
 function bindInput(){
  document.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if(['arrowleft','arrowright','arrowup',' '].includes(k))e.preventDefault();
-  keys[e.key.length===1?k:e.key]=true;AudioKit.start();statusEl.textContent='Keyboard input: '+e.key;
+  keys[e.key.length===1?k:e.key]=true;AudioKit.start();
   if(e.repeat)return;
   if(k==='m')AudioKit.toggle();
   if(k==='q'){e.preventDefault();toggleMap();}
   if(k==='r')restart();
-  if(k==='p')state=state==='play'?'pause':state==='pause'?'play':state;
+  if(k==='p')togglePause();
   if(k==='t')toggleCodex();
   if(k==='enter')advanceBakery();
-  if(k==='b')toggleParallax();
-  if(k==='g'){window.__crustCameraDebug=!window.__crustCameraDebug;cameraUI();}
-  if(k==='v'){window.__crustCameraSnap=!window.__crustCameraSnap;cameraUI();}
-  if(k==='1'||k==='2'||k==='3'){e.preventDefault();moveToAltitude(Number(k)-1);}
   if(state==='codex'){
    if(k==='arrowleft'||k==='a')codexFlip(-1);
    else if(k==='arrowright'||k==='d')codexFlip(1);
@@ -41,15 +34,7 @@ function bindInput(){
  click('audioBtn',()=>AudioKit.toggle());
  click('mapButton',toggleMap);
  click('restartSection',respawnCheckpoint);
- click('parallaxToggleBtn',toggleParallax);
- for(const profile of ['subtle','balanced','dramatic']){
-  click('parallax'+profile[0].toUpperCase()+profile.slice(1)+'Btn',()=>{
-   window.__crustParallaxProfile=profile;window.__crustParallaxEnabled=true;updateParallaxUI();
-  });
- }
- click('cameraSmoothBtn',()=>{window.__crustCameraSnap=!window.__crustCameraSnap;cameraUI();});
- click('cameraGridBtn',()=>{window.__crustCameraDebug=!window.__crustCameraDebug;cameraUI();});
- ['cameraFootBtn','cameraMiddleBtn','cameraTopBtn'].forEach((id,i)=>click(id,()=>moveToAltitude(i)));
+ click('pauseBtn',togglePause);
  c.addEventListener('pointerdown',e=>{
   AudioKit.start();
   if(state==='clear')advanceBakery();
@@ -71,12 +56,12 @@ function bindInput(){
    e.preventDefault();AudioKit.start();
    if(state==='codex'&&(k==='left'||k==='right')){codexFlip(k==='left'?-1:1);return;}
    pointers.add(e.pointerId);b.setPointerCapture(e.pointerId);keys[k]=true;
-   statusEl.textContent='Input detected: '+k;b.style.background='#58a5a2';
+   b.style.background='#58a5a2';
   });
   for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,release);
   b.addEventListener('click',()=>{
    if(k==='jump')player.buffer=9;
-   statusEl.textContent='Button activated: '+k;
+
   });
  }
  const clearHeld=()=>{
