@@ -9,3 +9,9 @@ The original five repeated ledges become courtyard steps, a solid workshop roof 
 Tests verify doorway passage, yeast collection, six route segments with actual player physics, safe checkpoint respawn, bounded geometry edits and unchanged enemies/other worlds. The original layout is frozen in `tests/fixtures/bakery1-original.js` for the historical 4,320-frame physics regression; production geometry has separate route tests. Render snapshots intentionally change only Bakery 1. Test harness native-canvas/Image overrides support visual inspection without changing production code.
 
 Pending user play-testing. Later phases place and vary encounters; no additional enemies are introduced here.
+
+## Phase 2: workshop encounters
+
+Add two enemies without changing the approved geometry: a ground-level patroller in the right-hand workshop bay, and a roof hopper beyond the first landing. Explicit encounter bounds keep them away from the courtyard checkpoint, doorway approach and roof entry. Their original speeds, hopper launch strength/cadence, hitboxes, shooting rewards and pogo-stomp behaviour are retained. Existing enemy placements remain unchanged; Bakery 1 now has five enemies.
+
+The old hopper branch uses a 620px cleanup limit and does not land on one-way platforms. New authored encounters use world-height cleanup and support-aware landing, leaving the legacy path unchanged for the historical regression fixture. Tests run 900 enemy frames for survival/bounds, verify safe checkpoint recovery, shooting from the approach and the existing pogo reward. The preview compares encounters against the approved Phase 1 layout with the two new enemies omitted.

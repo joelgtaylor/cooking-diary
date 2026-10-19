@@ -19,6 +19,11 @@ const cultures=[[16,50],[32,37],[61,22],[83,25],[100,37]];
 const checkpoints=[[8,51],[40,33],[72,17],[91,33]];
 const hazards=[[22,53],[51,53],[84,53],[88,53]]; // ground, not overhead.
 const enemies=[[27,45,'walker'],[50,30,'walker'],[81,39,'walker']];
+// Encounter bounds leave the doorway, checkpoint and first roof landing clear.
+const encounters=[
+ {x:19*T,y:54*T-25,type:'walker',left:17.5*T,right:21*T-25,hopT:0},
+ {x:16*T,y:48*T-25,type:'hopper',left:14*T,right:18.5*T-25,hopT:50}
+];
 const sections=[
 {name:'Bakery Entry',start:0,end:22,description:'safe ground and first ledges'},
 {name:'Moonlit Ascension',start:23,end:52,description:'forking elevated rooftop routes'},
@@ -48,13 +53,13 @@ function apply({map}){
   gems:cultures.map(([x,y])=>({x:x*T+12,y:y*T,got:false})),
   enemies:enemies.map(([x,y,type],i)=>({
    x:x*T,y:y*T,w:25,h:25,vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:30+i*9
-  })),
+  })).concat(encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}}))),
   powerups:[[38,39,'kefir'],[70,17,'banneton'],[92,33,'rye']]
     .map(([x,y,kind],i)=>({x:x*T+4,y:y*T,kind,got:false,ph:i*1.5}))
  };
 }
 window.CrustVerticalBakery1=Object.freeze({
- rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,workshop,
+ rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,workshop,encounters,
  apply,version:'courtyard-workshop-phase1'
 });
 })();
