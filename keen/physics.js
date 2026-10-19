@@ -76,5 +76,5 @@ if(supported){
   else if(player.vy<0)player.y=Math.floor((player.y+player.vy)/T+1)*T;
   player.ground=player.vy>0;player.vy=0;
  }
-}if(!wasG&&player.ground&&fallV>6)burst(player.x+14,player.y+player.h,'#e8dcc8',8);if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false;player.coyote=0;burst(player.x+15,player.y+player.h,'#9af3fa',3);AudioKit.effect('pogo')}return {shoot};
+}if(!wasG&&player.ground)myceliumLanding(pogoOn);if(!wasG&&player.ground&&fallV>6)burst(player.x+14,player.y+player.h,'#e8dcc8',8);if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false;player.coyote=0;burst(player.x+15,player.y+player.h,'#9af3fa',3);AudioKit.effect('pogo')}return {shoot};
 }

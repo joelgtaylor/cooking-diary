@@ -41,6 +41,8 @@ window.AudioKit=(()=>{
  }
  function effect(name){if(!enabled||!ctx||ctx.state!=='running')return;
   const t=ctx.currentTime+.005;
+  if(/^relay[123]$/.test(name))tone([72,76,79][Number(name.slice(-1))-1],t,.24,'triangle',.16,fxGain);
+  if(name==='relayReset'){tone(64,t,.12,'triangle',.12,fxGain);tone(57,t+.10,.18,'triangle',.10,fxGain)}
   if(name==='jump'){tone(60,t,.10,'square',.12,fxGain);tone(67,t+.07,.13,'triangle',.10,fxGain)}
   if(name==='pogo'){tone(50,t,.08,'sawtooth',.085,fxGain);tone(74,t+.055,.17,'square',.085,fxGain)}
   if(name==='shoot')tone(86,t,.065,'square',.09,fxGain);

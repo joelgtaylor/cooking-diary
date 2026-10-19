@@ -10,7 +10,7 @@ function oneWayTop(x,foot,nextFoot,w){
  for(let ty=minY;ty<=maxY;ty++){
   const top=ty*T;
   if(foot>top+1.3||nextFoot<top-.02)continue;
-  for(let tx=x0;tx<=x1;tx++)if(tile(tx,ty)==='=')return top;
+  for(let tx=x0;tx<=x1;tx++)if(tile(tx,ty)==='='||tile(tx,ty)==='M')return top;
  }
  return null;
 }

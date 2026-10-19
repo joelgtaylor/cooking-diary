@@ -15,9 +15,12 @@ const branches=[[13,46,10],[20,42,9],[27,38,10],[35,34,9],
  [21,50,8],[39,44,8],[55,38,8],[68,33,7],[80,43,7],[95,50,9]];
 const platforms=[[0,54,105],...rise,...crest,...descent,...branches];
 const cultures=[[11,48],[35,34],[62,17],[83,27],[98,46]];
-const checkpoints=[[9,51],[37,35],[71,18],[89,38]];
+const checkpoints=[[9,51],[34,35],[71,18],[89,38]];
 const hazards=[[24,53],[48,53],[78,53],[91,53]];
-const enemies=[[27,45,'walker'],[50,28,'walker'],[81,30,'walker']];
+const enemies=[[27,45,'walker'],[81,30,'walker']];
+// Mycelium grotto: tile-aligned switches, fixed bloom and root doorway.
+const relay={bounds:[32,26,56,36],switches:[[36,33,3],[41,33,3],[46,33,3]],
+ sequence:[0,1,2],bloom:[51,31,4],gate:[55,28,7],clue:[1105,875]};
 const oven={x:102,y:52};
 const altitudeTargets=[[4,54],[45,32],[71,18]];
 const sections=[
@@ -31,6 +34,14 @@ function apply({map}){
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)map[y][x]=y>=54?'#':'.';
  for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)
    if(map[y][xx]!=='#')map[y][xx]='=';
+ // Keep the approved compact chamber local to Sporelit Stairways.
+ for(let y=20;y<39;y++)for(let x=33;x<56;x++)map[y][x]='.';
+ for(let x=32;x<56;x++){map[26][x]='#';map[35][x]='=';}
+ for(let y=26;y<33;y++)map[y][32]='#';
+ for(let y=26;y<35;y++)map[y][55]='#';
+ for(let x=56;x<64;x++)map[28][x]='=';
+ for(let x=56;x<60;x++)map[31][x]='=';
+ for(const [x,y,len] of relay.switches)for(let i=0;i<len;i++)map[y][x+i]='M';
  for(const [x,y] of hazards){
   if(map[y+1][x]!=='#'||map[y][x]==='#')throw Error('Unsafe spore at '+x+','+y);
   map[y][x]='^';
@@ -44,6 +55,6 @@ function apply({map}){
  };
 }
 window.CrustVerticalBakery2=Object.freeze({rows,cols,T,sections,platforms,
- cultures,checkpoints,hazards,enemies,oven,altitudeTargets,
- apply,version:'vertical-fungal-bakery-v1'});
+ cultures,checkpoints,hazards,enemies,oven,altitudeTargets,relay,
+ apply,version:'vertical-fungal-relay-v2'});
 })();
