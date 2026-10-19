@@ -23,3 +23,11 @@ One thrower stands at column 30 on the existing row-40 ledge, beyond the approve
 Attacks require the enemy to be on screen, within 256px horizontally and 55px vertically, with no solid wall between it and the baker. Losing that opportunity cancels the wind-up and restores the startup delay. Shots expire after 150 ticks, stop at solid walls, deal normal damage once, and disappear when their owner is defeated or the baker respawns/restarts. Ordinary shooting and pogo stomps retain their existing rewards. All timing advances in the fixed simulation, not the renderer.
 
 Tests cover full warning duration, locked direction, offscreen/range/cover gating, dodging, single-hit damage, wall collision, cleanup and ordinary defeat. Render snapshots include warning/projectile states. The preview starts at an isolated thrower approach, with an option to play the full level from the beginning. Awaiting difficulty play-test.
+
+## Phase 4a: Moonlit Ascension
+
+Rebuild columns 23–52, rows 28–48 around a Proofing Hall. A lower balcony leads through three-tile-high open side doors to an interior shelf holding culture two. Exterior steps lead to the solid hall roof and a high bridge; a pogo jump from the entrance balcony shortcuts those steps. The lower exit has a continuous landing before its upward jumps. Both paths reconnect at the existing High Towers climb, column 52 onward.
+
+Move checkpoint two to the balcony outside the hall. Relocate the old unsupported middle walker into a bounded interior patrol, and add one bounded rooftop hopper beyond the initial roof landing. The opening's two encounters and the column-30 thrower stay unchanged. Powerups, hazards, the other three cultures and later level geometry are retained. The lower path is a yeast detour; all five cultures remain required.
+
+Eleven route checks use actual player physics to validate ordinary jumps, interior shelf access, the pogo shortcut and both rejoins. Tests also verify passage/culture collection, continuous exit footing, safe checkpoint recovery, enemy survival and exact preservation outside the section. The approved workshop layout is frozen as a comparison fixture. All 75 tests pass; only Bakery 1 render snapshots change. Native-canvas scene inspected with loaded art. Pending difficulty/play-flow review before expanding to High Towers.

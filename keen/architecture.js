@@ -20,4 +20,20 @@ function drawBakeryArchitecture(){
  // Lintel trim is contained within the solid wall above each open doorway.
  for(const dx of [11,21]){rect(dx*T,51*T-5,T,5,'#b3936a');rect(dx*T+3,51*T-5,T-6,2,'#ecd3a0');}
  g.restore();
+ const room=currentVerticalLayout().ascension?.room;
+ if(room){
+  const rx=room.x*T,ry=room.y*T;
+  g.save();rect(rx+T,ry+T,(room.w-2)*T,(room.h-1)*T,'#242839');
+  for(let row=1;row<room.h;row++){
+   rect(rx+T,ry+row*T,(room.w-2)*T,2,'#3b3e50');
+   for(let col=1;col<room.w-1;col++)rect(rx+col*T+(row%2?16:0),ry+row*T,1,T,'#343749');
+  }
+  for(const wx of [37,41]){
+   rect(wx*T,ry+T+18,25,38,'#141c2a');rect(wx*T+3,ry+T+21,19,31,'#be8f54');
+   rect(wx*T+11,ry+T+21,3,31,'#584449');rect(wx*T+3,ry+T+36,19,3,'#584449');
+  }
+  g.textAlign='center';g.font='bold 11px monospace';g.fillStyle='#e6cba1';g.fillText('PROOFING HALL',40*T,ry+T+11);
+  for(const dx of [35,44]){rect(dx*T,35*T-5,T,5,'#ba9b70');rect(dx*T+3,35*T-5,T-6,2,'#eddbad');}
+  g.restore();
+ }
 }

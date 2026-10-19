@@ -15,15 +15,17 @@ const branches=[[24,40,8],[30,38,8],[36,36,8],[42,34,8],[47,32,8],
 const courtyard=[[4,52,5],[7,50,4],[15,51,4],[22,44,4]];
 const workshop={x:11,y:48,w:11,h:6};
 const platforms=[...courtyard,...climb,...descent,...lower,...branches];
-const cultures=[[16,50],[32,37],[61,22],[83,25],[100,37]];
-const checkpoints=[[8,51],[40,33],[72,17],[91,33]];
+const cultures=[[16,50],[40,34],[61,22],[83,25],[100,37]];
+const checkpoints=[[8,51],[34,37],[72,17],[91,33]];
 const hazards=[[22,53],[51,53],[84,53],[88,53]]; // ground, not overhead.
 const enemies=[[27,45,'walker'],[50,30,'walker'],[81,39,'walker']];
 // Encounter bounds leave the doorway, checkpoint and first roof landing clear.
 const encounters=[
  {x:19*T,y:54*T-25,type:'walker',left:17.5*T,right:21*T-25,hopT:0},
- {x:16*T,y:48*T-25,type:'hopper',left:14*T,right:18.5*T-25,hopT:50}
+ {x:16*T,y:48*T-25,type:'hopper',left:14*T,right:18.5*T-25,hopT:50},
+ {x:40*T,y:32*T-25,type:'hopper',left:38*T,right:42.5*T-25,hopT:65}
 ];
+const ascension={room:{x:35,y:32,w:10,h:6},platforms:[[24,40,8],[24,42,6],[25,45,7],[34,42,5],[31,38,5],[29,36,4],[33,34,3],[38,35,4],[45,38,4],[45,35,4],[48,32,5],[45,30,4]]};
 const sections=[
 {name:'Bakery Entry',start:0,end:22,description:'safe ground and first ledges'},
 {name:'Moonlit Ascension',start:23,end:52,description:'forking elevated rooftop routes'},
@@ -43,6 +45,13 @@ function apply({map}){
  for(let x=11;x<=21;x++)map[48][x]='#';
  for(const x of [11,21])for(let y=49;y<=50;y++)map[y][x]='#';
  for(let x=19;x<=21;x++)for(let y=44;y<=47;y++)map[y][x]='#';
+ // Ascension: low proofing-hall passage and an upper rooftop route.
+ for(let y=28;y<=48;y++)for(let x=23;x<=52;x++)if(map[y][x]==='=')map[y][x]='.';
+ for(const [x,y,len] of ascension.platforms)for(let xx=x;xx<x+len;xx++)map[y][xx]='=';
+ for(let x=35;x<=44;x++){map[32][x]='#';map[38][x]='#';}
+ for(const x of [35,44])for(let y=33;y<=34;y++)map[y][x]='#';
+ // Retain the first landing of the existing High Towers climb.
+ map[28][52]='=';
  // Ensure low shortcut and final oven surface are well supported.
  for(const [x,y] of hazards){
    // Hazard must be exposed and backed by solid geometry.
@@ -51,7 +60,7 @@ function apply({map}){
  }
  return {
   gems:cultures.map(([x,y])=>({x:x*T+12,y:y*T,got:false})),
-  enemies:enemies.map(([x,y,type],i)=>({
+  enemies:enemies.map(([x,y,type],i)=>i===1?{x:42*T,y:38*T-25,w:25,h:25,vx:-1.1,vy:0,alive:true,type:'walker',hopT:0,encounter:{left:41.5*T,right:44*T-25}}:({
    x:x*T,y:y*T,w:25,h:25,vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:30+i*9
   })).concat(encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}}))).concat([{x:30*T,y:40*T-25,w:25,h:25,vx:0,vy:0,alive:true,type:'thrower',attackT:90,windup:0,face:-1}]),
   powerups:[[38,39,'kefir'],[70,17,'banneton'],[92,33,'rye']]
@@ -59,7 +68,7 @@ function apply({map}){
  };
 }
 window.CrustVerticalBakery1=Object.freeze({
- rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,workshop,encounters,
- apply,version:'courtyard-workshop-phase1'
+ rows,cols,T,sections,platforms,cultures,checkpoints,hazards,enemies,oven,workshop,encounters,ascension,
+ apply,version:'moonlit-ascension-phase4a'
 });
 })();
