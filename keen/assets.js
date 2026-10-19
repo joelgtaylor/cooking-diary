@@ -9,6 +9,9 @@ function loadGameArt(){
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
 loadArt('cavernTerrain','art/cavern-terrain.png');
 loadArt('forgeTerrain','art/forge-terrain.png');
+loadArt('foremanDefeated','art/foreman-defeated.png');
+loadArt('foremanSweep','art/foreman-sweep.png');
+loadArt('foremanConcept','art/foreman-concept.png');
 loadArt('grandOvens','art/grand-ovens.png');
 loadArt('spikeHazards','art/spike-hazards.png');
 // CRUST_MUSHROOM_CITY_BG_V1: generated 960x540 background, Bakery 2 only.

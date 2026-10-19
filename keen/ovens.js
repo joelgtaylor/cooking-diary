@@ -53,13 +53,13 @@ function drawGrandOven(){
  g.save();g.translate(x,base-115);g.scale(65/96,115/176);
  g.imageSmoothingEnabled=false;
  g.drawImage(art,(bakery-1)*96,0,96,176,0,0,96,176);
- drawOvenFire(OVEN_MOUTHS[bakery-1],collected===5);
+ drawOvenFire(OVEN_MOUTHS[bakery-1],foremanOvenReady());
  g.restore();
 }
 function drawOvenFallback(){
 const ex=currentVerticalLayout().oven.x*T;
 rect(ex-8,currentVerticalLayout().oven.y*T,65,115,'#6b4945');rect(ex-3,currentVerticalLayout().oven.y*T+6,55,106,'#c0aaa0');rect(ex+3,currentVerticalLayout().oven.y*T+23,43,70,'#523a3c');
-rect(ex+7,currentVerticalLayout().oven.y*T+27,35,62,collected===5?'#ffb54e':'#7a5252');
+rect(ex+7,currentVerticalLayout().oven.y*T+27,35,62,foremanOvenReady()?'#ffb54e':'#7a5252');
 rect(ex+13,currentVerticalLayout().oven.y*T+49,23,15,'#b46c36');
 rect(ex+17,currentVerticalLayout().oven.y*T+46,15,6,'#f2cd8c');
 rect(ex+1,currentVerticalLayout().oven.y*T+9,47,8,'#fff0cd');
