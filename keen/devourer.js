@@ -22,8 +22,8 @@ function startDevourerPreview(){
 }
 function leaveDevourerPreview(){window.__crustDevourerPreview=false;init(3);}
 function devourerBody(f){return {x:f.x-56,y:f.foot-148,w:112,h:148};}
-function devourerMouth(f){return {x:f.x-56,y:f.foot-142,w:93,h:59};}
-function devourerOpen(f){return f.phase==='recovery'&&f.timer>24;}
+function devourerMouth(f){return {x:f.x-56,y:f.foot-148,w:93,h:96};}
+function devourerOpen(f){return f.phase==='recovery'&&f.timer<=84&&f.timer>24;}
 function startDevourerSlam(f){
  f.phase='slam';f.timer=DEVOURER_SLAM_TICKS;f.fromX=f.x;
  f.targetX=Math.max(83*T+56,Math.min(103*T-56,player.x+player.w/2));
@@ -76,8 +76,13 @@ function updateDevourer(){
   if(--f.timer<=0){f.phase='boules';f.timer=50;}
  }else if(f.phase==='boules'){
   if((50-f.timer)%10===0)fireDevourerBoule(f,(50-f.timer)/10);
-  if(--f.timer<=0){f.phase='recovery';f.timer=60;}
+  if(--f.timer<=0){f.phase='recovery';f.timer=108;}
  }else if(f.phase==='recovery'){
+  if(f.timer===85){
+   // Venting extinguishes the last loaves so the shooting opening is usable.
+   for(const s of f.projectiles)burst(s.x,s.y,'#cbb99c',3);f.projectiles=[];
+   burst(f.x-65,f.foot-130,'#e9dcc8',6);burst(f.x+65,f.foot-130,'#e9dcc8',6);
+  }
   if(--f.timer<=0){f.phase='windup';f.timer=24;f.cycle++;}
  }else if(f.phase==='windup'&&--f.timer<=0)startDevourerSlam(f);
 }
@@ -96,9 +101,9 @@ function drawDevourer(){
  }else{rect(-56,-h,112,h,'#66554b');rect(-30,-95,60,50,'#e8a24d');}
  if(open){
   // The revealed furnace opening overlays the closed-door key pose.
-  rect(-56,-142,93,59,'#27202b');rect(-52,-138,85,51,'#863d2c');rect(-46,-133,73,42,'#e68138');rect(-40,-128,61,32,'#ffd37e');
-  for(let i=0;i<6;i++)rect(-37+i*10,-124+(tick+i)%4,4,24,'#fff0c0');
-  rect(38,-144,14,63,'#403342');rect(42,-139,4,51,'#d5a65b');
+  rect(-56,-148,93,96,'#27202b');rect(-52,-144,85,88,'#863d2c');rect(-46,-139,73,78,'#e68138');rect(-40,-134,61,68,'#ffd37e');
+  for(let i=0;i<6;i++)rect(-37+i*10,-130+(tick+i)%4,4,58,'#fff0c0');
+  rect(38,-150,14,100,'#403342');rect(42,-145,4,88,'#d5a65b');
  }
  g.restore();
  for(const s of f.projectiles){
@@ -111,7 +116,8 @@ function drawDevourer(){
   const hx=camera+W/2-165,hy=cameraY+H-43;
   rect(hx,hy,330,38,'#151a2b');g.font='bold 15px monospace';g.fillStyle='#ffe4b2';g.fillText(f.health?'THE GRAND DEVOURER · '+f.health+'/12':'DEVOURER DEFEATED',hx+165,hy+15);
   for(let i=0;i<12;i++)rect(hx+12+i*26,hy+25,20,5,i<f.health?'#f8d898':'#46404a');
-  if(open)worldBadge('DOOR OPEN — JUMP + SHOOT',f.x,f.foot-278,'#ffe5b0');
+  if(f.phase==='recovery'&&f.timer>84)worldBadge('PRESSURE DROPPING',f.x,f.foot-278,'#ffe5b0');
+  else if(open)worldBadge('DOOR OPEN — JUMP + SHOOT',f.x,f.foot-278,'#ffe5b0');
   else if(f.phase==='windup')worldBadge('PISTONS CHARGING',f.x,f.foot-278,'#ffe5b0');
  }else worldBadge('GRAND OVEN',f.x,54*T-206,'#ffe5b0');
  rect(79*T+10,54*T-65,3,65,'#c1a16c');rect(79*T+13,54*T-64,26,18,'#70514d');worldBadge('RETRY CHECKPOINT',79*T+14,54*T-86,'#ffe5b0');g.textAlign='left';
