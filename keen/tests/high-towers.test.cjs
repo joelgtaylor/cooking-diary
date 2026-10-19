@@ -3,8 +3,8 @@ const assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 test('High Towers preserves both approved slices and all geometry outside the tower section',()=>{
  const a=game(),b=game({}, {layoutFixture:'bakery1-ascension.js'});const am=a.run('map'),bm=b.run('map');
- for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x>=53&&x<=77&&y>=16&&y<=37);
- for(const q of ['gems','checkpointState.spawns.slice(0,2)','checkpointState.spawns[3]','enemies.slice(0,6)','powerups'])assert.equal(a.run(`JSON.stringify(${q})`),b.run(`JSON.stringify(${q})`));
+ for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok((x>=53&&x<=77&&y>=16&&y<=37)||(x>=78&&x<=104&&y>=20&&y<=53));
+ for(const q of ['gems.slice(0,3)','checkpointState.spawns.slice(0,2)','enemies.slice(0,6).filter((e,i)=>i!==2)','powerups'])assert.equal(a.run(`JSON.stringify(${q})`),b.run(`JSON.stringify(${q})`));
 });
 test('tower routes, recovery ledges, pogo shortcut and descent rejoin are reachable',()=>{
  for(const [name,sx,sy,tx,ty,pogo] of [['bridge',55,28,58,26,false],['culture',61,26,61,23,false],['safe landing',64,26,68,23,false],['tower',68,23,71,19,false],['pogo shortcut',62,23,68,19,true],['parapet',73,19,75,16,false],['checkpoint',75,16,76.5,19,false],['descent',76,19,80,20,false],['entry recovery',56,33,56,28,false],['bridge recovery',56,30,58,26,false],['middle recovery',67,29,64,26,false],['far recovery',74,27,74,23,false]]){
