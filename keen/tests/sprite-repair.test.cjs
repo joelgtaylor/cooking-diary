@@ -30,11 +30,9 @@ test('pogo spring openings and unused atlas cells are preserved',()=>{
  const result=repairBakerPixels(data,192,896,96,112,[0,0,0,0,0,0,1]);
  assert.equal(result.repaired,0);assert.deepEqual(result.pixels,data);
 });
-test('asset loader installs repaired atlas once and retains the original for comparison',()=>{
+test('production loads the immutable repaired image without runtime canvas readback',()=>{
  const {game}=require('./game-harness.cjs');const {run}=game();
- run('var originalBaker=assets.bakerAI;var repairCalls=0;solidBakerAtlas=image=>{repairCalls++;return {complete:true,naturalWidth:960,naturalHeight:896,src:image.src};};originalBaker.onload();originalBaker.onload();');
- assert.equal(run('repairCalls'),1);
- assert.equal(run('assets.bakerOriginal===originalBaker'),true);
- assert.equal(run('assets.bakerAI===assets.bakerSolid'),true);
- assert.equal(run('assets.bakerAI.naturalWidth'),960);
+ assert.equal(run('assets.bakerAI.src'),'art/baker-ai-solid.png');
+ assert.equal(run('assets.bakerAI.onload'),undefined);
+ assert.doesNotMatch(require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8'),/src="sprite-repair.js"/);
 });

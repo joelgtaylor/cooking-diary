@@ -1,4 +1,4 @@
-/* One-time, pixel-preserving repair of small enclosed baker transparency holes.
+/* Build-time, pixel-preserving repair of small enclosed baker transparency holes.
  * Exterior-connected gaps, large openings and the pogo spring remain transparent.
  * This never moves a pixel or changes an existing non-transparent pixel.
  */
@@ -44,17 +44,5 @@ function repairBakerPixels(source,width,height,frameWidth=96,frameHeight=112,cou
   }
  }
  return {pixels,repaired};
-}
-function solidBakerAtlas(image){
- const canvas=document.createElement('canvas');
- canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
- const context=canvas.getContext('2d',{willReadFrequently:true});
- context.drawImage(image,0,0);
- const data=context.getImageData(0,0,canvas.width,canvas.height);
- const result=repairBakerPixels(data.data,canvas.width,canvas.height);
- data.data.set(result.pixels);context.putImageData(data,0,0);
- // Keep the asset readiness contract and diagnostic identity used by the renderer.
- canvas.complete=true;canvas.naturalWidth=canvas.width;canvas.naturalHeight=canvas.height;canvas.src=image.src;
- return canvas;
 }
 if(typeof module!=='undefined')module.exports={repairBakerPixels};

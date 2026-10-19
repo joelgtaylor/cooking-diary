@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 const {createHash}=require('node:crypto');
-const bakerHash=createHash('sha256').update('art/baker-ai-stable.png').digest('hex');
+const bakerHash=createHash('sha256').update('art/baker-ai-solid.png').digest('hex');
 test('baker feet stay anchored across idle/run frames without changing actor state',()=>{
  const {run,trace}=game();run('assets.bakerAI.complete=true;assets.bakerAI.naturalWidth=960;');
  for(const vx of [0,3.6])for(const t of [0,14,28,42,56]){

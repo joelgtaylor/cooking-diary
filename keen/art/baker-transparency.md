@@ -1,21 +1,22 @@
 # Baker transparency repair
 
-The production PNG remains byte-for-byte unchanged. Some dark body pixels in
-its binary alpha mask were transparent, allowing scenery to show through the
-face and clothing. On image load, sprite-repair.js creates a cached canvas and
-fills only small enclosed transparent components (up to 64 source pixels).
-Each repaired pixel copies the colour of its nearest original opaque boundary
-pixel. All original opaque RGBA values, source positions, frame sizes, artwork,
-foot anchors and animation timing are preserved.
+The original baker-ai-stable.png remains byte-for-byte unchanged. Some dark
+body pixels in its binary alpha mask were transparent, allowing scenery to
+show through the face and clothing. The build tool creates baker-ai-solid.png
+by filling only small enclosed transparent components (up to 64 pixels), using
+the nearest original opaque boundary colour. All original opaque RGBA values,
+frame positions, dimensions, foot anchors and animation timing are preserved.
+The atlas receives 1,533 repaired pixels with zero opaque pixels altered/removed.
 
-Processing is per 96 × 112 active frame. Exterior-connected transparency,
-unused cells, large enclosed openings, the low pogo spring loops and the lowest
-foot/particle edges are retained. The existing source atlas receives 1,533
-repaired pixels, with zero existing opaque pixels altered or removed. A failed
-canvas read keeps the original image rather than preventing gameplay.
+The game loads the repaired PNG as a normal immutable Image. There is no runtime
+canvas readback, flood fill or software-backed sprite surface. This avoids
+repeated canvas-to-canvas transfer overhead on affected graphics systems.
 
-Processing occurs once after image load, never per animation frame. The canvas
-retains the asset readiness dimensions and diagnostic source identity expected
-by the renderer. Original and repaired surfaces remain available for review.
-Render-command snapshots therefore remain unchanged; pixel-buffer tests cover
-the mask repair and source immutability.
+Rebuild with sharp available to Node:
+
+    node keen/tools/build-baker-solid.cjs
+
+sprite-repair.js is build/test code only. Processing is per 96 × 112 active
+frame. Exterior-connected gaps, unused cells, large enclosed openings, low
+pogo spring loops and the lowest foot/particle edges remain transparent. Tests
+cover source-buffer immutability and production loading without canvas repair.
