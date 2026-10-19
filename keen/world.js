@@ -35,13 +35,13 @@ function initVerticalWorld(){
  collected=0;combo=0;comboT=0;shake=0;hitStop=0;
  state='play';tick=0;prevJump=false;pogoOn=false;
  checkpointState={current:-1,spawns:layout.checkpoints.map(([x,y])=>({x:x*T+3,y:checkpointSupportRow(x,y)*T-38})),complete:false};
- document.getElementById('pogoBtn').textContent='Mixer OFF';resetForeman();resetMycelium();
+ document.getElementById('pogoBtn').textContent='Mixer OFF';resetForeman();resetMycelium();resetBloomrot();
 }
 function respawnCheckpoint(){
  const cp=checkpointState.spawns[Math.max(0,checkpointState.current)] || {x:3*T,y:54*T-38};
  player.x=cp.x;player.y=cp.y;player.vx=0;player.vy=0;player.ground=false;
  player.hang=null;player.health=3;player.inv=90;player.shield=false;
- recoverMycelium();resetForeman();if(foremanState&&checkpointState.current===3)player.ammo=Math.max(35,player.ammo);enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
+ recoverMycelium();resetForeman();resetBloomrot();if(foremanState&&checkpointState.current===3)player.ammo=Math.max(35,player.ammo);enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
 }
 function updateWorldProgress(){
  if(state!=='play')return;
@@ -73,4 +73,4 @@ function advanceBakery(){
  if(bakery<MAXBAKERY)init(bakery+1);
  else state='win';
 }
-function restart(){init(bakery)}
+function restart(){if(bloomrotArena()){startBloomrotPreview();return;}init(bakery)}
