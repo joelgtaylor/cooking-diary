@@ -118,7 +118,9 @@ if(window.CrustParallax&&window.__crustParallaxEnabled!==false){
     bakery===2?
     {far:assets.bakery2ParallaxFar,mid:assets.bakery2ParallaxMid,near:assets.bakery2ParallaxNear}:
     {far:assets.bakery3ParallaxFar,mid:assets.bakery3ParallaxMid,near:assets.bakery3ParallaxNear},
-  profile:window.__crustParallaxProfile||'dramatic',enabled:true});
+  profile:window.__crustParallaxProfile||'dramatic',enabled:true,time:tick/60,
+  atmosphere:window.__crustAtmosphereEnabled!==false,
+  reducedMotion:typeof window.matchMedia==='function'&&window.matchMedia('(prefers-reduced-motion: reduce)').matches});
 }else if(generatedBackground&&generatedBackground.complete&&generatedBackground.naturalWidth){
  g.imageSmoothingEnabled=false;
  g.drawImage(generatedBackground,0,0,W,H);
