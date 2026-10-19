@@ -36,5 +36,6 @@ test('forecourt is clear, checkpoint recovery is safe, and Foreman rendering can
  assert.equal(a.run('JSON.stringify([player,enemies,gems,state,checkpointState,unlocked])'),before);
  assert.equal(a.trace.filter(c=>c[0]==='drawImage').length,1);
  const draw=a.trace.find(c=>c[0]==='drawImage');assert.equal(a.trace.find(c=>c[0]==='translate').at(-1)+draw.at(-3)+draw.at(-1),54*32);
+ a.run("foremanState.health=0;foremanState.phase='defeated';");
  a.run('collected=5;player.x=102*T;player.y=54*T-player.h;updateWorldProgress()');assert.equal(a.run('state'),'clear');
 });

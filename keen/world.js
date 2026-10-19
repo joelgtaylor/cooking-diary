@@ -41,7 +41,7 @@ function respawnCheckpoint(){
  const cp=checkpointState.spawns[Math.max(0,checkpointState.current)] || {x:3*T,y:54*T-38};
  player.x=cp.x;player.y=cp.y;player.vx=0;player.vy=0;player.ground=false;
  player.hang=null;player.health=3;player.inv=90;player.shield=false;
- resetForeman();enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
+ resetForeman();if(foremanState&&checkpointState.current===3)player.ammo=Math.max(35,player.ammo);enemyShots=[];shots=[];state='play';cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.52));
 }
 function updateWorldProgress(){
  if(state!=='play')return;
@@ -56,7 +56,7 @@ function updateWorldProgress(){
  }
  if(player.health<=0){respawnCheckpoint();return;}
  const target=layout.oven;
- if(collected===5&&Math.abs(player.x+14-(target.x*T+12))<53&&
+ if(foremanOvenReady()&&Math.abs(player.x+14-(target.x*T+12))<53&&
     Math.abs(player.y+22-(target.y*T+25))<85){
     checkpointState.complete=true;
     if(player.score>best){best=player.score;saveBest();}

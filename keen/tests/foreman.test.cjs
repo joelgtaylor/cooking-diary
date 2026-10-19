@@ -35,7 +35,7 @@ test('Foreman simulation matches at 30, 60 and 120 render fps',()=>{
  let expected;
  for(const fps of [30,60,120]){
   const a=arena();a.run('draw=()=>{};diagnosticOverlay=()=>{};drawPhase3Map=()=>{};player.x=89*T;');
-  a.run(`for(let i=0;i<=${fps*3};i++)loop(i*1000/${fps})`);
+  a.run(`for(let i=0;i<=${fps*9};i++)loop(i*1000/${fps})`);
   const actual=a.run('JSON.stringify([foremanState,player.health,tick])');if(expected)assert.equal(actual,expected);else expected=actual;
  }
 });
