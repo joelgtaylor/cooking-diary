@@ -17,7 +17,15 @@ const platforms=[[0,54,105],...rise,...crest,...descent,...branches];
 const cultures=[[11,48],[35,34],[62,17],[83,27],[98,46]];
 const checkpoints=[[9,51],[34,35],[71,18],[89,38]];
 const hazards=[[24,53],[48,53],[78,53],[91,53]];
-const enemies=[[27,45,'walker',0],[81,30,'walker',2]];
+const enemies=[[81,30,'walker',2]];
+const foothills={
+ platforms:[[5,52,5],[10,49,6],[17,51,5],[21,48,5],[24,45,5],[27,42,5],[23,40,5],[27,38,6]],
+ balcony:{x:10,y:49,w:6},door:{x:12,top:49,opening:52,bottom:54},
+ encounters:[
+  {x:18.5*T,y:54*T-25,type:'walker',left:16*T,right:21*T-25,hopT:0},
+  {x:26*T,y:45*T-25,type:'hopper',left:25.2*T,right:28*T-25,hopT:60}
+ ]
+};
 // Mycelium grotto: tile-aligned switches, fixed bloom and root doorway.
 const relay={bounds:[32,26,56,36],switches:[[36,33,3],[41,32,3],[46,33,3]],
  sequences:[[2,0,1],[0,2,1]],bloom:[51,31,4],gate:[55,28,7],keeper:[29.4,38]};
@@ -34,6 +42,13 @@ function apply({map}){
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)map[y][x]=y>=54?'#':'.';
  for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)
    if(map[y][xx]!=='#')map[y][xx]='=';
+ // A low passage, culture balcony and switchback climb replace the uniform
+ // opening staircase. The keeper shelf and relay remain separate and peaceful.
+ for(let y=38;y<54;y++)for(let x=4;x<32;x++)map[y][x]='.';
+ for(const [x,y,len] of foothills.platforms)for(let i=0;i<len;i++)map[y][x+i]='=';
+ for(let y=52;y<54;y++)for(let x=5;x<10;x++)map[y][x]='#';
+ for(let x=10;x<16;x++)map[49][x]='#';
+ for(let y=49;y<52;y++)map[y][12]='#';
  // Keep the approved compact chamber local to Sporelit Stairways.
  for(let y=20;y<39;y++)for(let x=33;x<56;x++)map[y][x]='.';
  for(let x=32;x<56;x++){map[26][x]='#';map[35][x]='=';}
@@ -49,12 +64,13 @@ function apply({map}){
  return {
   gems:cultures.map(([x,y],i)=>({x:x*T+12,y:y*T,got:false,ph:i*.7})),
   enemies:enemies.map(([x,y,type,i])=>({x:x*T,y:y*T,w:25,h:25,
-   vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:35+i*8})),
+   vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:35+i*8}))
+   .concat(foothills.encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}}))),
   powerups:[[30,40,'kefir'],[68,20,'banneton'],[94,42,'rye']]
    .map(([x,y,kind],i)=>({x:x*T+4,y:y*T,kind,got:false,ph:i*1.5}))
  };
 }
 window.CrustVerticalBakery2=Object.freeze({rows,cols,T,sections,platforms,
- cultures,checkpoints,hazards,enemies,oven,altitudeTargets,relay,
- apply,version:'vertical-fungal-relay-v2'});
+ cultures,checkpoints,hazards,enemies,oven,altitudeTargets,relay,foothills,
+ apply,version:'vertical-fungal-foothills-v3'});
 })();

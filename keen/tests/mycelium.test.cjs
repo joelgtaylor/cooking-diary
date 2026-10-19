@@ -51,9 +51,9 @@ test('root gate blocks jumping and pogo before solve; exit is reachable after',(
  const a=chamber();for(const pogo of [false,true]){a.run(`player.x=53*T;player.y=33*T-player.h;player.vx=0;player.vy=0;player.ground=true;pogoOn=${pogo};keys={right:true,jump:true};for(let i=0;i<100;i++)updatePlayer();`);assert.ok(a.run('player.x+player.w')<=55*32+1);}
  solve(a);a.run('player.x=52*T;player.y=31*T-player.h;player.vx=0;player.vy=0;player.ground=true;pogoOn=false;keys={right:true};for(let i=0;i<55;i++)updatePlayer()');assert.ok(a.run('player.x')>56*32);assert.ok(a.run('player.y+player.h')<=35*32);
 });
-test('grotto edits remain local; cultures, powerups, oven and outside geometry are preserved',()=>{
- const a=chamber(),b=game({}, {originalLayout:true});b.run('init(2)');a.run('init(2)');const am=a.run('map'),bm=b.run('map');for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x>=32&&x<64&&y>=20&&y<39,`${x},${y}`);
- assert.equal(a.run('JSON.stringify(enemies)'),b.run('JSON.stringify(enemies.filter(e=>e.x!==50*T))'));
+test('Bakery 2 authored edits remain local; cultures, powerups, oven and original distant enemy are preserved',()=>{
+ const a=chamber(),b=game({}, {originalLayout:true});b.run('init(2)');a.run('init(2)');const am=a.run('map'),bm=b.run('map');for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok((x>=32&&x<64&&y>=20&&y<39)||(x>=4&&x<32&&y>=38&&y<54),`${x},${y}`);
+ assert.equal(a.run('JSON.stringify(enemies.filter(e=>!e.encounter))'),b.run('JSON.stringify(enemies.filter(e=>e.x===81*T))'));
  for(const expr of ['JSON.stringify(gems)','JSON.stringify(powerups)','JSON.stringify(currentVerticalLayout().oven)'])assert.equal(a.run(expr),b.run(expr));
 });
 test('real movement supports chamber entry, backtracking to keeper, and deliberate activation with mixer lowered between caps',()=>{
