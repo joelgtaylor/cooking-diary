@@ -60,5 +60,38 @@ function renderFungal(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
  }
  g.restore();
 }
-window.CrustAtmosphere={renderMoonlit,renderFungal};
+function renderClockwork(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
+ const sx=width/1200,sy=height/676;
+ const pixel=(px,py,w,h)=>g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),Math.max(1,Math.round(w*sx)),Math.max(1,Math.round(h*sy)));
+ const furnaces=layer==='near'?[[150,449,59,57],[1090,506,57,59]]:
+  [[110,395,30,31],[159,520,31,35],[735,558,28,30],[1108,481,30,33]];
+ g.save();
+ for(let i=0;i<furnaces.length;i++){
+  const [cx,cy,rx,ry]=furnaces[i],pulse=reduced?.4:(1+Math.sin(time*1.8+i*2.1))/2;
+  for(let ring=1;ring>=0;ring--){
+   g.globalAlpha=.04+pulse*(ring?.08:.18);g.fillStyle=ring?'#ff922e':'#ffe092';
+   g.beginPath();g.ellipse(Math.round(x+cx*sx),Math.round(y+cy*sy),rx*sx*(ring?1.12:1),ry*sy*(ring?1.12:1),0,0,Math.PI*2);g.fill();
+  }
+ }
+ if(!reduced){
+  const vents=layer==='near'?[[220,134],[994,174],[1066,80]]:[[429,268],[507,248],[726,242],[1037,127]];
+  for(let i=0;i<vents.length;i++)for(let k=0;k<3;k++){
+   const p=((time/(3.2+i*.3)+k/3+i*.27)%1+1)%1;
+   const [vx,vy]=vents[i],px=vx+Math.sin(p*5+i)*p*18,py=vy-p*86;
+   g.globalAlpha=.85*Math.sin(p*Math.PI);g.fillStyle=k%2?'#ffb451':'#ffe5a0';
+   pixel(px,py,2,3);g.globalAlpha*=.35;pixel(px,py+4,1,5);
+  }
+  if(layer==='near'){
+   // Moving brass collars follow existing vertical piston rods. No gear redraw.
+   for(const [px,py,phase] of [[323,199,0],[835,328,Math.PI]]){
+    const travel=Math.round(Math.sin(time*.85+phase)*23);
+    g.globalAlpha=.85;g.fillStyle='#452b31';pixel(px-5,py+travel,13,7);
+    g.fillStyle='#bd8246';pixel(px-4,py+travel+1,11,4);
+    g.fillStyle='#ffcf83';pixel(px-3,py+travel+1,9,1);
+   }
+  }
+ }
+ g.restore();
+}
+window.CrustAtmosphere={renderMoonlit,renderFungal,renderClockwork};
 })();
