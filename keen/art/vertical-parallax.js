@@ -94,6 +94,11 @@ function render(g,opt){
      const x=Math.round(-padX/2-offsetX);
      const y=Math.round(-padY/2-offsetY);
      g.drawImage(item.image,x,y,W+padX,H+padY);
+     if((stage>=1&&stage<=3)&&(item.image===illustration.mid||item.image===illustration.near)&&opt.atmosphere!==false&&window.CrustAtmosphere){
+       const atmosphereRenderer=stage===1?window.CrustAtmosphere.renderMoonlit:stage===2?window.CrustAtmosphere.renderFungal:window.CrustAtmosphere.renderClockwork;
+       atmosphereRenderer(g,{x,y,width:W+padX,height:H+padY,
+         time:opt.time||0,reduced:!!opt.reducedMotion,layer:item.image===illustration.near?'near':'mid'});
+     }
    }
  }else if(stage===2&&opt.fungalCavern){
    // Fungal Caverns: layered mushroom silhouettes, rather than the skyline
