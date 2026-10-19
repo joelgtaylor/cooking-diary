@@ -13,7 +13,7 @@ for(const [label,value,x,width] of cells){
  g.font='bold 19px monospace';g.fillStyle=label==='YEAST'&&collected>=5?'#ffe1a1':'#f6e8ca';g.fillText(value,x,35,width);
  if(x>18)rect(x-16,10,1,26,'#39475c');
 }
-g.restore();g.font='bold 16px monospace';g.fillStyle='#fff0cc';if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else if(state==='clear'||state==='win'){drawBakeCelebration()}else{g.font='bold 52px monospace';g.fillText('PAUSED',W/2,H/2-60);g.font='22px monospace';g.fillText('Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}
+g.restore();g.font='bold 16px monospace';g.fillStyle='#fff0cc';if(combo>1&&comboT>0){g.fillStyle='#efff8b';g.fillText('COMBO x'+combo,18,62);g.fillStyle='#fff'}if(player.speedT>0)g.fillText('⚡'+Math.ceil(player.speedT/60)+'s',190,62);if(state!=='play'&&state!=='dialogue'){rect(0,0,W,H,'#090c22dd');g.textAlign='center';g.fillStyle='#fff';if(state==='codex'){drawCodex()}else if(state==='clear'||state==='win'){drawBakeCelebration()}else{g.font='bold 52px monospace';g.fillText('PAUSED',W/2,H/2-60);g.font='22px monospace';g.fillText('Press P to resume - T for recipes',W/2,H/2+10)}g.textAlign='left'}
 }
 
 function drawPhase3Map(){

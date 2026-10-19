@@ -12,9 +12,11 @@ function togglePause(){state=state==='play'?'pause':state==='pause'?'play':state
 function bindInput(){
  document.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
+  if(state==='dialogue'){e.preventDefault();if(!e.repeat&&['e','enter','escape'].includes(k))talkMycelium();return;}
   if(['arrowleft','arrowright','arrowup',' '].includes(k))e.preventDefault();
   keys[e.key.length===1?k:e.key]=true;AudioKit.start();
   if(e.repeat)return;
+  if(k==='e'){e.preventDefault();talkMycelium();}
   if(k==='m')AudioKit.toggle();
   if(k==='q'){e.preventDefault();toggleMap();}
   if(k==='r')restart();
@@ -28,6 +30,7 @@ function bindInput(){
  });
  document.addEventListener('keyup',e=>{keys[e.key.length===1?e.key.toLowerCase():e.key]=false;});
  const click=(id,fn)=>document.getElementById(id).addEventListener('click',fn);
+ click('talkBtn',()=>{AudioKit.start();talkMycelium();});
  click('pogoBtn',()=>{AudioKit.start();togglePogo();AudioKit.effect('pogo');});
  click('codexBtn',()=>{AudioKit.start();toggleCodex();});
  click('restartBtn',()=>{AudioKit.start();restart();});

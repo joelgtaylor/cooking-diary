@@ -4,7 +4,7 @@
  */
 'use strict';
 function rect(x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)}
-function draw(){drawWorld();drawHUD();}
+function draw(){drawWorld();drawHUD();drawMyceliumUI();syncMyceliumTalkButton();}
 function drawWorld(){
 const hazardArt=assets.spikeHazards;
 const hazardsReady=hazardArt&&hazardArt.complete&&hazardArt.naturalWidth===96&&hazardArt.naturalHeight===32;

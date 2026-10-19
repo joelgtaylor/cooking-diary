@@ -17,10 +17,10 @@ const platforms=[[0,54,105],...rise,...crest,...descent,...branches];
 const cultures=[[11,48],[35,34],[62,17],[83,27],[98,46]];
 const checkpoints=[[9,51],[34,35],[71,18],[89,38]];
 const hazards=[[24,53],[48,53],[78,53],[91,53]];
-const enemies=[[27,45,'walker'],[81,30,'walker']];
+const enemies=[[27,45,'walker',0],[81,30,'walker',2]];
 // Mycelium grotto: tile-aligned switches, fixed bloom and root doorway.
-const relay={bounds:[32,26,56,36],switches:[[36,33,3],[41,33,3],[46,33,3]],
- sequence:[0,1,2],bloom:[51,31,4],gate:[55,28,7],clue:[1105,875]};
+const relay={bounds:[32,26,56,36],switches:[[36,33,3],[41,32,3],[46,33,3]],
+ sequences:[[2,0,1],[0,2,1]],bloom:[51,31,4],gate:[55,28,7],keeper:[29.4,38]};
 const oven={x:102,y:52};
 const altitudeTargets=[[4,54],[45,32],[71,18]];
 const sections=[
@@ -48,7 +48,7 @@ function apply({map}){
  }
  return {
   gems:cultures.map(([x,y],i)=>({x:x*T+12,y:y*T,got:false,ph:i*.7})),
-  enemies:enemies.map(([x,y,type],i)=>({x:x*T,y:y*T,w:25,h:25,
+  enemies:enemies.map(([x,y,type,i])=>({x:x*T,y:y*T,w:25,h:25,
    vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:35+i*8})),
   powerups:[[30,40,'kefir'],[68,20,'banneton'],[94,42,'rye']]
    .map(([x,y,kind],i)=>({x:x*T+4,y:y*T,kind,got:false,ph:i*1.5}))
