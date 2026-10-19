@@ -51,3 +51,14 @@ test('the real shooting path can exhaust all twelve health bars across controlle
  }
  assert.equal(a.run('devourerState.health'),0);assert.ok(a.run('player.ammo')>0);
 });
+
+test('repeat attacks leave a full cooling beat, warn early, cap travel and never retarget during windup',()=>{
+ const a=trial();engage(a);a.run("devourerState.phase='recovery';devourerState.timer=1;devourerState.foot=54*T;updateDevourer()");assert.equal(a.run('devourerState.phase'),'rest');assert.equal(a.run('devourerState.timer'),60);
+ a.run('player.x=82*T;for(let i=0;i<59;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'rest');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'windup');assert.equal(a.run('devourerState.timer'),48);
+ const target=a.run('devourerState.queuedTargetX');assert.ok(Math.abs(target-a.run('devourerState.x'))<=160);a.run('player.x=102*T;for(let i=0;i<48;i++)updateDevourer()');assert.equal(a.run('devourerState.targetX'),target);assert.equal(a.run('devourerState.timer'),36);
+ a.run('for(let i=0;i<35;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.timer'),30);
+ a.run('for(let i=0;i<29;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'boules');
+});
+test('ordinary movement during the repeat warning creates separation before the locked landing',()=>{
+ const a=trial();a.run("devourerState.cycle=1;devourerState.x=96*T;player.x=devourerState.x-110;queueDevourerSlam(devourerState);keys={left:true};for(let i=0;i<84;i++)update();");assert.equal(a.run('player.health'),3);assert.ok(a.run('Math.abs(player.x+player.w/2-devourerState.x)')>160);assert.equal(a.run('devourerState.phase'),'landing');
+});

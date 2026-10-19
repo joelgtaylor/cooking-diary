@@ -24,9 +24,16 @@ function leaveDevourerPreview(){window.__crustDevourerPreview=false;init(3);}
 function devourerBody(f){return {x:f.x-56,y:f.foot-148,w:112,h:148};}
 function devourerMouth(f){return {x:f.x-56,y:f.foot-148,w:93,h:96};}
 function devourerOpen(f){return f.phase==='recovery'&&f.timer<=84&&f.timer>24;}
+function queueDevourerSlam(f){
+ f.phase='windup';f.timer=48;
+ const wanted=Math.max(83*T+56,Math.min(103*T-56,player.x+player.w/2));
+ // A heavy machine can reposition, but cannot chase across the whole room.
+ f.queuedTargetX=Math.max(f.x-160,Math.min(f.x+160,wanted));
+}
 function startDevourerSlam(f){
- f.phase='slam';f.timer=DEVOURER_SLAM_TICKS;f.fromX=f.x;
- f.targetX=Math.max(83*T+56,Math.min(103*T-56,player.x+player.w/2));
+ const repeat=f.cycle>0;
+ f.phase='slam';f.slamDuration=repeat?36:DEVOURER_SLAM_TICKS;f.timer=f.slamDuration;f.fromX=f.x;
+ f.targetX=repeat?f.queuedTargetX:Math.max(83*T+56,Math.min(103*T-56,player.x+player.w/2));
  f.face=f.targetX<f.x?-1:1;f.impact=false;AudioKit.effect('climb');
 }
 function hurtDevourer(){
@@ -66,11 +73,11 @@ function updateDevourer(){
  }
  if(!updateDevourerBoules(f))return;
  if(f.phase==='slam'){
-  const t=(DEVOURER_SLAM_TICKS-f.timer+1)/DEVOURER_SLAM_TICKS;
+  const t=((f.slamDuration||DEVOURER_SLAM_TICKS)-f.timer+1)/(f.slamDuration||DEVOURER_SLAM_TICKS);
   f.x=f.fromX+(f.targetX-f.fromX)*t;f.foot=54*T-Math.sin(t*Math.PI)*190;
   if(--f.timer<=0){f.x=f.targetX;f.foot=54*T;f.impact=true;shake=Math.max(shake,9);burst(f.x,f.foot-5,'#e8bc83',18);AudioKit.effect('hit');
    if(collide(player,devourerBody(f))){damage();if(devourerState!==f)return;}
-   f.phase='landing';f.timer=10;
+   f.phase='landing';f.timer=30;
   }
  }else if(f.phase==='landing'){
   if(--f.timer<=0){f.phase='boules';f.timer=50;}
@@ -83,17 +90,19 @@ function updateDevourer(){
    for(const s of f.projectiles)burst(s.x,s.y,'#cbb99c',3);f.projectiles=[];
    burst(f.x-65,f.foot-130,'#e9dcc8',6);burst(f.x+65,f.foot-130,'#e9dcc8',6);
   }
-  if(--f.timer<=0){f.phase='windup';f.timer=24;f.cycle++;}
+  if(--f.timer<=0){f.phase='rest';f.timer=60;f.cycle++;}
+ }else if(f.phase==='rest'){
+  if(--f.timer<=0)queueDevourerSlam(f);
  }else if(f.phase==='windup'&&--f.timer<=0)startDevourerSlam(f);
 }
 function drawDevourer(){
  const f=devourerState;if(!f||!devourerArena())return;
  const disguised=f.phase==='disguise',open=devourerOpen(f),art=assets.devourerForms;
- g.save();g.fillStyle='rgba(9,12,25,.55)';g.beginPath();g.ellipse(f.phase==='slam'?f.targetX:f.x,54*T,disguised?60:70,7,0,0,Math.PI*2);g.fill();
- if(f.phase==='slam'){g.strokeStyle='#ffe3a1';g.lineWidth=2;g.strokeRect(f.targetX-56,54*T-8,112,5);}
+ g.save();g.fillStyle='rgba(9,12,25,.55)';g.beginPath();g.ellipse(f.phase==='slam'?f.targetX:f.phase==='windup'?f.queuedTargetX:f.x,54*T,disguised?60:70,7,0,0,Math.PI*2);g.fill();
+ if(f.phase==='slam'||f.phase==='windup'){const target=f.phase==='slam'?f.targetX:f.queuedTargetX;g.strokeStyle='#ffe3a1';g.lineWidth=2;g.strokeRect(target-56,54*T-8,112,5);}
  g.translate(Math.round(f.x),Math.round(f.foot));g.imageSmoothingEnabled=false;
  let h=disguised?190:260,w=disguised?180:330;
- if(f.phase==='slam'&&f.timer>16){h=190+(24-f.timer)*70/8;w=180+(24-f.timer)*150/8;}
+ if(f.phase==='slam'&&f.cycle===0&&f.timer>16){h=190+(24-f.timer)*70/8;w=180+(24-f.timer)*150/8;}
  if(f.phase==='defeated'){h=260-100*Math.min(1,(96-f.timer)/30);}
  if(art?.complete&&art.naturalWidth===2007){
   if(!disguised&&f.face>0)g.scale(-1,1);
@@ -118,6 +127,7 @@ function drawDevourer(){
   for(let i=0;i<12;i++)rect(hx+12+i*26,hy+25,20,5,i<f.health?'#f8d898':'#46404a');
   if(f.phase==='recovery'&&f.timer>84)worldBadge('PRESSURE DROPPING',f.x,f.foot-278,'#ffe5b0');
   else if(open)worldBadge('DOOR OPEN — JUMP + SHOOT',f.x,f.foot-278,'#ffe5b0');
+  else if(f.phase==='rest')worldBadge('COOLING',f.x,f.foot-278,'#ffe5b0');
   else if(f.phase==='windup')worldBadge('PISTONS CHARGING',f.x,f.foot-278,'#ffe5b0');
  }else worldBadge('GRAND OVEN',f.x,54*T-206,'#ffe5b0');
  rect(79*T+10,54*T-65,3,65,'#c1a16c');rect(79*T+13,54*T-64,26,18,'#70514d');worldBadge('RETRY CHECKPOINT',79*T+14,54*T-86,'#ffe5b0');g.textAlign='left';
