@@ -64,14 +64,14 @@ test('real shooting defeats the integrated oven and the settled wreck completes 
   for(let n=0;n<108&&a.run('devourerState.health')>0;n++)a.run(`keys={jump:${n>=44&&n<52},shoot:${n>=52&&n<84}};update();updateWorldProgress()`);
  }
  assert.equal(a.run('devourerState.health'),0);assert.equal(a.run('state'),'play');assert.equal(a.run('player.score'),2000);
- a.run('keys={};for(let i=0;i<120;i++)updateDevourer();player.x=96*T;player.y=54*T-player.h;updateWorldProgress()');
+ a.run('keys={};for(let i=0;i<120;i++)updateDevourer();player.x=devourerState.finishOven.x-14;player.y=54*T-player.h;updateWorldProgress()');
  assert.equal(a.run('state'),'clear');assert.equal(a.storage.get('crustQuestCodex'),'[2]');
 });
 test('the full-level oven requires cultures and the finished collapse, then unlocks recipe three',()=>{
  const a=level();a.run('collected=5;player.x=96*T;player.y=54*T-player.h;updateWorldProgress()');assert.equal(a.run('state'),'play');
  a.run('devourerState.health=1;hurtDevourer();updateWorldProgress()');assert.equal(a.run('state'),'play');
  a.run('for(let i=0;i<120;i++)updateDevourer();collected=4;updateWorldProgress()');assert.equal(a.run('state'),'play');
- a.run('collected=5;updateWorldProgress()');assert.equal(a.run('state'),'clear');assert.equal(a.run('player.score'),2000);assert.equal(a.storage.get('crustQuestCodex'),'[2]');
+ a.run('collected=5;player.x=devourerState.finishOven.x-14;updateWorldProgress()');assert.equal(a.run('state'),'clear');assert.equal(a.run('player.score'),2000);assert.equal(a.storage.get('crustQuestCodex'),'[2]');
  a.enter();assert.equal(a.run('state'),'win');
 });
 test('full mission restart returns to the entrance while isolated restart keeps its practice arena',()=>{

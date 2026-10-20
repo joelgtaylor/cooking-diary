@@ -34,7 +34,7 @@ function drawPhase3Map(){
   const [x,y]=currentVerticalLayout().checkpoints[i];
   g.fillStyle=i<=checkpointState.current?'#82ffbf':'#5ba887';g.fillRect(x*10,y*sy+offset,10,9);
  }
- g.fillStyle='#ff985e';g.fillRect(currentVerticalLayout().oven.x*10,currentVerticalLayout().oven.y*sy+offset,16,12);
+ g.fillStyle='#ff985e';g.fillRect(worldOvenTarget().x*10,worldOvenTarget().y*sy+offset,16,12);
  g.fillStyle='#56f4f3';g.fillRect(Math.floor(player.x/T)*10,Math.floor(player.y/T)*sy+offset,10,10);
  g.strokeStyle='#c2fff4';g.lineWidth=2;
  g.strokeRect(camera/T*10,cameraY/T*sy+offset,W/T*10,H/T*sy);

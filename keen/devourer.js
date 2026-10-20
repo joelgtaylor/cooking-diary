@@ -5,7 +5,27 @@ const DEVOURER_SHELTER_LEFT=100*32;
 function devourerLandingX(x){return Math.max(83*T+56,Math.min(DEVOURER_SHELTER_LEFT-56,x));}
 const DEVOURER_SLAM_TICKS=24;
 function devourerArena(){return bakery===3&&(window.__crustDevourerPreview||currentVerticalLayout().devourer);}
-function devourerOvenReady(){return !devourerArena()||(devourerState?.health===0&&devourerState.timer===0);}
+function devourerOvenReady(){return !devourerArena()||(devourerState?.health===0&&devourerState.timer===0&&devourerState.finishOven?.landed);}
+function releaseDevourerOven(f){
+ if(f.finishOven)return;
+ // Both landing bays are clear of the pogo shelf and service-shelter roof.
+ const targetX=(f.x<=90*T?98:82.5)*T;
+ f.finishOven={fromX:f.x,fromFoot:f.foot-45,x:f.x,foot:f.foot-45,targetX,age:0,landed:false};
+ burst(f.x,f.foot-90,'#fff0c9',12);AudioKit.effect('shoot');
+}
+function updateReleasedOven(f){
+ const o=f.finishOven;if(!o||o.landed)return;
+ const t=Math.min(1,++o.age/48);
+ o.x=o.fromX+(o.targetX-o.fromX)*t;o.foot=o.fromFoot+(54*T-o.fromFoot)*t-Math.sin(t*Math.PI)*100;
+ if(t===1){o.landed=true;burst(o.x,54*T-5,'#e5c692',12);AudioKit.effect('collect');floater(o.x,54*T-190,'OVEN RECOVERED!','#fff0b5');}
+}
+function drawReleasedOven(f){
+ const o=f.finishOven;if(!o)return;
+ g.save();
+ if(!o.landed){const angle=Math.sin(o.age/48*Math.PI)*.3*Math.sign(o.targetX-o.fromX);g.translate(o.x,o.foot-57.5);g.rotate(angle);g.translate(-o.x,-o.foot+57.5);}
+ drawGrandOven({x:o.x,foot:o.foot,ready:!!(collected===5&&devourerOvenReady())});g.restore();
+ if(o.landed)worldBadge(collected===5&&devourerOvenReady()?'REAL OVEN — FINISH HERE':'REAL OVEN',o.x,54*T-138,'#ffe5b0');
+}
 function resupplyDevourerCheckpoint(){
  player.health=Math.max(3,player.health);player.ammo=Math.max(65,player.ammo);player.kefirCharges=Math.max(1,player.kefirCharges||0);
 }
@@ -113,6 +133,8 @@ function updateDevourer(){
    if(!f.defeatImpact){f.defeatImpact=true;shake=Math.max(shake,8);burst(f.x,f.foot-14,'#e0b677',18);AudioKit.effect('enemy');}
    f.defeatAge=(f.defeatAge||0)+1;if(f.timer)f.timer--;
    if(f.defeatAge===12||f.defeatAge===24){burst(f.x-55,f.foot-100,'#e9e4d8',8);burst(f.x+55,f.foot-90,'#e9e4d8',8);}
+   if(f.defeatAge>=30)releaseDevourerOven(f);
+   updateReleasedOven(f);
   }
   return;
  }
@@ -194,6 +216,6 @@ function drawDevourer(){
  }else worldBadge('GRAND OVEN',f.x,54*T-206,'#ffe5b0');
  worldBadge('SERVICE SHELTER',102*T,50*T-18,'#d5e9e5');
  if(window.__crustDevourerPreview){rect(79*T+10,54*T-65,3,65,'#c1a16c');rect(79*T+13,54*T-64,26,18,'#70514d');worldBadge('RETRY CHECKPOINT',79*T+14,54*T-86,'#ffe5b0');}
- else if(f.health===0&&f.timer===0)worldBadge(collected===5?'OVEN READY':'FIND ALL FIVE CULTURES',f.x,54*T-206,'#ffe5b0');
+ drawReleasedOven(f);
  g.textAlign='left';
 }

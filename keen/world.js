@@ -57,7 +57,7 @@ function updateWorldProgress(){
   }
  }
  if(player.health<=0){respawnCheckpoint();return;}
- const target=layout.oven;
+ const target=worldOvenTarget();
  if(foremanOvenReady()&&bloomrotOvenReady()&&devourerOvenReady()&&Math.abs(player.x+14-(target.x*T+12))<53&&
     Math.abs(player.y+22-(target.y*T+25))<85){
     checkpointState.complete=true;
@@ -69,6 +69,10 @@ function updateWorldProgress(){
 }
 
 function init(b){if(b)bakery=b;initVerticalWorld();}
+function worldOvenTarget(){
+ const o=bakery===3&&devourerState?.finishOven;
+ return o?{x:(o.x-12)/T,y:53}:currentVerticalLayout().oven;
+}
 // Both keyboard and canvas input advance through the same clear-state gate.
 function advanceBakery(){
  if(state!=='clear')return;

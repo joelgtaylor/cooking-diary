@@ -89,7 +89,7 @@ test('a real descending pogo hits the tiny cap while other armor only clangs and
 });
 test('rising through the cap is not a pogo hit; grounded defeat impacts and vents only once',()=>{
  const a=trial();a.run("devourerState.phase='rest';devourerState.timer=60;pogoOn=true;player.x=devourerState.x-12;player.y=devourerState.foot-211-player.h+4;player.vy=-5;player.ground=false;keys={};update()");assert.equal(a.run('devourerState.health'),12);
- a.run('devourerState.health=1;devourerState.inv=0;hurtDevourer();');const sounds=a.audio.effects.length;a.run('for(let i=0;i<160;i++)updateDevourer()');assert.equal(a.run('devourerState.defeatAge'),160);assert.equal(a.run('devourerState.timer'),0);assert.equal(a.audio.effects.length,sounds+1);assert.equal(a.run('devourerState.puddles.length'),0);
+ a.run('devourerState.health=1;devourerState.inv=0;hurtDevourer();');const sounds=a.audio.effects.length;a.run('for(let i=0;i<160;i++)updateDevourer()');assert.equal(a.run('devourerState.defeatAge'),160);assert.equal(a.run('devourerState.timer'),0);assert.equal(a.audio.effects.length,sounds+3);assert.equal(a.run('devourerState.puddles.length'),0);
 });
 test('the cap is reachable from the maintenance shelf with ordinary pogo and movement input',()=>{
  const a=trial();a.run("devourerState.x=90*T;devourerState.cycle=1;devourerState.phase='rest';devourerState.timer=180;player.x=87*T;player.y=51*T-player.h;player.ground=true;togglePogo();");for(let n=0;n<100;n++)a.run(`keys={right:${n<20},jump:${n<15}};update()`);assert.ok(a.run('devourerState.health')<12);
