@@ -1,0 +1,37 @@
+[
+  {
+    "name": "retroStage1",
+    "path": "art/fallback-retro-stage-1.png",
+    "sha256": "a045330f50d655fce3c89a2cb39bd55b3dd48bf2051ea32a9f5d432da30d6896"
+  },
+  {
+    "name": "retroStage2",
+    "path": "art/fallback-retro-stage-2.png",
+    "sha256": "9e94b523effabf06ca56da0dbe62a8f5373c33f0b66b5b2d0b28ccf02150821f"
+  },
+  {
+    "name": "retroStage3",
+    "path": "art/fallback-retro-stage-3.png",
+    "sha256": "e6a39064819afa3ba47fecddd772c928e3c24f775844bf8c4a1cca7d28a1cbc7"
+  },
+  {
+    "name": "bakerPhase4",
+    "path": "art/fallback-baker-phase4.png",
+    "sha256": "25457545df3a10a03313c58493541cb5991e953f926b5bc38a3a557e4a292768"
+  },
+  {
+    "name": "tiles",
+    "path": "art/fallback-tiles.png",
+    "sha256": "2813d794c9b7a2b8e853dac7019ee783804f7361e3bc5ea92dfeac3a6dfa2615"
+  },
+  {
+    "name": "background",
+    "path": "art/fallback-background.png",
+    "sha256": "5fd03cc1b960fcd732c8e311217fb202f7189906f1fba8b15bfbb0ee2ba92099"
+  },
+  {
+    "name": "items",
+    "path": "art/fallback-items.png",
+    "sha256": "c20aedc9fad4894932640f49df2a070c29055c8588f50d3ea7707b44f9faca0e"
+  }
+]

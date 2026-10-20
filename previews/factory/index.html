@@ -1,0 +1,87 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crust Quest — Factory Entrance Playtest</title><style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#101522;color:#f3e6c9;font-family:monospace}#wrap{max-width:1040px;margin:auto;padding:18px 14px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}h1{font-size:22px;letter-spacing:2px;margin:0}header p{margin:5px 0;color:#aebbd0;font-size:12px;letter-spacing:1px}.edition{color:#d6b779;font-size:11px;text-align:right}canvas{display:block;width:100%;image-rendering:pixelated;border:3px solid #9b8051;box-shadow:0 5px 0 #080d17;background:#111}button{font: bold 12px monospace;border:1px solid #69758b;border-bottom:3px solid #080d17;border-radius:3px;background:#263348;color:#f3e6c9;padding:11px 14px;cursor:pointer;min-height:44px}button:hover{background:#36465d}button:focus-visible,summary:focus-visible{outline:3px solid #ffe3a1;outline-offset:3px}button:active{transform:translateY(1px)}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 10px}.toolbar .secondary{margin-left:auto}#touch{display:flex;gap:8px;justify-content:center;margin:14px 0;touch-action:none}#touch button{min-width:54px;flex:1;max-width:110px;font-size:16px;padding:13px 5px;user-select:none;touch-action:none}#pogoBtn{max-width:150px!important;font-size:12px!important;border-color:#b39861}#status{color:#bfccd9;font-size:12px;line-height:1.6;min-height:20px;margin:10px 0}.guide{border-top:1px solid #39465c;padding-top:12px;color:#b9c5d5;font-size:12px;line-height:1.8}.guide p{margin:8px 0}summary{cursor:pointer;color:#e4cd9c}kbd{color:#fff0cc;font:inherit}#verticalMap{margin:12px 0;border-color:#69758b}@media(max-width:540px){#wrap{padding:10px 8px}h1{font-size:17px}.edition{display:none}header p{font-size:10px}.toolbar{gap:5px}.toolbar button{flex:1;padding:9px 8px}.toolbar .secondary{margin-left:0}#touch{gap:4px}#touch button{min-width:42px;font-size:14px}}
+</style></head><body><aside style="max-width:960px;margin:12px auto;padding:12px;background:#202936;color:#e8d6b5;font:14px monospace"><button onclick="startFactoryPreview()">Restart entrance</button> <button onclick="practiceFactoryExit()">Exit encounter</button> <button onclick="respawnCheckpoint()">Retry checkpoint</button><p>Explore the maintenance passage for the first culture and stored kefir. The roof holds an optional supply cache. Arrows move · Space jump · X shoot · C pogo · V / Kefir activates your stored dash. Normal jumps reach every required landing.</p></aside><main id="wrap"><header><div><h1>CRUST QUEST</h1><p>RISE OF THE STARTER</p></div><span class="edition">FACTORY ENTRANCE<br>BAKERY 3 PLAYTEST</span></header>
+<canvas id="c" width="960" height="540" aria-label="Crust Quest platform game">Your browser does not support canvas.</canvas>
+<nav class="toolbar" aria-label="Game actions"><button id="pauseBtn" type="button">Pause / Resume</button><button id="mapButton" type="button">World map (Q)</button><button id="codexBtn" type="button">Recipes (T)</button><button id="audioBtn" type="button">♫ Music: ON</button><button id="restartSection" type="button">Return to checkpoint</button><button id="restartBtn" class="secondary" type="button">Restart mission</button></nav>
+<canvas id="verticalMap" width="1050" height="360" style="display:none" aria-label="Current bakery exploration map"></canvas>
+<div id="touch" role="group" aria-label="Movement controls"><button data-key="left" aria-label="Move left">◀</button><button data-key="jump" aria-label="Jump">↑ Jump</button><button id="talkBtn" type="button" style="display:none">Talk (E)</button><button id="kefirBtn" type="button" style="display:none">Kefir (V)</button><button id="pogoBtn" type="button">Mixer OFF</button><button data-key="shoot" aria-label="Shoot">✦ Shoot</button><button data-key="right" aria-label="Move right">▶</button></div>
+<p id="status" role="status">Find five yeast cultures, then reach the grand oven.</p>
+<div class="guide"><details><summary>How to play · keyboard controls</summary><p><kbd>← → / A D</kbd> move · <kbd>Space / W / ↑</kbd> jump · <kbd>C</kbd> toggle mixer pogo · <kbd>X / K</kbd> shoot · <kbd>Jump + shoot</kbd> fire up · <kbd>V</kbd> use stored kefir<br><kbd>E</kbd> talk · <kbd>P</kbd> pause · <kbd>M</kbd> mute · <kbd>Q</kbd> map · <kbd>R</kbd> restart · <kbd>T</kbd> recipes · <kbd>Enter / tap</kbd> next bakery</p><p>Gather five wild yeast cultures in each bakery. Flags save your checkpoint; the grand oven unlocks a real recipe.</p></details></div></main><script src="art/phase3-bg.js"></script>
+<script src="art/vertical-bakery1-layout.js"></script>
+<script src="art/vertical-bakery2-layout.js"></script>
+<script src="art/vertical-bakery3-layout.js"></script>
+<script src="art/checkpoint-flags-generated.js"></script>
+<script src="atmosphere.js"></script>
+<script src="art/vertical-parallax.js"></script>
+<script src="art/baker-reimagined.js"></script>
+<script src="art/environment-gameplay-atlas.js"></script>
+<script src="audio.js"></script>
+<script src="timing.js"></script>
+<script src="camera.js"></script>
+<script src="world.js"></script>
+<script src="input.js"></script>
+<script src="collision.js"></script>
+<script src="physics.js"></script>
+<script src="throwers.js"></script>
+<script src="combat.js"></script>
+<script src="gameplay.js"></script>
+<script src="characters.js"></script>
+<script src="celebration.js"></script>
+<script src="hud.js"></script>
+<script src="ovens.js"></script>
+<script src="interactables.js"></script>
+<script src="architecture.js"></script>
+<script src="foreman.js"></script>
+<script src="mycelium.js"></script>
+<script src="bloomrot.js"></script>
+<script src="devourer.js"></script>
+<script src="render.js"></script>
+<script src="assets.js"></script>
+<script>
+'use strict';window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';
+loadGameArt();
+const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;const W=960,H=540,T=32,cols=105,world=cols*T;let rows=56;let pogoOn=false,prevPogo=false;let map=[],gems=[],enemies=[],shots=[],particles=[],player={},camera=0,cameraY=0,tick=0,state='play',collected=0,keys={},prevJump=false;
+let bakery=1;const MAXBAKERY=3;let powerups=[],floaters=[],combo=0,comboT=0,shake=0,hitStop=0,codexFrom='play',codexPage=0;
+let best=parseInt(localStorage.getItem('factory-web-preview:crustQuestBest')||'0',10)||0;
+let unlocked=[];try{unlocked=JSON.parse(localStorage.getItem('factory-web-preview:crustQuestCodex')||'[]')}catch(e){unlocked=[]}
+const RECIPES=[
+{name:'Artisan Sourdough Bread',sub:'Starter: "Doughnald Knuth" - Joel\'s signature loaf',
+ ing:['100g active starter','320g water','500g all-purpose flour','10g salt'],
+ steps:['Mix + stretch & folds','Bulk ferment (watch the temp)','Cold retard overnight','Bake with steam']},
+{name:'Milk Kefir',sub:'Wild culture, maintained with love',
+ ing:['Kefir grains','Whole milk'],
+ steps:['Add grains to fresh milk','Ferment ~24h at room temp','Strain; restart with fresh milk']},
+{name:'High-Fat Cultured Kefir Ranch',sub:'Yield ~1.5 cups - 10 min + 30 min chill',
+ ing:['1/2 cup Kewpie mayo','1/2 cup strained whole-milk kefir','1/4-1/2 cup kefir buttermilk','1 tsp garlic powder','1 tsp dried parsley','1 tbsp fresh dill'],
+ steps:['Whisk mayo + strained kefir smooth','Fold in herbs & spices','Whisk in buttermilk to taste','Chill 30 min before serving']}
+];
+const THEMES=[
+{name:'Night Bakery',tint:null,mote:'#f8d9a5'},
+{name:'Rye Dawn',tint:'rgba(255,140,50,0.10)',mote:'#ffd0a0'},
+{name:'Midnight Patisserie',tint:'rgba(200,80,160,0.12)',mote:'#ffc0e0'}
+];
+function toggleCodex(){if(state==='codex')state=codexFrom;else{codexFrom=state;state='codex';codexPage=0}}
+const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;
+
+function codexFlip(d){codexPage=(codexPage+d+RECIPES.length)%RECIPES.length;AudioKit.effect('pogo')}
+
+// CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
+for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'+q,window.__PHASE3_BG[q]);
+const simulationClock=createFixedStepClock();
+function simulationStep(){if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();}
+function loop(now){try{
+ if(Number.isFinite(now))presentationNow=now;
+ if(document.hidden){simulationClock.reset();requestAnimationFrame(loop);return;}
+ simulationClock.advance(now,simulationStep);
+ draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop);
+}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}
+document.addEventListener('visibilitychange',()=>simulationClock.reset());const statusEl=document.getElementById('status');
+const minimap=document.getElementById('verticalMap');
+const mapButton=document.getElementById('mapButton');
+
+bindInput();
+try { init(); updateViewCamera(); draw(); diagnosticOverlay(); drawPhase3Map(); requestAnimationFrame(loop); statusEl.textContent='Find five yeast cultures, then reach the grand oven. Tap a control to start music.'; }
+catch(err) { statusEl.textContent='Game error: '+err.message; console.error(err); }
+</script><script>function startFactoryPreview(){window.__crustDevourerPreview=false;window.__crustBloomrotArena=false;init(3);keys={};}
+function practiceFactoryExit(){startFactoryPreview();player.x=21*T;player.y=49*T-player.h;player.ground=true;player.kefirCharges=1;camera=400;cameraY=1100;checkpointState.current=0;}
+startFactoryPreview();</script></body></html>

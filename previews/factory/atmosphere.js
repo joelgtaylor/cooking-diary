@@ -1,0 +1,144 @@
+/* Illustration-space atmosphere, always behind terrain and actors. */
+(function(){
+'use strict';
+const chimneys=[[42,181],[226,265],[410,266],[636,209],[722,153]];
+const windows=[[102,183,5,11],[208,208,5,9],[279,237,5,7],[331,235,4,8],[348,234,4,8],[546,208,5,10],[569,214,4,8]];
+function renderMoonlit(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
+ const sx=width/768,sy=height/432;
+ const pixel=(px,py,w,h)=>g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),Math.max(1,Math.round(w*sx)),Math.max(1,Math.round(h*sy)));
+ g.save();
+ // Tiny light changes stay within existing distant window panes.
+ if(layer==='mid')for(let i=0;i<windows.length;i++){
+  const [wx,wy,w,h]=windows[i];
+  g.globalAlpha=reduced?.06:.06+.035*Math.sin(time*.7+i*1.8);
+  g.fillStyle='#ffd39a';pixel(wx,wy,w,h);
+ }
+ // Existing painted plumes remain the still image in reduced-motion mode.
+ const sources=layer==='near'?[[62,67],[202,213],[520,178],[740,37]]:chimneys;
+ if(!reduced)for(let i=0;i<sources.length;i++){
+  const [cx,cy]=sources[i];
+  for(let k=0;k<4;k++){
+   const p=((time/4.5+k/4+i*.17)%1+1)%1;
+   // The left-hand painted plumes lean into the wind.
+   const leftward=layer==='near'?i<2:i===0;
+   const dx=leftward?-p*14+Math.sin(p*5)*p*2:Math.sin(p*3+i)*p*12;
+   const dy=p*55,size=5+Math.floor(p*10);
+   g.globalAlpha=(layer==='near'?.34:.19)*Math.sin(p*Math.PI);g.fillStyle='#b4bfd7';
+   pixel(cx+dx-size/2,cy-dy-size,size,size);
+   pixel(cx+dx-size/2+2,cy-dy-size-2,size-1,size+1);
+  }
+ }
+ // Thin depth bands, occluded by the nearer illustration and gameplay.
+ if(layer==='mid')for(let i=0;i<3;i++){
+  const drift=reduced?0:Math.sin(time*.08+i)*9;
+  g.globalAlpha=.018;g.fillStyle='#9daaca';
+  pixel(0,306+i*32+drift,768,7+i*3);
+ }
+ g.restore();
+}
+function renderFungal(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
+ const sx=width/1200,sy=height/676;
+ const caps=layer==='near'?[[168,214,160,35],[1050,226,145,37],[151,345,75,17],[1000,399,79,20]]:
+  [[410,252,92,22],[580,288,55,16],[851,248,46,14],[1054,249,77,20],[292,334,44,12],[891,450,46,14]];
+ g.save();
+ // Pulses follow the gills of the painted caps rather than covering the scene.
+ for(let i=0;i<caps.length;i++){
+  const [cx,cy,rx,ry]=caps[i],pulse=reduced?.5:(1+Math.sin(time*1.45+i*1.6))/2;
+  for(let ring=2;ring>=0;ring--){
+   g.globalAlpha=(reduced?.10:.035+pulse*.28)*(1-ring*.2);
+   g.fillStyle=i%2?'#bcfaff':'#f1b6ff';g.beginPath();
+   g.ellipse(Math.round(x+cx*sx),Math.round(y+cy*sy),rx*sx*(1+ring*.12),ry*sy*(1+ring*.12),0,0,Math.PI*2);g.fill();
+  }
+ }
+ if(!reduced)for(let i=0;i<(layer==='near'?14:20);i++){
+  const phase=((time/(6+i%3)+i*.381)%1+1)%1;
+  const px=90+(i*157)%1020+Math.sin(time*.5+i)*20,py=570-phase*370;
+  const size=i%4===0?4:3;
+  g.globalAlpha=(layer==='near'?.85:.65)*Math.sin(phase*Math.PI);
+  g.fillStyle=i%3?'#b3f3ed':'#e9ceff';
+  g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),size,size);
+ }
+ g.restore();
+}
+function drawClockworkCog(g,cx,cy,r,angle){
+ g.save();g.translate(Math.round(cx),Math.round(cy));g.rotate(angle);
+ // Squared teeth, dark iron body and a narrow copper bevel.
+ g.beginPath();
+ for(let tooth=0;tooth<24;tooth++)for(let corner=0;corner<4;corner++){
+  const a=(tooth+corner/4)*Math.PI/12,rad=r*(corner===1||corner===2?1:.9);
+  const px=Math.round(Math.cos(a)*rad),py=Math.round(Math.sin(a)*rad);
+  if(tooth===0&&corner===0)g.moveTo(px,py);else g.lineTo(px,py);
+ }
+ g.closePath();
+ const iron=g.createLinearGradient(-r,-r,r,r);
+ for(const [stop,color] of [[0,'#75605b'],[.18,'#3d3540'],[.5,'#24212e'],[.78,'#493438'],[1,'#8b6146']])iron.addColorStop(stop,color);
+ g.fillStyle=iron;g.fill();g.strokeStyle='#926b4c';g.lineWidth=2;g.stroke();
+ // Worn tooth faces and small pits break up the otherwise clean geometry.
+ for(let i=0;i<24;i++){
+  const a=(i+.38)*Math.PI/12;
+  g.fillStyle=i%3?'#9d7656':'#d0a16c';
+  g.fillRect(Math.round(Math.cos(a)*r*.94),Math.round(Math.sin(a)*r*.94),2,1);
+ }
+ for(let i=0;i<56;i++){
+  const a=i*2.39996,rad=r*(.34+(i%11)*.052);
+  g.fillStyle=i%3?'#302631':'#97725b';g.fillRect(Math.round(Math.cos(a)*rad),Math.round(Math.sin(a)*rad),1,1);
+ }
+ g.beginPath();g.arc(0,0,r*.79,0,Math.PI*2);g.strokeStyle='#684b42';g.lineWidth=r*.13;g.stroke();
+ g.beginPath();g.arc(0,0,r*.69,0,Math.PI*2);g.strokeStyle='#171c2a';g.lineWidth=2;g.stroke();
+ for(let spoke=0;spoke<6;spoke++){
+  g.save();g.rotate(spoke*Math.PI/3);
+  g.fillStyle='#171a26';g.fillRect(r*.12,-r*.09,r*.6,r*.18);
+  const brass=g.createLinearGradient(0,-r*.07,0,r*.06);brass.addColorStop(0,'#cf9b65');brass.addColorStop(.3,'#795144');brass.addColorStop(1,'#382c33');
+  g.fillStyle=brass;g.fillRect(r*.13,-r*.07,r*.58,r*.12);
+  g.fillStyle='#c58a54';g.fillRect(r*.17,-r*.07,r*.53,2);
+  g.fillStyle='#e1b77e';g.fillRect(r*.73,-1,2,2);g.restore();
+ }
+ g.beginPath();g.arc(0,0,r*.25,0,Math.PI*2);g.fillStyle='#b17a49';g.fill();
+ g.beginPath();g.arc(0,0,r*.16,0,Math.PI*2);g.fillStyle='#322d36';g.fill();
+ g.fillStyle='#ebc990';g.fillRect(-2,-2,4,4);g.restore();
+}
+function renderClockwork(g,{x,y,width,height,time=0,reduced=false,layer='mid'}){
+ const sx=width/1200,sy=height/676;
+ const pixel=(px,py,w,h)=>g.fillRect(Math.round(x+px*sx),Math.round(y+py*sy),Math.max(1,Math.round(w*sx)),Math.max(1,Math.round(h*sy)));
+ // Bearing brackets attach the cogs to arch bays and the front bridge.
+ g.save();
+ const mounts=layer==='near'?[[596,554,42,1]]:[[641,453,35,-1],[465,441,24,1]];
+ for(const [mx,my,r,direction] of mounts){
+  g.fillStyle='#252431';pixel(mx-r-7,my+r+9,r*2+14,7);
+  g.fillStyle='#735044';pixel(mx-r-5,my+r+9,r*2+10,2);
+  for(const side of [-1,1]){g.fillStyle='#3f3540';pixel(mx+side*(r+3)-3,my-8,6,r+18);g.fillStyle='#ba8655';pixel(mx+side*(r+3)-1,my-5,2,r+11);}
+  drawClockworkCog(g,x+mx*sx,y+my*sy,r*Math.min(sx,sy),reduced?0:time*.22*direction);
+ }
+ g.restore();
+ const furnaces=layer==='near'?[[150,449,59,57],[1090,506,57,59]]:
+  [[110,395,30,31],[159,520,31,35],[735,558,28,30],[1108,481,30,33]];
+ g.save();
+ for(let i=0;i<furnaces.length;i++){
+  const [cx,cy,rx,ry]=furnaces[i],pulse=reduced?.4:(1+Math.sin(time*1.8+i*2.1))/2;
+  for(let ring=1;ring>=0;ring--){
+   g.globalAlpha=.04+pulse*(ring?.08:.18);g.fillStyle=ring?'#ff922e':'#ffe092';
+   g.beginPath();g.ellipse(Math.round(x+cx*sx),Math.round(y+cy*sy),rx*sx*(ring?1.12:1),ry*sy*(ring?1.12:1),0,0,Math.PI*2);g.fill();
+  }
+ }
+ if(!reduced){
+  const vents=layer==='near'?[[220,134],[994,174],[1066,80]]:[[429,268],[507,248],[726,242],[1037,127]];
+  for(let i=0;i<vents.length;i++)for(let k=0;k<3;k++){
+   const p=((time/(3.2+i*.3)+k/3+i*.27)%1+1)%1;
+   const [vx,vy]=vents[i],px=vx+Math.sin(p*5+i)*p*18,py=vy-p*86;
+   g.globalAlpha=.85*Math.sin(p*Math.PI);g.fillStyle=k%2?'#ffb451':'#ffe5a0';
+   pixel(px,py,2,3);g.globalAlpha*=.35;pixel(px,py+4,1,5);
+  }
+  if(layer==='near'){
+   // Moving brass collars follow existing vertical piston rods. No gear redraw.
+   for(const [px,py,phase] of [[323,199,0],[835,328,Math.PI]]){
+    const travel=Math.round(Math.sin(time*.85+phase)*23);
+    g.globalAlpha=.85;g.fillStyle='#452b31';pixel(px-5,py+travel,13,7);
+    g.fillStyle='#bd8246';pixel(px-4,py+travel+1,11,4);
+    g.fillStyle='#ffcf83';pixel(px-3,py+travel+1,9,1);
+   }
+  }
+ }
+ g.restore();
+}
+window.CrustAtmosphere={renderMoonlit,renderFungal,renderClockwork};
+})();
