@@ -68,7 +68,7 @@ function updateWorldProgress(){
  }
 }
 
-function init(b){if(b)bakery=b;initVerticalWorld();}
+function init(b){if(b)bakery=b;initVerticalWorld();AudioKit.reset?.(bakery);}
 function worldOvenTarget(){
  const o=bakery===3&&devourerState?.finishOven;
  return o?{x:(o.x-12)/T,y:53}:currentVerticalLayout().oven;
