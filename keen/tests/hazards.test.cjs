@@ -6,6 +6,8 @@ const hash=createHash('sha256').update('art/spike-hazards.png').digest('hex');
 test('world-specific spike art stays within existing 32px hazard cells',()=>{
  for(let stage=1;stage<=3;stage++){
   const {run,trace}=game();run(`init(${stage});assets.spikeHazards.complete=true;assets.spikeHazards.naturalWidth=96;assets.spikeHazards.naturalHeight=32;`);
+  // Center the first authored hazard; the factory entrance is now spike-free.
+  run('camera=Math.max(0,currentVerticalLayout().hazards[0][0]*T-W/2)');
   const before=run('JSON.stringify({map,player,enemies})');trace.length=0;run('drawWorld()');
   const spikes=trace.filter(c=>c[0]==='drawImage'&&c[1]?.image===hash);assert.ok(spikes.length>0);
   for(const c of spikes){assert.equal(c[2],(stage-1)*32);assert.equal(c[8],32);assert.equal(c[9],32);assert.equal(run(`tile(${c[6]/32},${c[7]/32})`),'^');}

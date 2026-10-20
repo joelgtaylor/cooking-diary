@@ -1,6 +1,7 @@
 /* Non-colliding interior backing; all solid geometry is authored in the layout. */
 'use strict';
 function drawBakeryArchitecture(){
+ if(bakery===3){drawFactoryEntrance();return;}
  if(bakery===2){drawCavernFoothills();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
@@ -37,6 +38,41 @@ function drawBakeryArchitecture(){
   for(const dx of [35,44]){rect(dx*T,35*T-5,T,5,'#ba9b70');rect(dx*T+3,35*T-5,T-6,2,'#eddbad');}
   g.restore();
  }
+}
+
+// Riveted backing sits behind actors and collision tiles. The solid roof and
+// open doorways come from the layout; pipes and signs never add collision.
+function drawFactoryEntrance(){
+ const e=currentVerticalLayout().entrance;
+ if(!e||camera>26*T||cameraY+H<43*T)return;
+ const r=e.room,x=r.x*T,y=r.y*T,w=r.w*T;
+ g.save();
+ rect(x+T,y+T,w-2*T,4*T,'#18232c');
+ for(let col=1;col<r.w-1;col++){
+  const px=x+col*T;
+  rect(px,y+T,2,4*T,'#47505a');rect(px+2,y+T,1,4*T,'#0e1822');
+  for(const ry of [y+T+7,y+5*T-8]){rect(px+6,ry,3,3,'#9a8a6a');rect(px+23,ry,3,3,'#626975');}
+ }
+ // Recessed pipes and gauges, with restrained warm highlights.
+ rect(x+T+8,y+T+30,w-2*T-16,9,'#101820');
+ rect(x+T+8,y+T+31,w-2*T-16,3,'#8e6f48');
+ for(const px of [11*T,17*T]){
+  rect(px,y+T+24,10,22,'#302b28');rect(px+2,y+T+26,6,18,'#be925b');
+  rect(px+3,y+T+27,2,9,'#ead4a1');
+ }
+ for(const dx of [9,19]){
+  rect(dx*T,51*T-6,T,6,'#ad8752');rect(dx*T+3,51*T-6,T-6,2,'#f4d5a0');
+ }
+ g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#e8d6b5';
+ g.fillText('MAINTENANCE / KEFIR RESERVE',14.5*T,50*T+15);
+ // A permanent control cue works for both keyboard and the existing touch UI.
+ rect(10*T+8,52*T-4,8*T-16,22,'#101a26');g.fillStyle='#d7e9ec';
+ g.fillText('STORE NOW · V / KEFIR TO DASH',14*T,52*T+10);
+ g.fillStyle='#e8d6b5';g.fillText('SUPPLIES ↑',17*T,48*T-20);
+ // Exit wayfinding sits outside the combat silhouettes.
+ rect(21*T,44*T+7,4*T,20,'#15202a');g.fillStyle='#f4d5a0';
+ g.fillText('LIFT SHAFT ↑',23*T,44*T+21);
+ g.restore();
 }
 
 // Visual trim stays inside the authored solid balcony and root lintel.
