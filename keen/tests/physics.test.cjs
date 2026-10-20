@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {physicsCases}=require('./physics-cases.cjs');
 const {game}=require('./game-harness.cjs');
-test('physics/combat match all 4320 pre-extraction simulation frames and sound events',()=>{
+test('physics/combat match 4320 reviewed frames with the approved faster fire and upward aim',()=>{
  assert.deepEqual(physicsCases({originalLayout:true}),require('./physics-baseline.json'));
 });
 test('one-way platforms catch descending feet but permit upward passage',()=>{

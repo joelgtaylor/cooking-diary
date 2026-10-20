@@ -45,22 +45,20 @@ function drawOvenFire(m,ready){
   g.save();g.globalAlpha=.8;ovenLoaf(m.emblemX,m.emblemY+6,18);g.restore();
  }
 }
-function drawGrandOven(){
+function drawGrandOven(placement){
  const art=assets.grandOvens;
- if(!art||!art.complete||art.naturalWidth!==288||art.naturalHeight!==176){drawOvenFallback();return;}
+ if(!art||!art.complete||art.naturalWidth!==288||art.naturalHeight!==176){drawOvenFallback(placement);return;}
  const target=currentVerticalLayout().oven;
- const x=target.x*T-8,base=checkpointSupportRow(target.x,target.y)*T;
+ const x=placement?placement.x-32.5:target.x*T-8,base=placement?placement.foot:checkpointSupportRow(target.x,target.y)*T;
  g.save();g.translate(x,base-115);g.scale(65/96,115/176);
  g.imageSmoothingEnabled=false;
  g.drawImage(art,(bakery-1)*96,0,96,176,0,0,96,176);
- drawOvenFire(OVEN_MOUTHS[bakery-1],(foremanOvenReady()&&bloomrotOvenReady()));
+ drawOvenFire(OVEN_MOUTHS[bakery-1],placement?placement.ready:(foremanOvenReady()&&bloomrotOvenReady()));
  g.restore();
 }
-function drawOvenFallback(){
-const ex=currentVerticalLayout().oven.x*T;
-rect(ex-8,currentVerticalLayout().oven.y*T,65,115,'#6b4945');rect(ex-3,currentVerticalLayout().oven.y*T+6,55,106,'#c0aaa0');rect(ex+3,currentVerticalLayout().oven.y*T+23,43,70,'#523a3c');
-rect(ex+7,currentVerticalLayout().oven.y*T+27,35,62,(foremanOvenReady()&&bloomrotOvenReady())?'#ffb54e':'#7a5252');
-rect(ex+13,currentVerticalLayout().oven.y*T+49,23,15,'#b46c36');
-rect(ex+17,currentVerticalLayout().oven.y*T+46,15,6,'#f2cd8c');
-rect(ex+1,currentVerticalLayout().oven.y*T+9,47,8,'#fff0cd');
+function drawOvenFallback(placement){
+const ex=placement?placement.x-24.5:currentVerticalLayout().oven.x*T,y=placement?placement.foot-115:currentVerticalLayout().oven.y*T;
+rect(ex-8,y,65,115,'#6b4945');rect(ex-3,y+6,55,106,'#c0aaa0');rect(ex+3,y+23,43,70,'#523a3c');
+rect(ex+7,y+27,35,62,(placement?placement.ready:(foremanOvenReady()&&bloomrotOvenReady()))?'#ffb54e':'#7a5252');
+rect(ex+13,y+49,23,15,'#b46c36');rect(ex+17,y+46,15,6,'#f2cd8c');rect(ex+1,y+9,47,8,'#fff0cd');
 }

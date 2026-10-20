@@ -1,24 +1,33 @@
 /* Damage, hazards, projectiles and enemy updates, in original frame order. */
 'use strict';
+// Third-tick units give an exact 26/3-tick period: 50% faster than13ticks.
+let playerFireCooldown=0;
+function resetPlayerFire(){playerFireCooldown=0;}
 function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){respawnCheckpoint()}}
 
-function updateCombat(shoot){
+function updateCombat(shoot,aimUp=false){
  if(spike(player.x,player.y,player.w,player.h))damage();
- updateProjectiles(shoot);
+ updateProjectiles(shoot,aimUp);
  updateEnemies();
  updateEnemyShots();
  updateForeman();
  updateBloomrot();
+ updateDevourer();
 }
-function updateProjectiles(shoot){
- if(shoot&&tick%13===0&&player.ammo>0){shots.push({x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});player.ammo--;AudioKit.effect('shoot')}
+function updateProjectiles(shoot,aimUp=false){
+ if(playerFireCooldown>0)playerFireCooldown-=3;
+ if(shoot&&playerFireCooldown<=0&&player.ammo>0){
+  shots.push(aimUp?{x:player.x+player.w/2-3,y:player.y-4,w:6,h:10,vx:0,vy:-10}:{x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});
+  playerFireCooldown+=26;player.ammo--;AudioKit.effect('shoot');
+ }else if(!shoot&&playerFireCooldown<0)playerFireCooldown=0;
  for(const s of shots){
-  s.x+=s.vx;if(hit(s.x,s.y,s.w,s.h))s.dead=true;
+  s.x+=s.vx;s.y+=s.vy||0;if(hit(s.x,s.y,s.w,s.h))s.dead=true;
   for(const e of enemies)if(e.alive&&collide(s,e)){e.alive=false;s.dead=true;player.score+=100;burst(e.x+12,e.y+12,'#ffad57');AudioKit.effect('enemy')}
   if(!s.dead)hitForemanShot(s);
   if(!s.dead)hitBloomrotShot(s);
+  if(!s.dead)hitDevourerShot(s);
  }
- shots=shots.filter(s=>!s.dead&&s.x>0&&s.x<world);
+ shots=shots.filter(s=>!s.dead&&s.x>0&&s.x<world&&s.y+s.h>0&&s.y<rows*T);
 }
 // Authored encounters use real support and explicit patrol bounds. The legacy
 // hopper path assumed a 620px-tall world and cannot serve these lower rooftops.

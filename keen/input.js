@@ -16,6 +16,7 @@ function bindInput(){
   if(['arrowleft','arrowright','arrowup',' '].includes(k))e.preventDefault();
   keys[e.key.length===1?k:e.key]=true;AudioKit.start();
   if(e.repeat)return;
+  if(k==='v'){e.preventDefault();activateKefir();}
   if(k==='e'){e.preventDefault();talkMycelium();}
   if(k==='m')AudioKit.toggle();
   if(k==='q'){e.preventDefault();toggleMap();}
@@ -30,6 +31,7 @@ function bindInput(){
  });
  document.addEventListener('keyup',e=>{keys[e.key.length===1?e.key.toLowerCase():e.key]=false;});
  const click=(id,fn)=>document.getElementById(id).addEventListener('click',fn);
+ click('kefirBtn',()=>{AudioKit.start();activateKefir();});
  click('talkBtn',()=>{AudioKit.start();talkMycelium();});
  click('pogoBtn',()=>{AudioKit.start();togglePogo();AudioKit.effect('pogo');});
  click('codexBtn',()=>{AudioKit.start();toggleCodex();});

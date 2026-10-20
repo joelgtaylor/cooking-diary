@@ -1,6 +1,7 @@
 /* Non-colliding interior backing; all solid geometry is authored in the layout. */
 'use strict';
 function drawBakeryArchitecture(){
+ if(bakery===3){drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
  if(bakery===2){drawCavernFoothills();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
@@ -37,6 +38,83 @@ function drawBakeryArchitecture(){
   for(const dx of [35,44]){rect(dx*T,35*T-5,T,5,'#ba9b70');rect(dx*T+3,35*T-5,T-6,2,'#eddbad');}
   g.restore();
  }
+}
+
+// Riveted backing sits behind actors and collision tiles. The solid roof and
+// open doorways come from the layout; pipes and signs never add collision.
+function drawFactoryEntrance(){
+ const e=currentVerticalLayout().entrance;
+ if(!e||camera>26*T||cameraY+H<43*T)return;
+ const r=e.room,x=r.x*T,y=r.y*T,w=r.w*T;
+ g.save();
+ rect(x+T,y+T,w-2*T,4*T,'#18232c');
+ for(let col=1;col<r.w-1;col++){
+  const px=x+col*T;
+  rect(px,y+T,2,4*T,'#47505a');rect(px+2,y+T,1,4*T,'#0e1822');
+  for(const ry of [y+T+7,y+5*T-8]){rect(px+6,ry,3,3,'#9a8a6a');rect(px+23,ry,3,3,'#626975');}
+ }
+ // Recessed pipes and gauges, with restrained warm highlights.
+ rect(x+T+8,y+T+30,w-2*T-16,9,'#101820');
+ rect(x+T+8,y+T+31,w-2*T-16,3,'#8e6f48');
+ for(const px of [11*T,17*T]){
+  rect(px,y+T+24,10,22,'#302b28');rect(px+2,y+T+26,6,18,'#be925b');
+  rect(px+3,y+T+27,2,9,'#ead4a1');
+ }
+ for(const dx of [9,19]){
+  rect(dx*T,51*T-6,T,6,'#ad8752');rect(dx*T+3,51*T-6,T-6,2,'#f4d5a0');
+ }
+ g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#e8d6b5';
+ g.fillText('MAINTENANCE / KEFIR RESERVE',14.5*T,50*T+15);
+ // A permanent control cue works for both keyboard and the existing touch UI.
+ rect(10*T+8,52*T-4,8*T-16,22,'#101a26');g.fillStyle='#d7e9ec';
+ g.fillText('STORE NOW · V / KEFIR TO DASH',14*T,52*T+10);
+ g.fillStyle='#e8d6b5';g.fillText('SUPPLIES ↑',17*T,48*T-20);
+ // Exit wayfinding sits outside the combat silhouettes.
+ rect(21*T,44*T+7,4*T,20,'#15202a');g.fillStyle='#f4d5a0';
+ g.fillText('LIFT SHAFT ↑',23*T,44*T+21);
+ g.restore();
+}
+
+function drawClockworkAscent(){
+ const a=currentVerticalLayout().ascent;if(!a||camera+W<26*T||camera>78*T)return;
+ g.save();
+ for(const r of a.rooms){
+  const x=r.x*T,y=r.y*T,w=r.w*T,h=r.h*T;
+  if(x+w<camera||x>camera+W||y+h<cameraY||y>cameraY+H)continue;
+  rect(x+T,y+T,w-2*T,h-T,'#16222d');
+  for(let col=1;col<r.w-1;col++){
+   const px=x+col*T;
+   rect(px,y+T,2,h-T,'#46525f');rect(px+2,y+T,1,h-T,'#0c1721');
+   for(const py of [y+T+6,y+h-9]){rect(px+6,py,3,3,'#a39170');rect(px+23,py,3,3,'#65717b');}
+  }
+  for(const col of [2,6]){
+   const px=x+col*T;
+   rect(px,y+2*T,26,40,'#0c1620');rect(px+3,y+2*T+3,20,34,'#67523c');
+   rect(px+5,y+2*T+5,16,11,'#e3ba72');rect(px+12,y+2*T+4,3,33,'#353f47');
+  }
+  rect(x+T+8,y+h-15,w-2*T-16,7,'#403b34');rect(x+T+8,y+h-15,w-2*T-16,2,'#ac8551');
+  g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#e8d6b5';g.fillText(r.name,x+w/2,y+T+15);
+  for(const dx of [r.x,r.x+r.w-1]){rect(dx*T,(r.y+r.h-3)*T-6,T,6,'#ac8551');rect(dx*T+3,(r.y+r.h-3)*T-6,T-6,2,'#edcfa0');}
+ }
+ // Shapes/arrows and explicit words distinguish the optional loop from cultures.
+ for(const [x,y,label] of [[55,27,'MAIN → / CULTURES'],[55,26,'BONUS ↑ / DANGER'],[76,17,'DESCENT →']]){
+  if(x*T+76<camera||x*T-76>camera+W||y*T+8<cameraY||y*T-12>cameraY+H)continue;
+  rect(x*T-76,y*T-12,152,20,'#14212c');g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#ecd5aa';g.fillText(label,x*T,y*T+2);
+ }
+ g.restore();
+}
+
+function drawFinalDescent(){
+ if(!currentVerticalLayout().finale||camera+W<78*T)return;
+ g.save();g.font='bold 10px monospace';g.textAlign='center';
+ // Small route plaques keep the quiet return leg legible against machinery.
+ for(const [x,y,label] of [[98,32,'SERVICE STAIRS ←'],[83,33,'CHECKPOINT ←'],[79,38,'OVEN FLOOR ↓']]){
+  if(x*T+70<camera||x*T-70>camera+W||y*T+9<cameraY||y*T-12>cameraY+H)continue;
+  rect(x*T-70,y*T-12,140,21,'#15212c');g.fillStyle='#ecd5aa';g.fillText(label,x*T,y*T+2);
+ }
+ // Side railing is backing only, outside the open checkpoint-to-oven path.
+ for(let y=40;y<53;y+=3){rect(77*T+5,y*T,4,2*T,'#54463c');rect(77*T+6,y*T,1,2*T,'#b48c55');}
+ g.restore();
 }
 
 // Visual trim stays inside the authored solid balcony and root lintel.
