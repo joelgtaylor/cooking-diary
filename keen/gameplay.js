@@ -9,6 +9,7 @@ function burst(x,y,color,n=10){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.
 function update(){
  if(state!=='play')return;
  tick++;
+ updateAmmoCaches();
  const movement=updatePlayer();
  if(!movement)return;
  updateMycelium();
@@ -21,7 +22,7 @@ function updateEffects(){
 for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.life--}particles=particles.filter(p=>p.life>0);for(const fl of floaters){fl.y-=0.8;fl.life--}floaters=floaters.filter(fl=>fl.life>0);
 }
 function updatePickups(){
-for(const gem of gems)if(!gem.got&&Math.abs(player.x-gem.x)<25&&Math.abs(player.y-gem.y)<30){gem.got=true;collected++;combo=comboT>0?combo+1:1;comboT=240;const pts=250*combo;player.score+=pts;player.ammo+=5;burst(gem.x,gem.y,'#efff8b',18);floater(gem.x,gem.y-14,'+'+pts+(combo>1?' x'+combo+' COMBO':''),'#efff8b');AudioKit.effect('collect')}for(const u of powerups)if(!u.got&&Math.abs(player.x+14-u.x)<28&&Math.abs(player.y+19-u.y)<30){u.got=true;AudioKit.effect('collect');if(u.kind==='kefir'){player.kefirCharges=(player.kefirCharges||0)+1;burst(u.x,u.y,'#ffffff',14);floater(u.x,u.y-14,'KEFIR STORED · V TO DASH','#ffffff')}else if(u.kind==='cache'){player.ammo+=15;player.score+=500;burst(u.x,u.y,'#f0d9a0',10);floater(u.x,u.y-14,'+500 / +15 AMMO','#f0d9a0')}else if(u.kind==='rye'){player.health=Math.min(5,player.health+1);burst(u.x,u.y,'#c98d4b',14);floater(u.x,u.y-14,'+1 HEART','#ffb54e')}else{player.shield=true;burst(u.x,u.y,'#9af3fa',14);floater(u.x,u.y-14,'BANNETON SHIELD','#9af3fa')}}
+for(const gem of gems)if(!gem.got&&Math.abs(player.x-gem.x)<25&&Math.abs(player.y-gem.y)<30){gem.got=true;collected++;combo=comboT>0?combo+1:1;comboT=240;const pts=250*combo;player.score+=pts;player.ammo+=5;burst(gem.x,gem.y,'#efff8b',18);floater(gem.x,gem.y-14,'+'+pts+(combo>1?' x'+combo+' COMBO':''),'#efff8b');AudioKit.effect('collect')}for(const u of powerups)if(!u.got&&Math.abs(player.x+14-u.x)<28&&Math.abs(player.y+19-u.y)<30){u.got=true;AudioKit.effect('collect');if(u.kind==='kefir'){player.kefirCharges=(player.kefirCharges||0)+1;burst(u.x,u.y,'#ffffff',14);floater(u.x,u.y-14,'KEFIR STORED · V TO DASH','#ffffff')}else if(u.kind==='ammo'){player.ammo+=25;u.refreshT=u.refreshTicks||300;burst(u.x,u.y,'#ffe5a8',6);floater(u.x,u.y-14,'+25 AMMO','#ffe5a8')}else if(u.kind==='cache'){player.ammo+=15;player.score+=500;burst(u.x,u.y,'#f0d9a0',10);floater(u.x,u.y-14,'+500 / +15 AMMO','#f0d9a0')}else if(u.kind==='rye'){player.health=Math.min(5,player.health+1);burst(u.x,u.y,'#c98d4b',14);floater(u.x,u.y-14,'+1 HEART','#ffb54e')}else{player.shield=true;burst(u.x,u.y,'#9af3fa',14);floater(u.x,u.y-14,'BANNETON SHIELD','#9af3fa')}}
 }
 
 function activateKefir(){
@@ -34,4 +35,11 @@ function syncKefirButton(){
  b.style.display=player.kefirCharges||player.speedT>0?'':'none';
  b.disabled=state!=='play'||player.speedT>0||!player.kefirCharges;
  b.textContent=player.speedT>0?'Dash '+Math.ceil(player.speedT/60)+'s':'Kefir '+(player.kefirCharges||0)+' (V)';
+}
+
+function updateAmmoCaches(){
+ if(state!=='play')return;
+ for(const u of powerups)if(u.kind==='ammo'&&u.got&&u.refreshT>0){
+  if(--u.refreshT===0)u.got=false;
+ }
 }

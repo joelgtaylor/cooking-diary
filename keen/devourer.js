@@ -8,7 +8,7 @@ function devourerArena(){return bakery===3&&window.__crustDevourerPreview;}
 function devourerGate(closed){for(let y=36;y<54;y++)map[y][80]=closed?'#':'.';}
 function resetDevourer(){
  devourerState=devourerArena()?{x:96*T,foot:54*T,phase:'disguise',timer:0,health:12,maxHealth:12,inv:0,face:-1,projectiles:[],cycle:0,impact:false}:null;
- if(devourerState){devourerGate(false);player.ammo=Math.max(65,player.ammo);player.kefirCharges=Math.max(1,player.kefirCharges||0);}
+ if(devourerState){devourerGate(false);player.ammo=Math.max(65,player.ammo);player.kefirCharges=Math.max(1,player.kefirCharges||0);for(const u of powerups)if(u.kind==='ammo'){u.got=false;u.refreshT=0;}}
 }
 function startDevourerPreview(){
  window.__crustDevourerPreview=true;
@@ -19,7 +19,7 @@ function startDevourerPreview(){
  for(const [x,y,n] of [[85,51,4]])for(let i=0;i<n;i++)map[y][x+i]='=';
  // A96px-high service alcove: solid roof blocks boules and the tall boss.
  for(let x=100;x<104;x++)map[50][x]='#';
- enemies=[];enemyShots=[];gems=[];powerups=[{x:102*T+4,y:53*T,kind:'kefir',got:false,ph:0}];
+ enemies=[];enemyShots=[];gems=[];powerups=[{x:102*T+4,y:53*T,kind:'kefir',got:false,ph:0},{x:100*T+20,y:53*T,kind:'ammo',got:false,ph:1,refreshT:0,refreshTicks:300}];
  checkpointState.spawns.push({x:79*T,y:54*T-player.h});checkpointState.current=4;
  player.x=83*T;player.y=54*T-player.h;player.ground=true;player.ammo=65;
  camera=2400;cameraY=rows*T-H;keys={};resetDevourer();

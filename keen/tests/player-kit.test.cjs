@@ -30,3 +30,12 @@ test('the service shelter fits the baker, blocks the boss and boules, and has a 
 test('upward shots can enter an open furnace through the legs, but closed armor stops them',()=>{
  for(const open of [false,true]){const a=game();a.run(`startDevourerPreview();devourerState.phase='${open?'recovery':'landing'}';devourerState.timer=${open?84:100};player.x=devourerState.x-player.w/2;keys={jump:true,shoot:true};for(let i=0;i<20;i++)update()`);assert.equal(a.run('devourerState.health<12'),open);}
 });
+
+test('shelter ammo cache gives25 with no score, recharges in300 play ticks and cannot pay twice immediately',()=>{
+ const a=game();a.run("startDevourerPreview();var cache=powerups.find(u=>u.kind==='ammo');player.x=cache.x-14;player.y=54*T-player.h;player.ammo=0;updatePickups();updatePickups();");assert.equal(a.run('player.ammo'),25);assert.equal(a.run('player.score'),0);assert.equal(a.run('cache.refreshT'),300);
+ a.run('for(let i=0;i<299;i++)updateAmmoCaches();updatePickups()');assert.equal(a.run('player.ammo'),25);a.run('updateAmmoCaches();updatePickups()');assert.equal(a.run('player.ammo'),50);assert.equal(a.run('cache.refreshT'),300);
+});
+test('ammo cooldown pauses safely, drawing is pure, and retries restore the cache',()=>{
+ const a=game();a.run("startDevourerPreview();var cache=powerups.find(u=>u.kind==='ammo');cache.got=true;cache.refreshT=200;state='pause';for(let i=0;i<100;i++){update();updateAmmoCaches();draw()}");assert.equal(a.run('cache.refreshT'),200);
+ a.run("state='play';player.hang={x:player.x,y:player.y,timer:0,destX:player.x,top:54*T};update()");assert.equal(a.run('cache.refreshT'),199);a.run('respawnCheckpoint()');assert.equal(a.run('cache.got'),false);assert.equal(a.run('cache.refreshT'),0);
+});
