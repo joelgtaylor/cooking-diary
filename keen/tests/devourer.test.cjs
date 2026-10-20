@@ -57,7 +57,7 @@ test('repeat attacks leave a full cooling beat, warn early, cap travel and never
  a.run('player.x=82*T;for(let i=0;i<59;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'rest');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'windup');assert.equal(a.run('devourerState.timer'),48);
  const target=a.run('devourerState.queuedTargetX');assert.ok(Math.abs(target-a.run('devourerState.x'))<=160);a.run('player.x=102*T;for(let i=0;i<48;i++)updateDevourer()');assert.equal(a.run('devourerState.targetX'),target);assert.equal(a.run('devourerState.timer'),87);
  a.run('for(let i=0;i<86;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.timer'),30);
- a.run('for(let i=0;i<29;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'boules');
+ a.run('for(let i=0;i<29;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'kefir');
 });
 test('ordinary movement during the repeat warning creates separation before the locked landing',()=>{
  const a=trial();a.run("devourerState.cycle=1;devourerState.x=96*T;player.x=devourerState.x-110;queueDevourerSlam(devourerState);keys={left:true};for(let i=0;i<135;i++)update();");assert.equal(a.run('player.health'),3);assert.ok(a.run('Math.abs(player.x+player.w/2-devourerState.x)')>160);assert.equal(a.run('devourerState.phase'),'landing');
@@ -71,4 +71,30 @@ test('the moving airborne boss exposes its furnace throughout ascent and descent
 });
 test('an airborne defeat falls to the floor and rewards only once',()=>{
  const a=trial();engage(a);a.run('for(let i=0;i<24;i++)updateDevourer();devourerState.health=1;hurtDevourer();');assert.ok(a.run('devourerState.foot<54*T'));a.run('for(let i=0;i<96;i++)updateDevourer();hurtDevourer()');assert.equal(a.run('devourerState.foot'),54*32);assert.equal(a.run('devourerState.health'),0);assert.equal(a.run('player.score'),2000);
+});
+
+test('kefir replaces alternating barrages with seven spaced droplets and the same recovery',()=>{
+ const a=trial();a.run("devourerState.cycle=1;devourerState.phase='landing';devourerState.timer=1;updateDevourer()");assert.equal(a.run('devourerState.phase'),'kefir');const fire=[];
+ for(let i=0;i<50;i++){const n=a.audio.effects.filter(x=>x==='shoot').length;a.run('updateDevourer()');if(a.audio.effects.filter(x=>x==='shoot').length>n)fire.push(i);}assert.deepEqual(fire,[0,7,14,21,28,35,42]);assert.equal(a.run('devourerState.timer'),108);assert.equal(a.run('devourerState.phase'),'recovery');
+ a.run("devourerState.phase='landing';devourerState.timer=1;devourerState.cycle=2;updateDevourer()");assert.equal(a.run('devourerState.phase'),'boules');
+});
+test('kefir puddles are bounded, short-lived, kept outside shelter and cleared for the opening',()=>{
+ const a=trial();a.run("devourerState.phase='kefir';devourerState.timer=49;devourerState.projectiles=Array.from({length:4},(_,i)=>({kind:'kefir',x:3000+i*10,y:54*T-12,w:10,h:12,vx:0,vy:1,life:10}));updateDevourer()");assert.equal(a.run('devourerState.puddles.length'),2);
+ a.run('devourerState.projectiles=[];devourerState.puddles.forEach(p=>p.life=1);updateDevourer()');assert.equal(a.run('devourerState.puddles.length'),0);
+ a.run("devourerState.projectiles=[{kind:'kefir',x:101*T,y:54*T-12,w:10,h:12,vx:0,vy:1,life:10}];updateDevourer()");assert.equal(a.run('devourerState.puddles.length'),0);
+ a.run("devourerState.puddles=[{x:3000,y:54*T-5,w:24,h:5,life:60}];devourerState.phase='recovery';devourerState.timer=85;updateDevourer()");assert.equal(a.run('devourerState.puddles.length'),0);
+});
+test('a real descending pogo hits the tiny cap while other armor only clangs and rebounds',()=>{
+ for(const hit of [true,false]){const a=trial();a.run(`devourerState.phase='rest';devourerState.timer=60;pogoOn=true;player.x=devourerState.x+${hit?-12:30};player.y=devourerState.foot-${hit?211:199}-player.h-3;player.vy=5;player.ground=false;keys={};update()`);assert.equal(a.run('devourerState.health'),hit?11:12);assert.ok(a.run('player.vy')<0);}
+});
+test('rising through the cap is not a pogo hit; grounded defeat impacts and vents only once',()=>{
+ const a=trial();a.run("devourerState.phase='rest';devourerState.timer=60;pogoOn=true;player.x=devourerState.x-12;player.y=devourerState.foot-211-player.h+4;player.vy=-5;player.ground=false;keys={};update()");assert.equal(a.run('devourerState.health'),12);
+ a.run('devourerState.health=1;devourerState.inv=0;hurtDevourer();');const sounds=a.audio.effects.length;a.run('for(let i=0;i<160;i++)updateDevourer()');assert.equal(a.run('devourerState.defeatAge'),160);assert.equal(a.run('devourerState.timer'),0);assert.equal(a.audio.effects.length,sounds+1);assert.equal(a.run('devourerState.puddles.length'),0);
+});
+test('the cap is reachable from the maintenance shelf with ordinary pogo and movement input',()=>{
+ const a=trial();a.run("devourerState.x=90*T;devourerState.cycle=1;devourerState.phase='rest';devourerState.timer=180;player.x=87*T;player.y=51*T-player.h;player.ground=true;togglePogo();");for(let n=0;n<100;n++)a.run(`keys={right:${n<20},jump:${n<15}};update()`);assert.ok(a.run('devourerState.health')<12);
+});
+test('live kefir effects pause without mutation and fatal puddle damage clears stale state on retry',()=>{
+ const a=trial();a.run("devourerState.phase='kefir';devourerState.timer=40;devourerState.projectiles=[{kind:'kefir',x:3000,y:1600,w:10,h:12,vx:4,vy:1,life:50}];devourerState.puddles=[{x:player.x,y:54*T-5,w:24,h:5,life:60}];state='pause';");const before=a.run('JSON.stringify(devourerState)');a.run('for(let i=0;i<30;i++){update();drawDevourer()}');assert.equal(a.run('JSON.stringify(devourerState)'),before);
+ a.run("state='play';player.health=1;player.inv=0;updateDevourer()");assert.equal(a.run('player.health'),3);assert.equal(a.run('devourerState.puddles.length'),0);assert.equal(a.run('devourerState.projectiles.length'),0);
 });

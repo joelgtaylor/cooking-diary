@@ -10,6 +10,7 @@ function update(){
  if(state!=='play')return;
  tick++;
  updateAmmoCaches();
+ rememberDevourerPogo();
  const movement=updatePlayer();
  if(!movement)return;
  updateMycelium();
