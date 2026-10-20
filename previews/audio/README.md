@@ -1,9 +1,19 @@
-# Moonlit Bakery audio audition 01
+# Crust Quest world-theme auditions
 
-Original procedural composition and synthesis, authored for Crust Quest. No external samples or melodies. 116 BPM, 32 bars (66.21 seconds), four eight-bar phrases. Preview only; nothing under keen/ changes. No storage access.
+Original procedural compositions and synthesis, authored for Crust Quest. No external samples or melodies. Preview only; nothing under keen/ changes. No storage access.
 
-Review: new/current comparison, individual effects, 12-second action sequence and independent new-theme/effect levels. The legacy track retains its original mix. Mute all applies to both contexts. Hidden tabs stop/reset the audition and require a gesture to restart. The new engine uses bounded lookahead, one timer, effect cooldowns, 64 carrier voices and a safety compressor. This is an instrument/composition study, not a production-ready world audio engine. Existing effect events have not been renamed or integrated.
+| Theme | Musical identity | Loop |
+| --- | --- | --- |
+| Moonlit Bakery (approved) | Warm reed, bells, rounded bass; C major colour; 4/4 at 116 BPM | 32 bars / 66.21 s |
+| Fungal Caverns | Glass mallets, soft plucks, droplet accents and open D Dorian harmony; lilting 6/8 at dotted-quarter 60 (quarter 90) | 32 bars / 64 s |
+| Clockwork Ovens | FM brass, clipped piston bass, metallic taps, E minor/harmonic-minor colour; 4/4 at 140 BPM | 40 bars / 68.57 s |
 
-Validation: `node --test previews/audio/audio.test.cjs` (3 tests); `node --test keen/tests/*.test.cjs` (196 tests). Tests verify graph/scheduling behavior, not perceived sound quality. Live browser playback requires a separate smoke check after publishing; listening approval remains Joel's. Headphone/speaker mix and loop fatigue remain review items.
+Caverns has four eight-bar phrases: descending curiosity, a brighter answer, a rising spacious bridge and a quiet return. Ovens has five: machinery starts, brass answer, high catwalks, stripped maintenance passage, full-machine return. These are exploration themes, not boss cues. They must not reveal the Devourer mimic.
 
-Publishing these isolated preview files on main serves the audition through the existing Pages deployment. This does not merge or enable an audio upgrade in production. Continue development on audio/keen-soundtrack; do not merge production audio without approval.
+World selector includes the existing game artwork for context. Switching worlds stops playback; Play starts the selected score from its entrance. Review with music alone, individual effects, or the 12-second action sequence. Independent music/effect levels apply to new themes; the legacy comparison retains its original mix. Mute all applies to both contexts. Hidden tabs stop/reset the audition and require a gesture to restart.
+
+The new engine uses bounded lookahead, one timer, effect cooldowns, 64 carrier voices and a safety compressor. Themes share an engine but have separately authored notes, harmony, rhythm and instrument palettes. This is an audition, not a production world-audio integration. Existing gameplay sound events remain untouched.
+
+Validation: `node --test previews/audio/audio.test.cjs` (5 tests); `node --test keen/tests/*.test.cjs` (196 tests). Bakery 1's 256 score steps were compared with the approved first audition and are identical. Tests verify graph/scheduling behavior, not perceived sound quality. Live browser controls need a separate check after deployment; headphone/speaker mix and loop fatigue remain listening-review items.
+
+Only isolated preview files are published on main through the existing Pages deployment. Development branch: audio/keen-soundtrack. Do not merge or enable production audio without approval.
