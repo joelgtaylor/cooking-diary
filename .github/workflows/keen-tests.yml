@@ -1,0 +1,17 @@
+name: Crust Quest regression tests
+on:
+  push:
+    branches: [audio/keen-soundtrack, main]
+    paths: ['keen/**', 'previews/audio/**', '.github/workflows/keen-tests.yml']
+  pull_request:
+    paths: ['keen/**', 'previews/audio/**', '.github/workflows/keen-tests.yml']
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gameplay, production audio and audition regression tests
+        run: node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs
