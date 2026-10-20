@@ -116,3 +116,21 @@ for `previews/finale/`. It starts at the summit with three cultures banked. A
 final-checkpoint shortcut banks all five for immediate integrated boss testing;
 Full Bakery 3 starts the complete mission. Awaiting playtest; do not merge the
 feature branch until approved.
+
+
+### The recovered finish oven
+
+The Devourer now ejects the real Bakery 3 oven 30 grounded ticks into his
+collapse. A 48-tick arc lands it in a clear bay on the opposite side of the
+wreck, away from the pogo shelf and shelter roof. It uses the existing oven
+atlas, gains its familiar fire when ready, and carries an explicit finish label.
+The completion target and map marker follow this real oven rather than the
+wreck. The original 120-tick collapse, battle tuning and 2,000-point reward are
+unchanged. Completion still requires five cultures and a finished collapse, plus
+the oven having landed. Retry removes the recovered oven and resets the fight.
+A preview-only Replay oven reveal button demonstrates the entire sequence.
+
+Three new tests cover one-time release/landing, both unobstructed landing bays,
+completion timing and location, reset, pause and the real oven draw path.
+All 196 tests pass; reviewed rendering differences are confined to Bakery 3
+ending states. Loaded artwork inspected with the wreck and recovered oven.

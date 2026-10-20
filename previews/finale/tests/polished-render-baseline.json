@@ -93,7 +93,8 @@
   "3/finale_return": "625572dee66a08a82939c6dc104e199950ca076dbecda7cf82a37b86c789df16",
   "3/finale_checkpoint": "8b78547ca304c7af9964d65a938b52806aaa690bf6808ba36c0b5e205dfb9bc7",
   "3/finale_oven": "d9315a5331eb09a9b50adacf5ca782eca9b3156bb08dea6755c91546cc9e2ef5",
-  "3/finale_ready": "381832cc20922032a84455c84b818ff23ab4abcc575e43aa67afc324f4d11afb",
+  "3/finale_spit": "dd7873d65cce92ce4acb3a8f9dca3449324521e6eccdb290464b01cc73fbca7d",
+  "3/finale_ready": "38da4ba615466373daca7c35ab5380780473f457ebdbfea48c9dd0914287a4c8",
   "3/devourer_disguise": "f11855951f35ecdf0dbf169260ea08609fd1cb53afcfc4b9acd599f4515c99e9",
   "3/devourer_slam": "c89636f01def98e913f63abea1f81391201a4ce69fcdf9bb3f61bdc23ddf6dc4",
   "3/devourer_boules": "bb3a8540e31c2173fae93ba53945320067736ac800e939d6fa8b9f4b66e1b45e",
@@ -110,7 +111,7 @@
   "3/devourer_puddles": "1234273816cf2d979a6c3d91a47d0d746a9e5476af55bfb043c575872d2ca746",
   "3/devourer_pogo": "50f95d26ce21ded6f7c7625a3b3beff9f466a6f9053738e88fa0aadc6b9cf8f0",
   "3/devourer_defeat_impact": "a54dbf33f7bce13a3eec9b75e6f2cf70cab069a45980d92d06346e5fdb3a4317",
-  "3/oven_ready": "bf0ac1f2a7add894a139f25076a192b18a700b6c8825a71e8229a3253444e525",
+  "3/oven_ready": "4925742fa0cdfc41bd0a90d29fdc142d629930642a5ceb626604714a6168f22e",
   "3/checkpoint_saved": "c253ce98e1479c730fae4837f88019234e37986359fb5dfe248701962dc72d33",
   "3/yeast_collected": "89cba79dda062e81530cecdb8a1c9723a2ec78c5b79802f58b163a418571acda"
 }
