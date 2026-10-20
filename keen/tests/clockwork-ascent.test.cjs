@@ -9,7 +9,7 @@ function segment(name,sx,sy,tx,ty,jump=true){
  }assert.fail(name+' '+a.run('JSON.stringify({x:player.x/T,foot:(player.y+player.h)/T})'));
 }
 test('ascent preserves the approved entrance and untouched final descent exactly',()=>{
- const a=level(),b=level({layoutFixture3:'bakery3-entrance-approved.js'}),am=a.run('map'),bm=b.run('map');
+ const a=level({layoutFixture3:'bakery3-ascent-approved.js'}),b=level({layoutFixture3:'bakery3-entrance-approved.js'}),am=a.run('map'),bm=b.run('map');
  for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x>=26&&x<=77&&y>=16&&y<54,`${x},${y}`);
  for(const q of ['currentVerticalLayout().entrance','gems[0]','gems.slice(3)','checkpointState.spawns[0]','checkpointState.spawns[3]','powerups.slice(0,2)','powerups[4]','currentVerticalLayout().oven'])assert.equal(a.run(`JSON.stringify(${q})`),b.run(`JSON.stringify(${q})`),q);
  assert.equal(a.run('JSON.stringify(enemies[0])'),b.run('JSON.stringify(enemies[1])'));
@@ -21,7 +21,7 @@ test('ordinary jumps traverse the main ascent and both culture passages',()=>{
   ['hall exit',44,37,47,37,false],['first catwalk',47,37,50,34],['central landing',50,34,54,31],
   ['exposed bridge',54,31,57,28],['upper passage approach',57,28,59,25],['upper entry',59,25,63,25,false],
   ['upper exit',68,25,71,25,false],['summit stair',71,25,73,22],['summit lip',73,22,73,19],
-  ['parapet',73,19,74,16],['summit refuge',74,16,76,19,false],['descent rejoin',76,19,80,20,false]
+  ['parapet',73,19,74,16],['summit refuge',74,16,76,19,false],['descent rejoin',76,19,80,22,false]
  ])segment(...s);
 });
 test('optional roof loop has a complete ordinary-jump entry and return',()=>{

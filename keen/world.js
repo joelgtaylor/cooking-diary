@@ -51,13 +51,14 @@ function updateWorldProgress(){
   if(i>checkpointState.current&&Math.abs(player.x+14-x*T-12)<52&&Math.abs(player.y+22-y*T)<62){
     checkpointState.current=i;
     if(bakery===2&&bloomrotArena()&&i===3)player.ammo=Math.max(45,player.ammo);
+    if(bakery===3&&layout.devourer&&i===layout.devourer.checkpoint)resupplyDevourerCheckpoint();
     floater(player.x,player.y-12,'CHECKPOINT '+(i+1),'#a5ffdc');
     AudioKit.effect('collect');
   }
  }
  if(player.health<=0){respawnCheckpoint();return;}
  const target=layout.oven;
- if(foremanOvenReady()&&bloomrotOvenReady()&&Math.abs(player.x+14-(target.x*T+12))<53&&
+ if(foremanOvenReady()&&bloomrotOvenReady()&&devourerOvenReady()&&Math.abs(player.x+14-(target.x*T+12))<53&&
     Math.abs(player.y+22-(target.y*T+25))<85){
     checkpointState.complete=true;
     if(player.score>best){best=player.score;saveBest();}
@@ -74,4 +75,4 @@ function advanceBakery(){
  if(bakery<MAXBAKERY)init(bakery+1);
  else state='win';
 }
-function restart(){if(devourerArena()){startDevourerPreview();return;}if(window.__crustBloomrotArena){startBloomrotPreview();return;}init(bakery)}
+function restart(){if(bakery===3&&window.__crustDevourerPreview){startDevourerPreview();return;}if(window.__crustBloomrotArena){startBloomrotPreview();return;}init(bakery)}

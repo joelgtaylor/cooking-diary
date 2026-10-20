@@ -1,14 +1,24 @@
-/* Isolated Grand Devourer trial. Normal authored worlds remain unchanged. */
+/* Grand Devourer: approved battle shared by the authored finale and trial. */
 'use strict';
 let devourerState=null;
 const DEVOURER_SHELTER_LEFT=100*32;
 function devourerLandingX(x){return Math.max(83*T+56,Math.min(DEVOURER_SHELTER_LEFT-56,x));}
 const DEVOURER_SLAM_TICKS=24;
-function devourerArena(){return bakery===3&&window.__crustDevourerPreview;}
+function devourerArena(){return bakery===3&&(window.__crustDevourerPreview||currentVerticalLayout().devourer);}
+function devourerOvenReady(){return !devourerArena()||(devourerState?.health===0&&devourerState.timer===0);}
+function resupplyDevourerCheckpoint(){
+ player.health=Math.max(3,player.health);player.ammo=Math.max(65,player.ammo);player.kefirCharges=Math.max(1,player.kefirCharges||0);
+}
 function devourerGate(closed){for(let y=36;y<54;y++)map[y][80]=closed?'#':'.';}
 function resetDevourer(){
  devourerState=devourerArena()?{x:96*T,foot:54*T,phase:'disguise',timer:0,health:12,maxHealth:12,inv:0,face:-1,projectiles:[],puddles:[],cycle:0,impact:false}:null;
- if(devourerState){devourerGate(false);player.ammo=Math.max(65,player.ammo);player.kefirCharges=Math.max(1,player.kefirCharges||0);for(const u of powerups)if(u.kind==='ammo'){u.got=false;u.refreshT=0;}}
+ if(devourerState){
+  if(!assets.devourerForms)loadArt('devourerForms','art/devourer-forms.png');
+  if(!assets.devourerDefeated)loadArt('devourerDefeated','art/devourer-defeated.png');
+  devourerGate(false);
+  if(window.__crustDevourerPreview||checkpointState.current===currentVerticalLayout().devourer?.checkpoint)resupplyDevourerCheckpoint();
+  for(const u of powerups)if(u.kind==='ammo'){u.got=false;u.refreshT=0;}
+ }
 }
 function startDevourerPreview(){
  window.__crustDevourerPreview=true;
@@ -107,7 +117,7 @@ function updateDevourer(){
   return;
  }
  if(f.phase==='disguise'){
-  if(Math.abs(player.x+player.w/2-f.x)<205){devourerGate(true);startDevourerSlam(f);}return;
+  if(Math.abs(player.x+player.w/2-f.x)<205&&Math.abs(player.y+player.h-54*T)<64){devourerGate(true);startDevourerSlam(f);}return;
  }
  if(!updateDevourerProjectiles(f))return;
  if(f.phase==='slam'){
@@ -183,5 +193,7 @@ function drawDevourer(){
   else if(f.phase==='windup')worldBadge('PISTONS CHARGING',f.x,f.foot-278,'#ffe5b0');
  }else worldBadge('GRAND OVEN',f.x,54*T-206,'#ffe5b0');
  worldBadge('SERVICE SHELTER',102*T,50*T-18,'#d5e9e5');
- rect(79*T+10,54*T-65,3,65,'#c1a16c');rect(79*T+13,54*T-64,26,18,'#70514d');worldBadge('RETRY CHECKPOINT',79*T+14,54*T-86,'#ffe5b0');g.textAlign='left';
+ if(window.__crustDevourerPreview){rect(79*T+10,54*T-65,3,65,'#c1a16c');rect(79*T+13,54*T-64,26,18,'#70514d');worldBadge('RETRY CHECKPOINT',79*T+14,54*T-86,'#ffe5b0');}
+ else if(f.health===0&&f.timer===0)worldBadge(collected===5?'OVEN READY':'FIND ALL FIVE CULTURES',f.x,54*T-206,'#ffe5b0');
+ g.textAlign='left';
 }

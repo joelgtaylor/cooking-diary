@@ -1,9 +1,9 @@
 const{test}=require('node:test'),assert=require('node:assert/strict');const{game}=require('./game-harness.cjs');
 function trial(){const a=game();a.run('startDevourerPreview()');return a;}
 function engage(a){a.run('player.x=91*T;updateDevourer()');}
-test('Devourer trial is isolated, disguised and unannounced until approaching',()=>{
- const a=game();for(const i of [1,2,3]){a.run(`init(${i})`);assert.equal(a.run('devourerState'),null);}
- a.run('startDevourerPreview();updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('tile(80,50)'),'.');engage(a);assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.timer'),58);assert.equal(a.run('tile(80,50)'),'#');
+test('Devourer stays in Bakery 3, disguised and unannounced until approaching',()=>{
+ const a=game();for(const i of [1,2]){a.run(`init(${i})`);assert.equal(a.run('devourerState'),null);}
+ a.run('init(3)');assert.equal(a.run('devourerState.phase'),'disguise');a.run('startDevourerPreview();updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('tile(80,50)'),'.');engage(a);assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.timer'),58);assert.equal(a.run('tile(80,50)'),'#');
 });
 test('first slam has a fixed 58-tick high arc and never tracks the player after takeoff',()=>{
  const a=trial();engage(a);const target=a.run('devourerState.targetX');a.run('player.x+=140;for(let i=0;i<57;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.targetX'),target);a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.foot'),54*32);assert.equal(a.run('devourerState.x'),target);
@@ -27,8 +27,8 @@ test('boules bounce once, expire, respect stone, and fatal damage stops stale up
  a.run('devourerState.projectiles[0].life=1;updateDevourer()');assert.equal(a.run('devourerState.projectiles.length'),0);
  a.run('player.health=1;player.inv=0;devourerState.projectiles=[{x:player.x,y:player.y,w:18,h:18,vx:0,vy:0,bounces:0,life:100}];updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('devourerState.projectiles.length'),0);assert.equal(a.run('player.x'),79*32);
 });
-test('retry/restart/defeat safely reset or clear the isolated fight without changing full Bakery 3',()=>{
- const a=trial();engage(a);a.run('devourerState.health=1;hurtDevourer();hurtDevourer()');assert.equal(a.run('player.score'),2000);assert.equal(a.run('tile(80,50)'),'.');a.run('player.ammo=0;respawnCheckpoint()');assert.equal(a.run('player.ammo'),65);assert.equal(a.run('devourerState.health'),12);a.run('restart()');assert.equal(a.run('player.x'),83*32);a.run('leaveDevourerPreview()');assert.equal(a.run('devourerState'),null);assert.equal(a.run('gems.length'),5);
+test('retry/restart/defeat safely reset or clear the isolated fight while preserving full Bakery 3 progression',()=>{
+ const a=trial();engage(a);a.run('devourerState.health=1;hurtDevourer();hurtDevourer()');assert.equal(a.run('player.score'),2000);assert.equal(a.run('tile(80,50)'),'.');a.run('player.ammo=0;respawnCheckpoint()');assert.equal(a.run('player.ammo'),65);assert.equal(a.run('devourerState.health'),12);a.run('restart()');assert.equal(a.run('player.x'),83*32);a.run('leaveDevourerPreview()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('gems.length'),5);
 });
 test('pause and rendering are pure; timing is identical at 30/60/120 render fps',()=>{
  const a=trial();engage(a);const before=a.run('JSON.stringify(devourerState)');a.run("state='pause';for(let i=0;i<100;i++){updateDevourer();drawDevourer()}");assert.equal(a.run('JSON.stringify(devourerState)'),before);

@@ -71,3 +71,48 @@ HTML/save overrides for `previews/ascent/`. It starts at the second checkpoint
 with culture one banked; buttons offer the bonus roof and full Bakery 3.
 Awaiting difficulty and flow playtest. The final descent and boss integration
 remain the next phase.
+
+
+## Step 3 — final descent and the grand oven
+
+The last section now spirals through cultures four and five on broad descending
+terraces, guarded by a bounded patroller and hopper. A continuous return bridge
+leads west into a quiet service stairwell and the fourth checkpoint. Alternating
+one-way steps can be descended without a jump and climbed again with ordinary
+jumps. Two new stair landings occupy previously empty columns 76–77 below row
+36; every other tile west of column 78 is exact, including the approved summit.
+The old upper walker and arena-floor spikes are removed. The existing health
+pickup moves to the descent. First three cultures/checkpoints and all earlier
+encounters/powerups are preserved.
+
+The floor-level checkpoint restores at least three hearts, 65 ammo and one
+stored kefir charge, on first activation and retry. It is outside the boss's
+activation range. The right shelter, refreshable ammo, pogo shelf, floor and
+right wall match the approved isolated arena exactly. All overhead descent
+platforms are above the boss's maximum leap silhouette. Crossing those terraces
+cannot reveal the oven: engagement now requires proximity at oven-floor height.
+
+The Grand Devourer uses the same twelve health, attack cadence, leap arc,
+landing lock, door openings, precision pogo target and defeat sequence as the
+approved trial. It now guards normal Bakery 3 completion. The final recipe
+requires five cultures, the completed collapse, and proximity to the wreck.
+Defeat opens the entry gate so missed cultures remain recoverable. The normal
+mission restart returns to the factory entrance; isolated practice still restarts
+its arena. Regular checkpoint flags remain visible; the separate ordinary oven
+is suppressed to avoid a duplicate finish point.
+
+Ten new tests cover preserved layout boundaries, thirteen descent/walking
+segments, nine recovery jumps, actual culture collection, overhead engagement,
+checkpoint resupply/clean retry, identical arena cells, enemy counterplay, real
+shooting to twelve-health defeat, recipe gating and both restart paths. The
+historical ascent boundary test uses its frozen approved fixture; current route
+tests run against the new complete layout. Reviewed loaded-art views cover the
+terraces, service stairs, checkpoint and settled wreck. All 193 tests pass,
+including the unchanged 4,320-frame movement regression. Only Bakery 3 render
+traces change, with five dedicated finale states and the updated overview map.
+
+`tools/package-finale-preview.py OUTPUT_DIR` builds isolated save-key overrides
+for `previews/finale/`. It starts at the summit with three cultures banked. A
+final-checkpoint shortcut banks all five for immediate integrated boss testing;
+Full Bakery 3 starts the complete mission. Awaiting playtest; do not merge the
+feature branch until approved.

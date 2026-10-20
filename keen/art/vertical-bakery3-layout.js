@@ -14,9 +14,9 @@ const branches=[[13,46,8],[20,43,9],[28,39,9],[35,36,10],
 const platforms=[[0,54,105],...rise,...ridge,...descent,...branches];
 const cultures=[[12,49],[34,37],[62,20],[83,27],[99,45]];
 const checkpoints=[[9,51],[39,35],[71,18],[90,36]];
-const hazards=[[50,53],[80,53],[93,53]];
-const enemies=[[81,33,'walker']];
-const oven={x:102,y:52};
+const hazards=[[50,53]];
+const enemies=[];
+const oven={x:96,y:53};
 const altitudeTargets=[[4,54],[43,32],[70,18]];
 // Step 1 replaces only the factory entrance, columns 4..25 / rows 43..53.
 // The passage is safe; encounters occupy the roof and exit catwalks.
@@ -46,6 +46,16 @@ const ascent={
 };
 cultures[1]=[40,34];cultures[2]=[64,24];
 checkpoints[1]=[33,36];checkpoints[2]=[76,18];
+const finale={
+ platforms:[[79,22,5],[83,25,6],[89,28,6],[95,31,6],
+  [81,32,12],[78,36,2],[76,40,2],[78,44,2],[76,48,2],[78,51,2]],
+ encounters:[
+  {x:86*T,y:25*T-25,type:'walker',left:85*T,right:88*T-25,hopT:0},
+  {x:92*T,y:28*T-25,type:'hopper',left:91*T,right:94*T-25,hopT:70}
+ ]
+};
+const devourer={entry:80,checkpoint:3,floor:54};
+cultures[3]=[84,24];cultures[4]=[97,30];checkpoints[3]=[79,53];
 const sections=[
 {name:'Ashen Boilerworks',start:0,end:25,description:'low furnaces and introductory gearway'},
 {name:'Copper Lift Shafts',start:26,end:52,description:'branching boiler towers and hot pipes'},
@@ -70,6 +80,14 @@ function apply({map}){
  }
  // A short parapet keeps optional roof shots out of the summit refuge.
  for(let y=16;y<19;y++)map[y][74]='#';
+ // The upper descent stays above the boss's full jump silhouette. A westward
+ // return leads down outside the arena, past a quiet resupply checkpoint.
+ for(let y=20;y<54;y++)for(let x=78;x<105;x++)map[y][x]='.';
+ for(const [x,y,len] of finale.platforms)for(let xx=x;xx<x+len;xx++)map[y][xx]='=';
+ // Exact approved arena: one pogo shelf, right wall, and low service shelter.
+ for(let y=36;y<54;y++)map[y][104]='#';
+ for(let x=85;x<89;x++)map[51][x]='=';
+ for(let x=100;x<104;x++)map[50][x]='#';
  for(const [x,y] of hazards){
   if(map[y+1][x]!=='#'||map[y][x]==='#')throw Error('Bad furnace hazard '+x+','+y);
   map[y][x]='^';
@@ -80,12 +98,13 @@ function apply({map}){
    vx:-1.1,alive:true,type,vy:0,hopT:51}))
    .concat(entrance.encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}})))
    .concat(ascent.encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}})))
+   .concat(finale.encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}})))
    .concat([[24,43],...ascent.throwers].map(([x,y])=>({x:x*T,y:y*T-25,w:25,h:25,vx:0,vy:0,alive:true,type:'thrower',attackT:90,windup:0,face:-1}))),
-  powerups:[[12,53,'kefir'],[17,48,'cache'],[34,36,'kefir'],[61,18,'banneton'],[94,43,'rye'],[66,18,'cache'],[69,18,'cache']]
+  powerups:[[12,53,'kefir'],[17,48,'cache'],[34,36,'kefir'],[61,18,'banneton'],[90,27,'rye'],[66,18,'cache'],[69,18,'cache'],[102,53,'kefir'],[100.5,53,'ammo']]
    .map(([x,y,kind],i)=>({x:x*T+4,y:y*T,kind,got:false,ph:i*1.5}))
  };
 }
 window.CrustVerticalBakery3=Object.freeze({rows,cols,T,sections,platforms,
  cultures,checkpoints,hazards,enemies,oven,altitudeTargets,
- entrance,ascent,apply,version:'clockwork-ascent-step2'});
+ entrance,ascent,finale,devourer,apply,version:'grand-oven-finale-step3'});
 })();

@@ -1,7 +1,7 @@
 /* Non-colliding interior backing; all solid geometry is authored in the layout. */
 'use strict';
 function drawBakeryArchitecture(){
- if(bakery===3){drawFactoryEntrance();drawClockworkAscent();return;}
+ if(bakery===3){drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
  if(bakery===2){drawCavernFoothills();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
@@ -101,6 +101,19 @@ function drawClockworkAscent(){
   if(x*T+76<camera||x*T-76>camera+W||y*T+8<cameraY||y*T-12>cameraY+H)continue;
   rect(x*T-76,y*T-12,152,20,'#14212c');g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#ecd5aa';g.fillText(label,x*T,y*T+2);
  }
+ g.restore();
+}
+
+function drawFinalDescent(){
+ if(!currentVerticalLayout().finale||camera+W<78*T)return;
+ g.save();g.font='bold 10px monospace';g.textAlign='center';
+ // Small route plaques keep the quiet return leg legible against machinery.
+ for(const [x,y,label] of [[98,32,'SERVICE STAIRS ←'],[83,33,'CHECKPOINT ←'],[79,38,'OVEN FLOOR ↓']]){
+  if(x*T+70<camera||x*T-70>camera+W||y*T+9<cameraY||y*T-12>cameraY+H)continue;
+  rect(x*T-70,y*T-12,140,21,'#15212c');g.fillStyle='#ecd5aa';g.fillText(label,x*T,y*T+2);
+ }
+ // Side railing is backing only, outside the open checkpoint-to-oven path.
+ for(let y=40;y<53;y+=3){rect(77*T+5,y*T,4,2*T,'#54463c');rect(77*T+6,y*T,1,2*T,'#b48c55');}
  g.restore();
 }
 

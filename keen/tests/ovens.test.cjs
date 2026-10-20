@@ -11,7 +11,7 @@ test('each oven uses its own art and rests on its authored supporting surface',(
   const {run,trace}=setup(stage);trace.length=0;run('drawGrandOven()');
   const draw=trace.find(c=>c[0]==='drawImage'&&c[1]?.image===hash);
   assert.equal(draw[2],(stage-1)*96);
-  assert.deepEqual(trace.find(c=>c[0]==='translate'),['translate',102*32-8,54*32-115]);
+  assert.deepEqual(trace.find(c=>c[0]==='translate'),['translate',(stage===3?96:102)*32-8,54*32-115]);
  }
 });
 test('ready artwork preserves the structure, game state and completion trigger',()=>{
