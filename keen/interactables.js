@@ -1,6 +1,32 @@
 /* Rendering-only feedback. Pickup/checkpoint rules remain in gameplay/world.js. */
 'use strict';
 const pickupVisuals=new WeakMap(),checkpointVisuals=new WeakMap();
+
+/* Approved culture / kefir art audition. Opt-in keeps the reviewed default
+ * render path intact until playtesting is approved. All pickup rules stay put.
+ */
+let pickupIdentityArt=null;
+const PICKUP_IDENTITY_SPRITES=Object.freeze({
+ culture:Object.freeze({sx:96,sy:96,sw:752,sh:744,w:34,h:34}),
+ kefir:Object.freeze({sx:1200,sy:40,sw:272,sh:816,w:16,h:40})
+});
+function drawIdentityPickup(kind,cx,cy){
+ if(!window.location||!/(?:^|[?&])pickups=pilot(?:&|$)/.test(window.location.search||''))return false;
+ const sprite=PICKUP_IDENTITY_SPRITES[kind];
+ if(!sprite)return false;
+ if(!pickupIdentityArt){
+  pickupIdentityArt=new Image();
+  pickupIdentityArt.src='art/culture-kefir-pickups.png';
+ }
+ // Keep original artwork AND labels on loading/error, never an invisible item.
+ if(!pickupIdentityArt.complete||pickupIdentityArt.naturalWidth!==1774||pickupIdentityArt.naturalHeight!==887)return false;
+ g.save();g.imageSmoothingEnabled=false;
+ g.drawImage(pickupIdentityArt,sprite.sx,sprite.sy,sprite.sw,sprite.sh,
+  Math.round(cx-sprite.w/2),Math.round(cy-sprite.h/2),sprite.w,sprite.h);
+ g.restore();
+ return true;
+}
+
 function worldBadge(text,cx,y,accent){
  const width=text.length*6+10,x=Math.round(cx-width/2);y=Math.round(y);
  g.save();g.fillStyle='#101426';g.fillRect(x-1,y-1,width+2,15);
@@ -46,14 +72,16 @@ function drawYeastCollectibles(){
   g.fillStyle=halo;g.beginPath();g.arc(cx,cy-6,23,0,Math.PI*2);g.fill();
   g.fillStyle='rgba(12,15,34,.55)';g.beginPath();g.ellipse(cx,cy-6,14,18,0,0,Math.PI*2);g.fill();
   g.imageSmoothingEnabled=false;
-  if(envReady)g.drawImage(env,192,0,64,64,Math.round(gem.x-13),cy-23,30,34);
+  const identity=drawIdentityPickup('culture',cx,cy-6);
+  if(identity){/* The broad cloth-covered jar identifies the required culture. */}
+  else if(envReady)g.drawImage(env,192,0,64,64,Math.round(gem.x-13),cy-23,30,34);
   else if(assets.items.complete&&assets.items.naturalWidth)g.drawImage(assets.items,0,0,32,32,Math.round(gem.x-9),cy-13,32,32);
   else rect(Math.round(gem.x),cy,18,18,'#f8d994');
   // Fixed glints replace orbiting crosses, reducing motion around small targets.
   g.globalAlpha=.65+pulse*.35;g.fillStyle='#fff4bf';
   for(const [dx,dy]of [[-19,-10],[19,3]]){g.fillRect(cx+dx-2,cy+dy,5,1);g.fillRect(cx+dx,cy+dy-2,1,5);}
   g.restore();
-  worldBadge('YEAST',cx,gem.y-46,'#edc775');
+  if(!identity)worldBadge('YEAST',cx,gem.y-46,'#edc775');
  }
 }
 function checkpointVisual(){
