@@ -17,6 +17,6 @@ The three scores and instrument settings match the approved previews/audio/audit
 ## Validation
 Twelve targeted fake-Web-Audio/facade checks were executed in the available JavaScript runtime. These cover score equivalence, theme switching, timer uniqueness, pause/resume, master mute, hidden tabs, delayed resume cancellation, cooldown/voice limits, relay pitches, every existing effect name, gesture unlock and graceful failure.
 
-The normal Node suite and real browser checks must also run before treating the integration as fully validated. The previous 196 gameplay + 5 audition passes predate this integration. The repository workflow runs those suites together with the new production audio tests. A complete audible playthrough remains a human review item; fake graph checks cannot validate mix or listening comfort.
+The GitHub Node regression workflow passed at 5af64314f807a11cdd630ef86bcb458ad06a8df7, running the complete gameplay suite, new production audio tests and audition tests together. This validates the integration rather than relying on the earlier audition-only run. The local execution environment and browser were unavailable during integration, so real integrated playback and a complete audible playthrough remain human review items; fake graph checks cannot validate mix or listening comfort.
 
 No geometry, physics, camera, boss behavior, progression, saves, artwork or sound-event trigger locations were changed.
