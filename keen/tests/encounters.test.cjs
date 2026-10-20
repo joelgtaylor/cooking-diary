@@ -27,3 +27,27 @@ test('roof hopper uses the existing pogo stomp and reward',()=>{
  const a=game();a.run('var e=enemies[4];e.vx=0;e.hopT=100;player.x=e.x;player.y=e.y-player.h+4;player.vy=2;pogoOn=true;updateEnemies();');
  assert.equal(a.run('enemies[4].alive'),false);assert.equal(a.run('player.vy'),-11);assert.equal(a.run('player.score'),150);
 });
+
+test('lower ascension walker stands on its shelf and patrols without sinking or jittering',()=>{
+ const {run}=game();
+ run('player.x=0;var lowerWalker=enemies[0],positions=new Set();');
+ assert.equal(run('lowerWalker.y+lowerWalker.h'),45*32);
+ assert.equal(run('contactSurface(lowerWalker)'),45*32);
+ for(let i=0;i<900;i++){
+  run('updateEnemies();positions.add(Math.round(lowerWalker.x));');
+  assert.equal(run('contactSurface(lowerWalker)'),45*32);
+  assert.equal(run('lowerWalker.alive&&lowerWalker.x>=lowerWalker.encounter.left&&lowerWalker.x<=lowerWalker.encounter.right'),true);
+ }
+ assert.ok(run('positions.size')>100,'walker should cross the shelf, not reverse every frame');
+});
+test('corrected lower ascension walker remains shootable and pogo-stompable',()=>{
+ const a=game();
+ a.run('player.x=enemies[0].x-55;player.y=enemies[0].y+12-19;player.face=1;updateProjectiles(true);for(let i=0;i<5;i++)updateProjectiles(false);');
+ assert.equal(a.run('enemies[0].alive'),false);
+ assert.equal(a.run('player.score'),100);
+ const b=game();
+ b.run('var lowerWalker=enemies[0];lowerWalker.vx=0;player.x=lowerWalker.x;player.y=lowerWalker.y-player.h+4;player.vy=2;pogoOn=true;updateEnemies();');
+ assert.equal(b.run('enemies[0].alive'),false);
+ assert.equal(b.run('player.score'),150);
+ assert.equal(b.run('player.vy'),-11);
+});

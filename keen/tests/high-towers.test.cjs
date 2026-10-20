@@ -3,6 +3,8 @@ const assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 test('High Towers preserves both approved slices and all geometry outside the tower section',()=>{
  const a=game(),b=game({}, {layoutFixture:'bakery1-ascension.js'});const am=a.run('map'),bm=b.run('map');
+ // Historical fixture retains the sunk walker; allow only its reviewed placement/patrol fix.
+ b.run('enemies[0].y-=enemies[0].h;enemies[0].encounter={left:25*T,right:32*T-25};');
  for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok((x>=53&&x<=77&&y>=16&&y<=37)||(x>=78&&x<=104&&y>=20&&y<=53));
  for(const q of ['gems.slice(0,3)','checkpointState.spawns.slice(0,2)','enemies.slice(0,6).filter((e,i)=>i!==2)','powerups'])assert.equal(a.run(`JSON.stringify(${q})`),b.run(`JSON.stringify(${q})`));
 });
