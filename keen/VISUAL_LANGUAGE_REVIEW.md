@@ -1,5 +1,5 @@
 # Crust Quest — Visual Language Review
-Status: proposal only, 20 October 2026. Branch: design/keen-world-polish.
+Status: concept direction approved; first entry pilot rejected and reverted, 20 October 2026. Branch: design/keen-world-polish.
 No production code, layouts, audio, enemy or boss rules changed.
 
 ## Evidence and limits
@@ -71,3 +71,7 @@ Playable pilot and source-based before/after screenshots are pending approval an
 
 ## Review decision
 Approve or adjust direction A and the ten meanings before rendering changes. Then implement only the entry checkpoint/culture pilot. Do not start enemy/world redesign.
+
+
+## Authoritative pilot review correction
+The entry pilot was rejected. Preserve existing animated checkpoint flags and their distinctive activation change completely; checkpoint concept sketches above are not authorization to replace them. Restore original culture artwork and badge for now: removing a single badge was not a meaningful visual comparison. The entry pilot recommendation above is superseded. Next candidate is an existing text-heavy route fork in B2/B3, with explicit before/after review before artwork implementation. Do not extend the rejected pilot. See ENTRY_INDICATOR_PILOT.md.
