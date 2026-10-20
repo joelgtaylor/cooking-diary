@@ -62,3 +62,13 @@ test('repeat attacks leave a full cooling beat, warn early, cap travel and never
 test('ordinary movement during the repeat warning creates separation before the locked landing',()=>{
  const a=trial();a.run("devourerState.cycle=1;devourerState.x=96*T;player.x=devourerState.x-110;queueDevourerSlam(devourerState);keys={left:true};for(let i=0;i<135;i++)update();");assert.equal(a.run('player.health'),3);assert.ok(a.run('Math.abs(player.x+player.w/2-devourerState.x)')>160);assert.equal(a.run('devourerState.phase'),'landing');
 });
+
+test('the moving airborne boss exposes its furnace throughout ascent and descent, then closes on landing',()=>{
+ const a=trial();engage(a);a.run('player.x=devourerState.targetX-player.w/2;keys={jump:true,shoot:true};');let hit=false;
+ for(let n=0;n<58;n++){assert.equal(a.run('devourerOpen(devourerState)'),true);a.run('update()');if(a.run('devourerState.health<12'))hit=true;}
+ assert.ok(hit,'ordinary upward firing must hit the moving boss before landing');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerOpen(devourerState)'),false);
+ a.run("devourerState.phase='recovery';devourerState.timer=84");assert.equal(a.run('devourerOpen(devourerState)'),true);
+});
+test('an airborne defeat falls to the floor and rewards only once',()=>{
+ const a=trial();engage(a);a.run('for(let i=0;i<24;i++)updateDevourer();devourerState.health=1;hurtDevourer();');assert.ok(a.run('devourerState.foot<54*T'));a.run('for(let i=0;i<96;i++)updateDevourer();hurtDevourer()');assert.equal(a.run('devourerState.foot'),54*32);assert.equal(a.run('devourerState.health'),0);assert.equal(a.run('player.score'),2000);
+});

@@ -6,7 +6,7 @@ The boss and shelter remain isolated behind `startDevourerPreview()`. Normal Bak
 
 Approaching within205px transforms the oven with no warning text. First takeoff locks its destination; later leaps retain the48-tick visible target warning,160px travel cap,60-tick cooling phase,30-tick landing pause, five-boule barrage and108-tick recovery (24pressure-release,60open,24sealed). Health stays12. No barrage or damage reduction.
 
-The leap now rises380px instead of190. Ascent speed is retained by doubling ascent time:24ticks for the ambush,36 for repeats. Descent takes34/51ticks, giving about70% of the former average downward speed. Total flights58/87ticks. An above-screen cue and landing stripe maintain readability when the massive sprite leaves the viewport. The collision body remains112×148. The exposed furnace is93×96 and accepts horizontal shots through its door or upward shots through the leg gap while open; closed armor still blocks both.
+The leap now rises380px instead of190. Ascent speed is retained by doubling ascent time:24ticks for the ambush,36 for repeats. Descent takes34/51ticks, giving about70% of the former average downward speed. Total flights58/87ticks. An above-screen cue and landing stripe maintain readability when the massive sprite leaves the viewport. The collision body remains112×148. The exposed furnace is93×96 and accepts horizontal shots through its door or upward shots through the leg gap while open; closed armor still blocks both. The door is open throughout ascent and descent, closes on landing, and reopens in recovery. Airborne defeats fall to the floor rather than freezing in midair.
 
 A solid steel roof at columns100..103,row50 provides a96px-high service shelter, open on the left. Baker38px fits; boss148px cannot. Landing/body bounds stop the boss outside the opening. Real solid-tile collision blocks boules and player bullets through the roof. The shelter contains a kefir bottle. Preview start/retry supplies at least one stored charge and65ammo. No invulnerability is granted by the shelter or dash.
 
@@ -30,7 +30,7 @@ Exact built-in imagegen prompt:
 
 ## Validation and packaging
 
-160 tests pass. The19 combined boss/player-kit tests cover isolation, high asymmetric arc, target locks, repeat pacing, exact firing rate, upward controls/door damage, stored/activated kefir with keyboard/touch/pause/death, actual shelter clearance/boule protection, bullet admission from both directions, real airborne horizontal shooting, defeat with starting ammo, and equal30/60/120fps battle timing.
+162 tests pass. The21 combined boss/player-kit tests cover isolation, high asymmetric arc, target locks, repeat pacing, exact firing rate, upward controls/door damage, stored/activated kefir with keyboard/touch/pause/death, actual shelter clearance/boule protection, bullet admission from both directions, real airborne horizontal shooting, defeat with starting ammo, and equal30/60/120fps battle timing.
 
 Ten isolated Devourer render cases are reviewed in both baselines; all prior non-Devourer render traces remain unchanged. All4320 historical-layout simulation frames are re-reviewed for the explicitly requested global firing/aim changes. Re-running the prior player modules reproduced every previous hash before updating the baseline; the historical levels and default movement constants are unchanged. These traces no longer claim pre-extraction combat equivalence.
 

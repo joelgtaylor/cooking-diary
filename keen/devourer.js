@@ -27,7 +27,7 @@ function startDevourerPreview(){
 function leaveDevourerPreview(){window.__crustDevourerPreview=false;init(3);}
 function devourerBody(f){return {x:f.x-56,y:f.foot-148,w:112,h:148};}
 function devourerMouth(f){return {x:f.x-56,y:f.foot-148,w:93,h:96};}
-function devourerOpen(f){return f.phase==='recovery'&&f.timer<=84&&f.timer>24;}
+function devourerOpen(f){return f.phase==='slam'||(f.phase==='recovery'&&f.timer<=84&&f.timer>24);}
 function queueDevourerSlam(f){
  f.phase='windup';f.timer=48;
  const wanted=devourerLandingX(player.x+player.w/2);
@@ -43,7 +43,7 @@ function startDevourerSlam(f){
 function hurtDevourer(){
  const f=devourerState;if(!f||f.health<=0||f.inv)return false;
  f.health--;f.inv=18;AudioKit.effect('enemy');burst(f.x,f.foot-85,'#ffe5aa',5);
- if(!f.health){f.phase='defeated';f.timer=96;f.projectiles=[];devourerGate(false);if(!checkpointState.devourerRewarded){checkpointState.devourerRewarded=true;player.score+=2000;}AudioKit.effect('win');floater(f.x,f.foot-190,'DEVOURER DEFEATED!','#fff0b5');}
+ if(!f.health){f.phase='defeated';f.timer=96;f.defeatVy=0;f.projectiles=[];devourerGate(false);if(!checkpointState.devourerRewarded){checkpointState.devourerRewarded=true;player.score+=2000;}AudioKit.effect('win');floater(f.x,f.foot-190,'DEVOURER DEFEATED!','#fff0b5');}
  return true;
 }
 function hitDevourerShot(s){
@@ -71,7 +71,7 @@ function updateDevourerBoules(f){
 function updateDevourer(){
  const f=devourerState;if(!f||!devourerArena()||state!=='play')return;
  if(f.inv)f.inv--;if(f.clang)f.clang--;
- if(f.health<=0){if(f.timer)f.timer--;return;}
+ if(f.health<=0){if(f.timer)f.timer--;if(f.foot<54*T){f.defeatVy=Math.min(10,(f.defeatVy||0)+.65);f.foot=Math.min(54*T,f.foot+f.defeatVy);}return;}
  if(f.phase==='disguise'){
   if(Math.abs(player.x+player.w/2-f.x)<205){devourerGate(true);startDevourerSlam(f);}return;
  }
