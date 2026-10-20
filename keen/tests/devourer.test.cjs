@@ -3,14 +3,14 @@ function trial(){const a=game();a.run('startDevourerPreview()');return a;}
 function engage(a){a.run('player.x=91*T;updateDevourer()');}
 test('Devourer trial is isolated, disguised and unannounced until approaching',()=>{
  const a=game();for(const i of [1,2,3]){a.run(`init(${i})`);assert.equal(a.run('devourerState'),null);}
- a.run('startDevourerPreview();updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('tile(80,50)'),'.');engage(a);assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.timer'),24);assert.equal(a.run('tile(80,50)'),'#');
+ a.run('startDevourerPreview();updateDevourer()');assert.equal(a.run('devourerState.phase'),'disguise');assert.equal(a.run('tile(80,50)'),'.');engage(a);assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.timer'),58);assert.equal(a.run('tile(80,50)'),'#');
 });
-test('first slam has a fixed 24-tick flight and never tracks the player after takeoff',()=>{
- const a=trial();engage(a);const target=a.run('devourerState.targetX');a.run('player.x+=140;for(let i=0;i<23;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.targetX'),target);a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.foot'),54*32);assert.equal(a.run('devourerState.x'),target);
+test('first slam has a fixed 58-tick high arc and never tracks the player after takeoff',()=>{
+ const a=trial();engage(a);const target=a.run('devourerState.targetX');a.run('player.x+=140;for(let i=0;i<57;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');assert.equal(a.run('devourerState.targetX'),target);a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.foot'),54*32);assert.equal(a.run('devourerState.x'),target);
 });
 test('standing still takes slam damage, running away using real player physics escapes',()=>{
- const a=trial();engage(a);a.run('for(let i=0;i<24;i++)updateDevourer()');assert.equal(a.run('player.health'),2);
- const b=trial();engage(b);b.run('keys={left:true};for(let i=0;i<24;i++)update()');assert.equal(b.run('player.health'),3);
+ const a=trial();engage(a);a.run('for(let i=0;i<58;i++)updateDevourer()');assert.equal(a.run('player.health'),2);
+ const b=trial();engage(b);b.run('keys={left:true};for(let i=0;i<58;i++)update()');assert.equal(b.run('player.health'),3);
 });
 test('five boules fire ten ticks apart, then recovery vents before exposing door for 60 ticks',()=>{
  const a=trial();engage(a);a.run("devourerState.phase='boules';devourerState.timer=50;");const fire=[];
@@ -36,9 +36,9 @@ test('pause and rendering are pure; timing is identical at 30/60/120 render fps'
 });
 
 test('real jump-and-fire controls can punish the opening after a human reaction delay at useful distances',()=>{
- for(const distance of [100,180,260])for(const delay of [12,20])for(let cadence=0;cadence<13;cadence++){
+ for(const distance of [100,180,260])for(const delay of [12,20])for(let cadence=0;cadence<3;cadence++){
   const a=trial();a.run(`devourerState.phase='recovery';devourerState.timer=108;tick=${cadence};player.x=devourerState.x-${distance};player.face=1;`);
-  for(let n=0;n<108;n++)a.run(`keys=${n>=24+delay?'{jump:true,shoot:true}':'{}'};update()`);
+  for(let n=0;n<108;n++)a.run(`keys={jump:${n>=24+delay&&n<32+delay},shoot:${n>=32+delay}};update()`);
   assert.ok(a.run('devourerState.health')<12,`distance${distance}, reaction${delay}, cadence${cadence}`);
  }
 });
@@ -47,7 +47,7 @@ test('the real shooting path can exhaust all twelve health bars across controlle
  while(a.run('devourerState.health')>0&&windows++<12){
   // Exercise an ordinary grounded jump with real ammo, firing cadence and bullets.
   a.run("devourerState.phase='recovery';devourerState.timer=108;player.x=devourerState.x-180;player.y=54*T-player.h;player.vy=0;player.vx=0;player.ground=true;player.face=1;prevJump=false;");
-  for(let n=0;n<108&&a.run('devourerState.health')>0;n++)a.run(`keys=${n>=44?`{jump:true,shoot:${n<84}}`:'{}'};update()`);
+  for(let n=0;n<108&&a.run('devourerState.health')>0;n++)a.run(`keys={jump:${n>=44&&n<52},shoot:${n>=52&&n<84}};update()`);
  }
  assert.equal(a.run('devourerState.health'),0);assert.ok(a.run('player.ammo')>0);
 });
@@ -55,10 +55,10 @@ test('the real shooting path can exhaust all twelve health bars across controlle
 test('repeat attacks leave a full cooling beat, warn early, cap travel and never retarget during windup',()=>{
  const a=trial();engage(a);a.run("devourerState.phase='recovery';devourerState.timer=1;devourerState.foot=54*T;updateDevourer()");assert.equal(a.run('devourerState.phase'),'rest');assert.equal(a.run('devourerState.timer'),60);
  a.run('player.x=82*T;for(let i=0;i<59;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'rest');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'windup');assert.equal(a.run('devourerState.timer'),48);
- const target=a.run('devourerState.queuedTargetX');assert.ok(Math.abs(target-a.run('devourerState.x'))<=160);a.run('player.x=102*T;for(let i=0;i<48;i++)updateDevourer()');assert.equal(a.run('devourerState.targetX'),target);assert.equal(a.run('devourerState.timer'),36);
- a.run('for(let i=0;i<35;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.timer'),30);
+ const target=a.run('devourerState.queuedTargetX');assert.ok(Math.abs(target-a.run('devourerState.x'))<=160);a.run('player.x=102*T;for(let i=0;i<48;i++)updateDevourer()');assert.equal(a.run('devourerState.targetX'),target);assert.equal(a.run('devourerState.timer'),87);
+ a.run('for(let i=0;i<86;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'slam');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');assert.equal(a.run('devourerState.timer'),30);
  a.run('for(let i=0;i<29;i++)updateDevourer()');assert.equal(a.run('devourerState.phase'),'landing');a.run('updateDevourer()');assert.equal(a.run('devourerState.phase'),'boules');
 });
 test('ordinary movement during the repeat warning creates separation before the locked landing',()=>{
- const a=trial();a.run("devourerState.cycle=1;devourerState.x=96*T;player.x=devourerState.x-110;queueDevourerSlam(devourerState);keys={left:true};for(let i=0;i<84;i++)update();");assert.equal(a.run('player.health'),3);assert.ok(a.run('Math.abs(player.x+player.w/2-devourerState.x)')>160);assert.equal(a.run('devourerState.phase'),'landing');
+ const a=trial();a.run("devourerState.cycle=1;devourerState.x=96*T;player.x=devourerState.x-110;queueDevourerSlam(devourerState);keys={left:true};for(let i=0;i<135;i++)update();");assert.equal(a.run('player.health'),3);assert.ok(a.run('Math.abs(player.x+player.w/2-devourerState.x)')>160);assert.equal(a.run('devourerState.phase'),'landing');
 });

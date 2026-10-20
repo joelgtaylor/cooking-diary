@@ -16,7 +16,7 @@ if(player.hang){
  return;
 }
 if(player.climb>0)player.climb--;
-let left=keys.left||keys.ArrowLeft||keys.a,right=keys.right||keys.ArrowRight||keys.d,jump=keys.jump||keys[' ']||keys.ArrowUp||keys.w,shoot=keys.shoot||keys.x||keys.k;let pogoKey=!!(keys.c||keys.C);if(pogoKey&&!prevPogo)togglePogo();prevPogo=pogoKey;let spd=player.speedT>0?5.4:3.6;let target=(right?spd:0)-(left?spd:0);player.vx+=(target-player.vx)*(player.ground?.24:.13);if(Math.abs(player.vx)<.035)player.vx=0;if(player.vx)player.face=Math.sign(player.vx);if(player.ground)player.coyote=7;else player.coyote=Math.max(0,(player.coyote||0)-1);if(jump&&!prevJump)player.buffer=9;else player.buffer=Math.max(0,(player.buffer||0)-1);if(player.buffer&&player.coyote){player.vy=pogoOn?-12.8:-10.7;player.ground=false;player.coyote=0;player.buffer=0;AudioKit.effect(pogoOn?'pogo':'jump')}if(jump&&player.vy<0)player.vy-=.16;else if(!jump&&player.vy< -3)player.vy+=.30;prevJump=!!jump;player.vy=Math.min(10.8,player.vy+.49);let nx=player.x+player.vx;
+let left=keys.left||keys.ArrowLeft||keys.a,right=keys.right||keys.ArrowRight||keys.d,jump=keys.jump||keys[' ']||keys.ArrowUp||keys.w,shoot=keys.shoot||keys.x||keys.k;let pogoKey=!!(keys.c||keys.C);if(pogoKey&&!prevPogo)togglePogo();prevPogo=pogoKey;let spd=player.speedT>0?8.1:3.6;let target=(right?spd:0)-(left?spd:0);player.vx+=(target-player.vx)*(player.ground?.24:.13);if(Math.abs(player.vx)<.035)player.vx=0;if(player.vx)player.face=Math.sign(player.vx);if(player.ground)player.coyote=7;else player.coyote=Math.max(0,(player.coyote||0)-1);if(jump&&!prevJump)player.buffer=9;else player.buffer=Math.max(0,(player.buffer||0)-1);if(player.buffer&&player.coyote){player.vy=pogoOn?-12.8:-10.7;player.ground=false;player.coyote=0;player.buffer=0;AudioKit.effect(pogoOn?'pogo':'jump')}if(jump&&player.vy<0)player.vy-=.16;else if(!jump&&player.vy< -3)player.vy+=.30;prevJump=!!jump;player.vy=Math.min(10.8,player.vy+.49);let nx=player.x+player.vx;
 if(!hit(nx,player.y,player.w,player.h))player.x=nx;
 else if(player.vy>=-1&&!pogoOn&&Math.abs(player.vx)>.4){
  // Catch the upper lip of a wall if the head/raised hand just reaches it.
@@ -76,5 +76,5 @@ if(supported){
   else if(player.vy<0)player.y=Math.floor((player.y+player.vy)/T+1)*T;
   player.ground=player.vy>0;player.vy=0;
  }
-}if(!wasG&&player.ground)myceliumLanding(pogoOn);if(!wasG&&player.ground&&fallV>6)burst(player.x+14,player.y+player.h,'#e8dcc8',8);if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false;player.coyote=0;burst(player.x+15,player.y+player.h,'#9af3fa',3);AudioKit.effect('pogo')}return {shoot};
+}if(!wasG&&player.ground)myceliumLanding(pogoOn);if(!wasG&&player.ground&&fallV>6)burst(player.x+14,player.y+player.h,'#e8dcc8',8);if(pogoOn&&player.ground){player.vy=-12.3;player.ground=false;player.coyote=0;burst(player.x+15,player.y+player.h,'#9af3fa',3);AudioKit.effect('pogo')}return {shoot,aimUp:!!jump};
 }

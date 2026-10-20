@@ -1,12 +1,22 @@
-# Grand Devourer — isolated first fight prototype
+# Grand Devourer — tactical player kit prototype
 
-Enabled only by `startDevourerPreview()`. Normal Bakery 3 layout, all existing world render traces, player physics/camera/input/music/recipes remain unchanged. No normal-player prototype buttons. `leaveDevourerPreview()` restores the authored level.
+The boss and shelter remain isolated behind `startDevourerPreview()`. Normal Bakery 3 geometry is unchanged. The user-approved faster firing, upward aim and stored kefir controls are shared by all three worlds; regular movement speed, jump physics, camera, music, recipes and existing layouts remain intact. `leaveDevourerPreview()` restores the authored level with the new player controls.
 
-The apparently safe grand oven has no boss health banner. Approaching within 205px launches the transformation/slam immediately, with no warning text. Takeoff locks the player's horizontal position, bounded to the arena. A 24-tick sine flight rises190px, then impacts with a112×148 body box; a landing stripe and shadow show the locked target. Existing movement from rest can narrowly escape. Repeat slams get a48-tick piston cue with a visible landing stripe; the target locks at cue start and travel is capped at160px. Their flight lasts36ticks rather than the first ambush’s24. A60-tick cooling phase after recovery gives room to reposition before that cue.
+## Battle and shelter
 
-After a30-tick landing, five flaming boules fire10 ticks apart. They arc under gravity, bounce once, collide with solid walls, expire and respect player invulnerability. A108-tick recovery follows:24ticks of pressure release,60ticks with the door open, then24ticks sealed before the piston cue. The vent extinguishes remaining boules at opening, giving a clean counterattack. The exposed mouth is93×96px, tall enough to intersect an ordinary held jump reliably despite the13-tick player firing cadence. Shots can travel through the outer body to the exposed mouth; armor elsewhere consumes them with a clang. Mouth requires a jump or the96px maintenance shelves. Boss12HP,18-tick hit protection. Three player hearts,65ammo. Retry checkpoint outside entry restores ammo and resets fight/projectiles. Defeat opens entry and gives2000points once per attempt; final defeat animation follows in pass3.
+Approaching within205px transforms the oven with no warning text. First takeoff locks its destination; later leaps retain the48-tick visible target warning,160px travel cap,60-tick cooling phase,30-tick landing pause, five-boule barrage and108-tick recovery (24pressure-release,60open,24sealed). Health stays12. No barrage or damage reduction.
 
-The prototype deliberately excludes kefir spray, the small top pogo weak point, enrage tuning and level integration. The pale ceramic cap is visible artwork, not yet an active target. No half-health modifiers yet.
+The leap now rises380px instead of190. Ascent speed is retained by doubling ascent time:24ticks for the ambush,36 for repeats. Descent takes34/51ticks, giving about70% of the former average downward speed. Total flights58/87ticks. An above-screen cue and landing stripe maintain readability when the massive sprite leaves the viewport. The collision body remains112×148. The exposed furnace is93×96 and accepts horizontal shots through its door or upward shots through the leg gap while open; closed armor still blocks both.
+
+A solid steel roof at columns100..103,row50 provides a96px-high service shelter, open on the left. Baker38px fits; boss148px cannot. Landing/body bounds stop the boss outside the opening. Real solid-tile collision blocks boules and player bullets through the roof. The shelter contains a kefir bottle. Preview start/retry supplies at least one stored charge and65ammo. No invulnerability is granted by the shelter or dash.
+
+## Shared player controls
+
+- Fire period26/3ticks (8/9-tick spacing), exactly50% faster than13ticks. A shot can fire immediately when ready; release/restart cannot accumulate burst credit.
+- Holding jump+shoot fires straight up. Release jump to shoot horizontally while airborne; normal jump physics are unchanged. Upward bullets hit solid tiles, enemies and boss weak points and expire above the map.
+- Kefir pickups add stored charges and do not start a boost. V or the contextual touch button consumes one charge for the existing480-tick duration. Speed is8.1px/tick,50% above the previous5.4; ordinary speed stays3.6. Pausing does not consume charges/time; repeated activation cannot stack the active boost. Death ends the active boost and preserves unused charges.
+
+Kefir spray, precision pogo weak point, enrage tuning, final defeat animation and full level integration are still deferred. The pale ceramic cap is artwork, not an active target yet.
 
 ## Artwork
 
@@ -20,6 +30,8 @@ Exact built-in imagegen prompt:
 
 ## Validation and packaging
 
-153 tests pass, including12 battle tests: isolation/trigger, fixed takeoff target/flight, damage versus real-movement escape, exact boule cadence/vent/door duration, real jump-and-fire damage from100/180/260px after12/20-tick reaction delays across all13 firing-cadence offsets, full12HP damage with the starting ammo over controlled repeated openings, actual moving bullets from both directions, projectile/fatal-respawn cleanup, checkpoint/restart/defeat, real-movement separation during repeat warning, capped travel/early aim lock, cooling/landing/cue/flight pacing and render purity/identical30/60/120fps timing. Eight isolated Devourer trace cases are reviewed in both baselines; all prior traces unchanged, historical4320 movement frames unchanged.
+160 tests pass. The19 combined boss/player-kit tests cover isolation, high asymmetric arc, target locks, repeat pacing, exact firing rate, upward controls/door damage, stored/activated kefir with keyboard/touch/pause/death, actual shelter clearance/boule protection, bullet admission from both directions, real airborne horizontal shooting, defeat with starting ammo, and equal30/60/120fps battle timing.
 
-Build: `python keen/tools/package-devourer-preview.py /absolute/output.zip`. All scripts and literal art URLs embed in `Bakery-3.html`. Native canvas QA renders the actual embedded HTML and rejects external asset URLs; disguise, flight, boules and door checked. Preview toolbar is above the game to avoid hiding the floor. Readme documents scope and controls. Do not merge until approved.
+Ten isolated Devourer render cases are reviewed in both baselines; all prior non-Devourer render traces remain unchanged. All4320 historical-layout simulation frames are re-reviewed for the explicitly requested global firing/aim changes. Re-running the prior player modules reproduced every previous hash before updating the baseline; the historical levels and default movement constants are unchanged. These traces no longer claim pre-extraction combat equivalence.
+
+Build: `python keen/tools/package-devourer-preview.py /absolute/output.zip`. All scripts and literal art URLs embed in `Bakery-3.html`. Native canvas QA renders the actual embedded HTML and rejects external asset URLs. Toolbar is above the game. Do not merge until approved.

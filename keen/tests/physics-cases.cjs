@@ -1,6 +1,6 @@
 const {createHash}=require('node:crypto');
 const {game}=require('./game-harness.cjs');
-// Deterministic frame traces captured before extracting physics/combat.
+// Deterministic historic-layout traces; player-kit fire/aim changes were reviewed explicitly.
 function physicsCases(options={}){
  const output={};
  for(let stage=1;stage<=3;stage++)for(const mode of ['traversal','pogo','shoot','hang','shield','pickups']){
