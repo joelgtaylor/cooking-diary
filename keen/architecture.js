@@ -1,7 +1,7 @@
 /* Non-colliding interior backing; all solid geometry is authored in the layout. */
 'use strict';
 function drawBakeryArchitecture(){
- if(bakery===3){drawFactoryEntrance();return;}
+ if(bakery===3){drawFactoryEntrance();drawClockworkAscent();return;}
  if(bakery===2){drawCavernFoothills();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
@@ -72,6 +72,35 @@ function drawFactoryEntrance(){
  // Exit wayfinding sits outside the combat silhouettes.
  rect(21*T,44*T+7,4*T,20,'#15202a');g.fillStyle='#f4d5a0';
  g.fillText('LIFT SHAFT ↑',23*T,44*T+21);
+ g.restore();
+}
+
+function drawClockworkAscent(){
+ const a=currentVerticalLayout().ascent;if(!a||camera+W<26*T||camera>78*T)return;
+ g.save();
+ for(const r of a.rooms){
+  const x=r.x*T,y=r.y*T,w=r.w*T,h=r.h*T;
+  if(x+w<camera||x>camera+W||y+h<cameraY||y>cameraY+H)continue;
+  rect(x+T,y+T,w-2*T,h-T,'#16222d');
+  for(let col=1;col<r.w-1;col++){
+   const px=x+col*T;
+   rect(px,y+T,2,h-T,'#46525f');rect(px+2,y+T,1,h-T,'#0c1721');
+   for(const py of [y+T+6,y+h-9]){rect(px+6,py,3,3,'#a39170');rect(px+23,py,3,3,'#65717b');}
+  }
+  for(const col of [2,6]){
+   const px=x+col*T;
+   rect(px,y+2*T,26,40,'#0c1620');rect(px+3,y+2*T+3,20,34,'#67523c');
+   rect(px+5,y+2*T+5,16,11,'#e3ba72');rect(px+12,y+2*T+4,3,33,'#353f47');
+  }
+  rect(x+T+8,y+h-15,w-2*T-16,7,'#403b34');rect(x+T+8,y+h-15,w-2*T-16,2,'#ac8551');
+  g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#e8d6b5';g.fillText(r.name,x+w/2,y+T+15);
+  for(const dx of [r.x,r.x+r.w-1]){rect(dx*T,(r.y+r.h-3)*T-6,T,6,'#ac8551');rect(dx*T+3,(r.y+r.h-3)*T-6,T-6,2,'#edcfa0');}
+ }
+ // Shapes/arrows and explicit words distinguish the optional loop from cultures.
+ for(const [x,y,label] of [[55,27,'MAIN → / CULTURES'],[55,26,'BONUS ↑ / DANGER'],[76,17,'DESCENT →']]){
+  if(x*T+76<camera||x*T-76>camera+W||y*T+8<cameraY||y*T-12>cameraY+H)continue;
+  rect(x*T-76,y*T-12,152,20,'#14212c');g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#ecd5aa';g.fillText(label,x*T,y*T+2);
+ }
  g.restore();
 }
 

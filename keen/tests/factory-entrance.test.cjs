@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 function level(options={}){const a=game({},options);a.run('init(3)');return a;}
 test('factory entrance preserves later geometry, cultures, checkpoints and existing enemies',()=>{
- const a=level(),b=level({layoutFixture3:'bakery3-original.js'}),am=a.run('map'),bm=b.run('map');
+ const a=level({layoutFixture3:'bakery3-entrance-approved.js'}),b=level({layoutFixture3:'bakery3-original.js'}),am=a.run('map'),bm=b.run('map');
  for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x>=4&&x<=25&&y>=43&&y<54,`${x},${y}`);
  for(const q of ['gems.slice(1)','checkpointState.spawns.slice(1)','enemies.slice(0,2)','currentVerticalLayout().oven','powerups.slice(2).map(({ph,...u})=>u)']){
   const old=q==='enemies.slice(0,2)'?'enemies.slice(1,3)':q.startsWith('powerups')?'powerups.map(({ph,...u})=>u)':q;

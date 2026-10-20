@@ -36,3 +36,38 @@ mechanics and visible arena artwork are unchanged. Awaiting playtest.
 
 `tools/package-factory-preview.py OUTPUT_DIR` prepares isolated HTML/save-key
 overrides for a copy of the `keen` subtree hosted at `previews/factory/`.
+
+
+## Step 2 — Clockwork ascent
+
+Columns 26–77, rows 16–53 now alternate open catwalks with two riveted
+maintenance halls. The approved entrance and original final descent are exact.
+Culture two is on the Copper Service Hall shelf; culture three is inside the
+Pressure Gallery. Both are on the main route. Checkpoints sit on the hall's
+approach balcony and beyond a solid summit parapet. The unsupported old middle
+walker is moved to a supported entrance patrol. A hopper and a warned thrower
+pressure the exposed central climb, with the two interiors offering quieter
+spaces. Existing enemy behaviors, movement, camera, audio and boss tuning stay
+unchanged.
+
+An explicitly marked optional roof loop climbs above the Pressure Gallery.
+A shield precedes a bounded hopper / thrower pairing. Two once-only supply
+caches provide ammo and score, without cultures. The roof drops to the main
+landing outside the gallery's right door. A player who skipped culture three
+can walk back through the door to retrieve it. No dash or pogo is mandatory.
+Recovery shelves lead from the lower floor back to the first hall and central
+catwalk. The normal jumps, door clearances, bonus return, actual culture pickup,
+checkpoint protection and enemy bounds have dedicated tests.
+
+The first entrance implementation is retained as a comparison fixture. Its
+historical boundary test uses that fixture; current entrance route and encounter
+tests still run against the production layout. Bakery 1/2 render traces remain
+exact. Bakery 3's overview map and offscreen checkpoint commands intentionally
+change, alongside four new ascent render cases. Reviewed loaded-art views cover
+both halls, the central bridge and bonus roof. All 183 tests pass.
+
+`tools/package-ascent-preview.py OUTPUT_DIR` prepares namespaced preview
+HTML/save overrides for `previews/ascent/`. It starts at the second checkpoint
+with culture one banked; buttons offer the bonus roof and full Bakery 3.
+Awaiting difficulty and flow playtest. The final descent and boss integration
+remain the next phase.
