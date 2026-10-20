@@ -2,7 +2,7 @@
 'use strict';
 function drawBakeryArchitecture(){
  if(bakery===3){drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
- if(bakery===2){drawCavernFoothills();return;}
+ if(bakery===2){drawCavernFoothills();drawPlungeIndicatorArt();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
  g.save();
@@ -137,8 +137,43 @@ function drawCavernFoothillsTrim(){
  for(const nx of [dx+7,dx+24]){rect(nx,dy+27,2,3,'#91d8ca');}
 }
 
+// Text-free fork audition: render the approved root artwork behind terrain and
+// actors. The established late text pass remains the loading/error fallback.
+let plungeIndicatorArt=null;
+function plungeIndicatorEnabled(){
+ return bakery===2&&!!window.location&&/(?:^|[?&])signs=pilot(?:&|$)/.test(window.location.search||'');
+}
+function plungeIndicatorReady(){
+ if(!plungeIndicatorEnabled())return false;
+ if(!plungeIndicatorArt){plungeIndicatorArt=new Image();plungeIndicatorArt.src='art/plunge-route-sign.png';}
+ return plungeIndicatorArt.complete&&plungeIndicatorArt.naturalWidth===1105&&plungeIndicatorArt.naturalHeight===1423;
+}
+function drawPlungeIndicatorArt(){
+ const p=currentVerticalLayout().plunge;
+ if(!p||camera>2600||camera+W<1750||cameraY>1150||!plungeIndicatorReady())return;
+ const [x,y]=p.fork,px=x*T,py=y*T;
+ g.save();g.imageSmoothingEnabled=false;
+ // Extend the sprite's own root texture to the existing support point. Both
+ // plaques finish above the canopy's first landing; no new collision is added.
+ g.drawImage(plungeIndicatorArt,180,1080,600,343,px-30,py-90,60,90);
+ g.drawImage(plungeIndicatorArt,0,0,1105,1423,px-70,py-250,140,180);
+ g.restore();
+}
+// Explicit scene shortcut for comparing this one fork without replaying B1 and
+// the relay. This affects only the requested preview URL, never ordinary init.
+function prepareWayfindingPreview(){
+ const search=window.location&&window.location.search||'';
+ if(!/(?:^|[?&])scene=plunge(?:&|$)/.test(search)||!/(?:^|[?&])signs=(?:pilot|off)(?:&|$)/.test(search))return;
+ init(2);myceliumState.solved=true;myceliumState.progress=3;syncMyceliumBloom();
+ for(let i=0;i<2;i++)gems[i].got=true;
+ collected=2;checkpointState.current=1;
+ player.x=60*T;player.y=31*T-player.h;player.ground=true;
+ camera=Math.max(0,player.x-W*.52);cameraY=Math.max(0,player.y-H*.52);
+}
+
 // A permanent fork sign distinguishes mandatory cultures from optional combat.
 function drawPlungeWayfinding(){
+ if(plungeIndicatorReady())return;
  const p=currentVerticalLayout().plunge;if(!p||camera>2600||camera+W<1750||cameraY>1150)return;
  const [x,y]=p.fork,px=x*T,py=y*T;
  rect(px-2,py-160,4,160,'#6b7560');

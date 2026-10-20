@@ -82,6 +82,6 @@ const minimap=document.getElementById('verticalMap');
 const mapButton=document.getElementById('mapButton');
 
 bindInput();
-try { init(); updateViewCamera(); draw(); diagnosticOverlay(); drawPhase3Map(); requestAnimationFrame(loop); statusEl.textContent='Find five yeast cultures, then reach the grand oven. Tap a control to start music.'; }
+try { init(); prepareWayfindingPreview(); updateViewCamera(); draw(); diagnosticOverlay(); drawPhase3Map(); requestAnimationFrame(loop); statusEl.textContent='Find five yeast cultures, then reach the grand oven. Tap a control to start music.'; }
 catch(err) { statusEl.textContent='Game error: '+err.message; console.error(err); }
 </script></body></html>
