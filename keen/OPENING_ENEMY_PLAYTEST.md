@@ -1,3 +1,7 @@
+# Bakery 1 rollout review
+
+The approved art now covers all six walkers, three hoppers and two slingers in Bakery 1 by default on the review branch. Earlier opening-only/first-slinger scope below is historical. Use `enemies=off&slinger=off` for original enemy art. Bakery 2/3 are unchanged. See MOONLIT_ENEMY_ROLLOUT.md for current validation and scope.
+
 # Shipped opening enemy artwork
 
 The approved two-enemy artwork and hopper anticipation are now enabled by default. Use enemies=off for the original art; enemies=pilot remains a compatible explicit preview setting. Other enemies retain their original artwork. The historical pilot notes below describe review URLs and scope.

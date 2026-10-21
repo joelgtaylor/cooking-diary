@@ -48,5 +48,5 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
 
 test('changed baker scripts share a release version so cached clients receive them together',()=>{
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
- for(const name of ['characters','baker-pilot','combat','architecture','render'])assert.ok(html.includes('src="'+name+'.js?v=baker-20261020"'));
+ for(const name of ['characters','baker-pilot','combat','architecture','render','throwers'])assert.ok(html.includes('src="'+name+'.js?v=moonlit-enemies-20261020"'));
 });

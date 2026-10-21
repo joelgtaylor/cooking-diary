@@ -215,6 +215,9 @@ function drawPlungeIndicatorArt(){
 // the relay. This affects only the requested preview URL, never ordinary init.
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
+ if(/(?:^|[?&])scene=moonlit-summit(?:&|$)/.test(search)&&/(?:^|[?&])enemies=(?:pilot|off)(?:&|$)/.test(search)){
+  init(1);player.x=70*T;player.y=19*T-player.h;player.ground=true;camera=player.x-W*.52;cameraY=player.y-H*.52;state='pause';return;
+ }
  if(/(?:^|[?&])scene=slinger(?:&|$)/.test(search)&&/(?:^|[?&])slinger=(?:pilot|off)(?:&|$)/.test(search)){
   init(1);player.x=26*T;player.y=40*T-player.h;player.ground=true;camera=600;cameraY=1000;state='pause';return;
  }

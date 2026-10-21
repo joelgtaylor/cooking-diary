@@ -1,3 +1,7 @@
+# Bakery 1 rollout review
+
+The approved art now covers all six walkers, three hoppers and two slingers in Bakery 1 by default on the review branch. Earlier opening-only/first-slinger scope below is historical. Use `enemies=off&slinger=off` for original enemy art. Bakery 2/3 are unchanged. See MOONLIT_ENEMY_ROLLOUT.md for current validation and scope.
+
 # Dough Slinger art pilot
 
 Review URL: keen/index.html?slinger=pilot&scene=slinger. Starts paused on the real column-26, row-40 shelf before the first Bakery 1 thrower (column30 / floor40). Tap Pause / Resume to begin. Shoot, jump or mixer-pogo using existing controls; reload to reset. Use slinger=off with the same scene for the original rendering. Omit scene for a normal start; the art still changes only the first B1 thrower when slinger=pilot is explicit.

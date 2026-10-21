@@ -46,12 +46,12 @@ function drawEnemyShots(){
  }
 }
 
-// Opening Moonlit slinger audition. AI and projectiles above remain authoritative.
+// Approved Moonlit slinger artwork. AI and projectiles above remain authoritative.
 let slingerArt=null;
 const slingerReleases=new WeakMap();
 const SLINGER_SPRITES=[{"crop":[29,176,489,412],"w":41.54,"h":35.0},{"crop":[573,177,502,411],"w":42.65,"h":34.92},{"crop":[1138,176,536,412],"w":45.53,"h":35.0},{"crop":[1724,176,408,412],"w":34.66,"h":35.0}];
-function slingerPilotEnabled(){return bakery===1&&/(?:^|[?&])slinger=pilot(?:&|$)/.test(window.location&&window.location.search||'');}
-function slingerPilotEnemy(e){return e.type==='thrower'&&e===enemies.find(actor=>actor.type==='thrower');}
+function slingerPilotEnabled(){return bakery===1&&visualIndicatorEnabled('slinger');}
+function slingerPilotEnemy(e){return e.type==='thrower';}
 function rememberSlingerRelease(e){if(slingerPilotEnabled()&&slingerPilotEnemy(e))slingerReleases.set(e,tick);}
 function slingerPose(e){
  if(e.windup>0)return 1;

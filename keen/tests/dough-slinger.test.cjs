@@ -1,9 +1,9 @@
 const{test}=require('node:test'),assert=require('node:assert/strict');const{game}=require('./game-harness.cjs');
 function scene(mode='pilot'){const a=game({}, {search:`?slinger=${mode}&scene=slinger`});a.run("var slinger=enemies.find(e=>e.type==='thrower')");return a;}
 function ready(a){a.run('drawDoughSlinger(slinger);slingerArt.complete=true;slingerArt.naturalWidth=2172;slingerArt.naturalHeight=724');}
-test('slinger is limited to first B1 thrower and retains loading/disabled fallbacks',()=>{
+test('slinger covers both B1 throwers and no other worlds and retains loading/disabled fallbacks',()=>{
  const a=scene();assert.equal(a.run('drawDoughSlinger(slinger)'),false);ready(a);assert.equal(a.run('drawDoughSlinger(slinger)'),true);
- assert.equal(a.run('enemies.filter(e=>drawDoughSlinger(e)).length'),1);
+ assert.equal(a.run('enemies.filter(e=>drawDoughSlinger(e)).length'),2);
  for(const s of [2,3]){a.run(`init(${s})`);assert.equal(a.run('enemies.some(e=>drawDoughSlinger(e))'),false);}
  const b=scene('off');assert.equal(b.run('drawDoughSlinger(slinger)'),false);assert.equal(b.run('slingerArt'),null);
 });

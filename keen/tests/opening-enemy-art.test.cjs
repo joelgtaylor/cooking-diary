@@ -1,9 +1,9 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');const{game}=require('./game-harness.cjs');
 function pilot(){return game({}, {search:'?enemies=pilot'});}
 function ready(a){a.run('drawOpeningEnemy(enemies[3]);openingEnemyArt.complete=true;openingEnemyArt.naturalWidth=1536;openingEnemyArt.naturalHeight=1024');}
-test('new enemy art is restricted to the two approved Bakery 1 opening enemies',()=>{
+test('approved role art covers all Bakery 1 walkers/hoppers and no other worlds',()=>{
  const a=pilot();ready(a);
- assert.deepEqual(Array.from(a.run('enemies.map(e=>drawOpeningEnemy(e))')), [false,false,false,true,true,false,false,false,false,false,false]);
+ assert.deepEqual(Array.from(a.run('enemies.map(e=>drawOpeningEnemy(e))')), [true,true,true,true,true,true,true,true,true,false,false]);
  for(const stage of [2,3]){a.run(`init(${stage})`);assert.equal(a.run('enemies.some(e=>drawOpeningEnemy(e))'),false);}
 });
 test('off, malformed, loading and failed artwork retain existing sprites',()=>{
