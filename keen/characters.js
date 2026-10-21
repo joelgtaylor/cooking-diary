@@ -100,3 +100,27 @@ else rect(-13,-38,26,38,'#fff0cd');
 }
 g.restore();}
 }
+
+// Approved opening-only art pilot. AI, collision bodies and rewards stay in combat.js.
+let openingEnemyArt=null;
+const OPENING_ENEMY_SPRITES=[[{"crop":[42,167,340,284],"w":42,"h":35},{"crop":[421,168,334,274],"w":41,"h":34},{"crop":[791,172,336,272],"w":42,"h":34},{"crop":[1164,170,332,274],"w":41,"h":34}],[{"crop":[91,648,265,301],"w":35,"h":40},{"crop":[470,628,269,277],"w":36,"h":37},{"crop":[799,560,287,300],"w":38,"h":40},{"crop":[1184,625,285,315],"w":38,"h":42}]];
+function openingEnemyPilotEnabled(){
+ return bakery===1&&/(?:^|[?&])enemies=pilot(?:&|$)/.test(window.location&&window.location.search||'');
+}
+function openingEnemyPose(e){
+ if(e.type==='walker')return Math.floor(actorAnimation(e,1)/9)%4;
+ if(contactSurface(e)!==null&&Math.abs(e.vy||0)<=1)return 0;
+ return e.vy < -1?1:Math.abs(e.vy||0)<=1?2:3;
+}
+function drawOpeningEnemy(e){
+ if(!openingEnemyPilotEnabled()||(e!==enemies[3]&&e!==enemies[4]))return false;
+ if(!openingEnemyArt){openingEnemyArt=new Image();openingEnemyArt.src='art/moonlit-opening-enemies.png';}
+ if(!openingEnemyArt.complete||openingEnemyArt.naturalWidth!==1536||openingEnemyArt.naturalHeight!==1024)return false;
+ const role=e.type==='hopper'?1:0,sprite=OPENING_ENEMY_SPRITES[role][openingEnemyPose(e)];
+ if(!sprite)return false;
+ const {crop,w,h}=sprite;
+ if(contactSurface(e)!==null&&Math.abs(e.vy||0)<=1)drawContactShadow(e,22);
+ g.save();g.imageSmoothingEnabled=false;
+ g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale(e.vx<0?-1:1,1);
+ g.drawImage(openingEnemyArt,...crop,-w/2,-h,w,h);g.restore();return true;
+}

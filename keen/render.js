@@ -205,6 +205,7 @@ else{rect(u.x-11,uy-8,22,14,'#c9a06a');rect(u.x-11,uy-8,22,4,'#a87f4e');for(let 
 // CRUST_DOUGH_GREMLINS_V1: art-only integration. No changes to AI,
 // hitboxes, damage, collision, movement speed, or enemy spawn logic.
 for(const e of enemies)if(e.alive){
+ if(drawOpeningEnemy(e))continue;
  const bob=Math.sin(tick*.1+e.x*.02)*2;
  const atlas=(e.type==='hopper'||e.type==='thrower')?assets.gremlinExpressions:assets.gremlinRun;
  const newArt=window.__crustGremlinArt!==false&&atlas&&atlas.complete&&atlas.naturalWidth===128;
