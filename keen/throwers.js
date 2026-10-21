@@ -15,7 +15,7 @@ function updateThrower(e){
  if(e.windup>0){
   if(--e.windup===0){
    enemyShots.push({x:e.x+(e.face<0?-10:e.w+2),y:e.y+8,w:9,h:9,vx:e.face*2.3,life:150,owner:e});
-   rememberSlingerRelease(e);rememberFungalRelease(e);e.attackT=timing.recovery;
+   rememberSlingerRelease(e);rememberFungalRelease(e);rememberClockworkRelease(e);e.attackT=timing.recovery;
   }
  }else if(--e.attackT<=0){e.face=player.x<e.x?-1:1;e.windup=timing.windup;}
 }
@@ -42,7 +42,7 @@ function drawThrowerCue(e){
 }
 function drawEnemyShots(){
  for(const s of enemyShots){
-  if(drawFungalShot(s))continue;
+  if(drawClockworkEnemyShot(s)||drawFungalShot(s))continue;
   rect(s.x-1,s.y+2,11,6,'#593828');rect(s.x,s.y,9,8,'#bf884e');rect(s.x+1,s.y,6,3,'#ffe0a1');
   rect(s.x+3,s.y+3,2,2,'#765039');
  }
