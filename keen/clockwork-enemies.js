@@ -1,6 +1,6 @@
 /* Approved mechanical identities; pilot art only, original combat remains authoritative. */
 'use strict';
-function clockworkEnemyEnabled(){return bakery===3&&/(?:^|[?&])clockwork=pilot(?:&|$)/.test(window.location&&window.location.search||'');}
+function clockworkEnemyEnabled(){return bakery===3&&!/(?:^|[?&])clockwork=off(?:&|$)/.test(window.location&&window.location.search||'');}
 let clockworkEnemyArt=null;
 const clockworkReleases=new WeakMap();
 function rememberClockworkRelease(e){if(clockworkEnemyEnabled())clockworkReleases.set(e,tick);}

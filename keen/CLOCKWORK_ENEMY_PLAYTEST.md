@@ -1,8 +1,8 @@
 # Clockwork enemy pilot
 
-Based on main after approved Fungal Caverns merge, bf900fff. The mechanical family concept is approved; this isolated art pilot is not merged.
+Based on main after approved Fungal Caverns merge, bf900fff. The mechanical family and playable pilot are approved for release.
 
-Enable `clockwork=pilot`; compare `clockwork=off`. Paused scene shortcuts: `scene=mechanical-gearling`, `mechanical-piston`, `mechanical-ember`. They use existing entrance roof/catwalk support with no overlapping actor, culture grants, puzzle completion or save writes. Reload resets. Normal starts retain existing Bakery 3 artwork until rollout approval.
+Enabled on normal Bakery 3 starts; compare original art with `clockwork=off`. Paused scene shortcuts: `scene=mechanical-gearling`, `mechanical-piston`, `mechanical-ember`. They use existing entrance roof/catwalk support with no overlapping actor, culture grants, puzzle completion or save writes. Reload resets. The scene shortcuts remain available for focused reviews.
 
 ## Audit and scope
 
@@ -14,6 +14,6 @@ The three profiles distinguish roles without colour: low round gearling, tall pi
 
 Generated production source: `art/clockwork-enemies.png`,1536×1024 RGBA, immutable crops in `clockwork-enemies.js`. Built-in image-generation prompt: preserve the approved ivory/brass three-role concept, produce three rows of four walk/compress/launch/load/release/recovery poses with transparent margins; no raster post-processing. Source/blob hash checked before publication.
 
-Validation:314 game/audio tests pass, including exact3/4/3 role coverage, explicit opt-in and world exclusion,900-tick simulation/audio equivalence in every world, phase timing and actor isolation, crop bounds, real supported preview spawns, render purity and fallback. Browser checks follow publication. Real-device touch review remains required.
+Validation:314 game/audio tests pass, including exact3/4/3 role coverage, normal-start enablement and world exclusion,900-tick simulation/audio equivalence in every world, phase timing and actor isolation, crop bounds, real supported preview spawns, render purity and fallback. Browser checks follow publication. Real-device touch review remains required.
 
 The Devourer, all other bosses, Bakery1/2 enemies, audio, flags, authored geometry and progression are unchanged. Do not add a mechanical flyer without a separate encounter proposal. First review the existing entrance actors, then assess whole-level clarity before rollout.

@@ -4,12 +4,12 @@ function ready(a){a.run("drawClockworkEnemy(enemies[0]);clockworkEnemyArt.comple
 test('mechanical scenes start paused on support without overlap or save changes',()=>{
  for(const scene of ['gearling','piston','ember']){const a=pilot(scene);assert.equal(a.run('state'),'pause');assert.equal(a.run('bakery'),3);assert.notEqual(a.run('contactSurface(player)'),null);assert.equal(a.run('enemies.some(e=>collide(e,player))'),false);assert.equal(a.run('collected'),0);assert.equal(a.storage.size,0);}
 });
-test('all ten authored mechanical actors select approved art only in opt-in Bakery 3',()=>{
+test('all ten authored mechanical actors select approved art on normal Bakery 3 starts',()=>{
  const a=pilot();ready(a);assert.equal(a.run('enemies.length'),10);
  assert.deepEqual(JSON.parse(a.run("JSON.stringify(['walker','hopper','thrower'].map(type=>enemies.filter(e=>e.type===type).length))")),[3,4,3]);
  for(let i=0;i<10;i++){a.trace.length=0;assert.equal(a.run(`drawClockworkEnemy(enemies[${i}])`),true);assert.equal(a.trace.filter(c=>c[0]==='drawImage').length,1);}
  for(const stage of [1,2]){a.run(`init(${stage})`);assert.equal(a.run('enemies.some(e=>drawClockworkEnemy(e))'),false);}
- const b=game({}, {search:''});b.run('init(3)');assert.equal(b.run('clockworkEnemyEnabled()'),false);
+ const b=game({}, {search:''});b.run('init(3)');assert.equal(b.run('clockworkEnemyEnabled()'),true);ready(b);assert.equal(b.run('enemies.every(e=>drawClockworkEnemy(e))'),true);const old=game({}, {search:'?clockwork=off'});old.run('init(3)');assert.equal(old.run('clockworkEnemyEnabled()'),false);
 });
 test('mechanical art preserves complete simulation and audio through 900 ticks in each world',()=>{
  for(const stage of [1,2,3]){
