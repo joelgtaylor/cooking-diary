@@ -4,6 +4,7 @@ function drawBakeryArchitecture(){
  if(bakery===3){drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
  if(bakery===2){drawCavernFoothills();drawPlungeIndicatorArt();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
+ if(drawMoonlitEnvironment())return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
  g.save();
  rect(px+T,py+T,(w-2)*T,(h-1)*T,'#202536');
@@ -215,6 +216,7 @@ function drawPlungeIndicatorArt(){
 // the relay. This affects only the requested preview URL, never ordinary init.
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
+ if(prepareMoonlitEnvironmentPreview(search))return;
  const mechanicalScene=search.match(/(?:^|[?&])scene=mechanical-(gearling|piston|ember)(?:&|$)/);
  if(mechanicalScene&&/(?:^|[?&])clockwork=(?:pilot|off)(?:&|$)/.test(search)){
   init(3);const scene=mechanicalScene[1],x=scene==='gearling'?20.5:scene==='piston'?11:21;

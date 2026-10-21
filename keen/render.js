@@ -17,6 +17,7 @@ function drawEnv(cell,x,y,w,h){
 const terrain=assets.moonlitTerrain;
 const moonlitReady=bakery===1&&terrain&&terrain.complete&&terrain.naturalWidth===256&&terrain.naturalHeight===96;
 function drawMoonlitTerrain(tx,ty,b){
+ if(b==='='&&moonlitEnvironmentReady()&&moonlitPlatformKind(tx,ty)==='bridge')return;
  const x=tx*T,y=ty*T;
  const left=tile(tx-1,ty)!==b,right=tile(tx+1,ty)!==b;
  const surface=tile(tx,ty-1)!=='#'&&tile(tx,ty-1)!=='=';
@@ -133,6 +134,7 @@ if(window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-cam
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
 drawBloomrotChamber();
 drawBakeryArchitecture();
+drawMoonlitPlatformBacking();
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
 for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
@@ -168,6 +170,7 @@ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
 }
 
+drawMoonlitPlatformFaces();
 // Original copper highlights are retained only for the load-failure fallback.
 if(bakery===3&&!forgeReady){
  g.save();g.imageSmoothingEnabled=false;
