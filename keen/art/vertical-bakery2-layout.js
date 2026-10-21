@@ -42,6 +42,13 @@ const plunge={
 // Mycelium grotto: tile-aligned switches, fixed bloom and root doorway.
 const relay={bounds:[32,26,56,36],switches:[[36,33,3],[41,32,3],[46,33,3]],
  sequences:[[2,0,1],[0,2,1]],bloom:[51,31,4],gate:[55,28,7],keeper:[29.4,38]};
+// A continuous geological divide makes the root doorway the only crossing.
+// Both faces have return shelves: falling never skips the relay or strands
+// a player below it. These remain one-way, like the existing cavern shelves.
+const relayDivide={column:55,gateTop:28,gateBottom:35,
+ approach:[[43,51,7],[46,48,7],[46,42,7],[43,39,7]],
+ return:[[58,51,4],[58,47,4],[58,43,4],[58,39,4]],
+ landing:[56,35,8]};
 const oven={x:102,y:52};
 const bloomrot={left:85*T+12,right:103*T-12,floor:54*T,entry:84,exit:103};
 const altitudeTargets=[[4,54],[45,32],[77,47]];
@@ -74,6 +81,11 @@ function apply({map}){
  // Replace the old mandatory canopy with a signed fork and lower route.
  for(let y=16;y<54;y++)for(let x=56;x<105;x++)map[y][x]='.';
  for(const [x,y,len] of [...plunge.main,...plunge.recovery,...plunge.bonus])for(let i=0;i<len;i++)map[y][x+i]='=';
+ // Seal the old ground bypass and the roof/canopy shortcut with real terrain.
+ // Only syncMyceliumBloom removes the original seven-cell root doorway.
+ for(let y=0;y<54;y++)map[y][relayDivide.column]='#';
+ for(const [x,y,len] of [...relayDivide.approach,...relayDivide.return,relayDivide.landing])
+  for(let i=0;i<len;i++)map[y][x+i]='=';
  // Tall sealing doors prevent bypassing the fight from either shelf.
  for(let y=42;y<54;y++)map[y][103]='#';
  for(const [x,y] of hazards){
@@ -92,5 +104,5 @@ function apply({map}){
 }
 window.CrustVerticalBakery2=Object.freeze({rows,cols,T,sections,platforms,
  cultures,checkpoints,hazards,enemies,oven,altitudeTargets,relay,foothills,plunge,
- bloomrot,apply,version:'vertical-fungal-bloomrot-v5'});
+ bloomrot,relayDivide,apply,version:'vertical-fungal-relay-divide-v6'});
 })();
