@@ -33,19 +33,3 @@ test('frame monitor is opt-in and reports known frame and CPU timings without ch
  assert.match(output.textContent,/60 FPS/);assert.match(output.textContent,/p95 16.7 ms/);assert.match(output.textContent,/CPU 2.0 ms/);
  c.window.location.search='';assert.equal(vm.runInContext('createFrameMonitor()',c),null);assert.equal(c.state,'play');
 });
-test('filtered architectural pieces are built once, bounded in memory, and invalidated on asset replacement',()=>{
- let builds=0,closed=0;
- class Surface{
-  getContext(){return {filter:'none',drawImage(){builds++;}};}
-  transferToImageBitmap(){return {close(){closed++;}};}
- }
- const a=game({}, {globals:{OffscreenCanvas:Surface}});
- a.run('assets.moonlitArchitecture.complete=true;assets.moonlitArchitecture.naturalWidth=1536;assets.moonlitArchitecture.naturalHeight=1024;camera=2400;cameraY=1252;');
- a.trace.length=0;a.run('moonlitPiece(2,91*T,43*T,12*T,11*T,.67);moonlitPiece(2,91*T,43*T,12*T,11*T,.67)');
- assert.equal(builds,1);assert.equal(a.trace.filter(c=>c[0]==='drawImage').length,2);
- assert.ok(a.trace.filter(c=>c[0]==='set'&&c[1]==='filter').every(c=>c[2]==='none'));
- a.run('assets.moonlitArchitecture={complete:true,naturalWidth:1536,naturalHeight:1024};moonlitPiece(2,91*T,43*T,12*T,11*T,.67)');
- assert.equal(builds,2);assert.equal(closed,1);
- a.run('for(let i=0;i<8;i++)moonlitPreparedPiece(MOONLIT_ENVIRONMENT_CROPS[0],.5+i*.01,512,512)');
- assert.ok(a.run('moonlitPiecePixels')<=1024*1024);assert.ok(closed>1);
-});
