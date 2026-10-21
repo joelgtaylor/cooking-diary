@@ -9,6 +9,7 @@ loadArt('myceliumAtlas','art/mycelium-relay-atlas.png');
 // Bakery 1 stone coping, slate ledges and opaque masonry (8 variants/row).
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
 loadArt('moonlitArchitecture','art/moonlit-architecture.png');
+for(let i=0;i<9;i++)loadArt('moonlitShadedTerrain'+i,'art/moonlit-shade-'+i+'.png');
 loadArt('cavernTerrain','art/cavern-terrain.png');
 loadArt('fungalEnvironment','art/fungal-environment.png');
 loadArt('forgeTerrain','art/forge-terrain.png');
