@@ -68,10 +68,12 @@ function drawFactoryEntrance(){
  // A permanent control cue works for both keyboard and the existing touch UI.
  rect(10*T+8,52*T-4,8*T-16,22,'#101a26');g.fillStyle='#d7e9ec';
  g.fillText('STORE NOW · V / KEFIR TO DASH',14*T,52*T+10);
- g.fillStyle='#e8d6b5';g.fillText('SUPPLIES ↑',17*T,48*T-20);
+ if(entranceIndicatorReady())drawEntrancePlate(0,17*T,48*T-96);
+ else{g.fillStyle='#e8d6b5';g.fillText('SUPPLIES ↑',17*T,48*T-20);}
  // Exit wayfinding sits outside the combat silhouettes.
- rect(21*T,44*T+7,4*T,20,'#15202a');g.fillStyle='#f4d5a0';
- g.fillText('LIFT SHAFT ↑',23*T,44*T+21);
+ if(entranceIndicatorReady())drawEntrancePlate(1,23*T,44*T+2);
+ else{rect(21*T,44*T+7,4*T,20,'#15202a');g.fillStyle='#f4d5a0';
+ g.fillText('LIFT SHAFT ↑',23*T,44*T+21);}
  g.restore();
 }
 
@@ -155,6 +157,18 @@ function drawCavernFoothillsTrim(){
  for(const nx of [dx+7,dx+24]){rect(nx,dy+27,2,3,'#91d8ca');}
 }
 
+// Entrance destinations share the approved literal arrow grammar.
+let entranceIndicatorArt=null;
+const ENTRANCE_ROUTE_CROPS=[[18,298,740,392],[780,298,740,392]];
+function entranceIndicatorReady(){
+ if(bakery!==3||!/(?:^|[?&])signs=pilot(?:&|$)/.test(window.location&&window.location.search||''))return false;
+ if(!entranceIndicatorArt){entranceIndicatorArt=new Image();entranceIndicatorArt.src='art/clockwork-entrance-plates.png';}
+ return entranceIndicatorArt.complete&&entranceIndicatorArt.naturalWidth===1536&&entranceIndicatorArt.naturalHeight===1024;
+}
+function drawEntrancePlate(index,cx,top){
+ g.save();g.imageSmoothingEnabled=false;
+ g.drawImage(entranceIndicatorArt,...ENTRANCE_ROUTE_CROPS[index],cx-56,top,112,56);g.restore();
+}
 // Riveted-metal variants of the same route/destination symbols. Kept out of
 // the default render path until the cross-world sign playtest is accepted.
 let clockworkIndicatorArt=null;
@@ -202,6 +216,10 @@ function drawPlungeIndicatorArt(){
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
  if(prepareSupplyPreview(search)||prepareOvenPreview(search))return;
+ if(/(?:^|[?&])scene=entrance(?:&|$)/.test(search)&&/(?:^|[?&])signs=(?:pilot|off)(?:&|$)/.test(search)){
+  init(3);player.x=3*T;player.y=54*T-player.h;player.ground=true;
+  camera=0;cameraY=rows*T-H;return;
+ }
  const scene=search.match(/(?:^|[?&])scene=(plunge|clockwork|clockwork-return)(?:&|$)/);
  if(!scene||!/(?:^|[?&])signs=(?:pilot|off)(?:&|$)/.test(search))return;
  if(scene[1]!=='plunge'){

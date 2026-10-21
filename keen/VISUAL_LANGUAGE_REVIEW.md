@@ -1,6 +1,18 @@
 # Crust Quest — Visual Language Review
-Status: concept direction approved; first entry pilot rejected and reverted, 20 October 2026. Branch: design/keen-world-polish.
-No production code, layouts, audio, enemy or boss rules changed.
+## Current review status
+Branch: `design/keen-world-polish`; main remains unchanged. The original audit and rejected first entry audition below are historical. Later approvals supersede their proposed treatments:
+
+- Preserve the original animated checkpoint flags completely.
+- Approved culture jar and distinct lightning kefir bottle; culture YEAST badge removed in the pickup pilot.
+- Approved wordless Fungal and Clockwork fork/return signs; do not reintroduce OPTIONAL.
+- Approved shape-based map, supply artwork/recharge segments, and oven readiness plaques.
+- Clockwork entrance crate/up and steps/up concepts approved for implementation. Keep its kefir control tutorial and maintenance place name.
+- Boss captions, puzzle dialogue, controls and enemy behavior remain outside this indicator pass.
+
+All artwork remains behind explicit pilot query switches pending final integrated review. Current browser/runtime verification and tests are recorded in the individual playtest documents. Earlier statements that no browser/runtime was available describe only the original audit session.
+
+## Original audit (historical)
+Status at initial audit: concept direction approved; first entry pilot rejected and reverted. No gameplay changes were made during that initial audit.
 
 ## Evidence and limits
 Source audit of main: render.js, hud.js, architecture.js, interactables.js, mycelium.js, ovens.js, foreman.js, bloomrot.js, devourer.js, throwers.js, world.js, gameplay.js, index.html, and all three vertical layouts. Published URL retrieval failed. No cloud browser or usable execution environment is exposed in this session. No visual playthrough, mobile verification or node tests claimed. Inventory below covers the inspected communication families; image-baked lettering and exact on-screen overlap still require browser inspection.
