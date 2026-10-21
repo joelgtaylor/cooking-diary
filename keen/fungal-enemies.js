@@ -1,6 +1,6 @@
 /* Opt-in fungal art and one isolated flyer encounter. No boss or audio changes. */
 'use strict';
-function fungalPilotEnabled(){return bakery===2&&/(?:^|[?&])fungal=pilot(?:&|$)/.test(window.location&&window.location.search||'');}
+function fungalPilotEnabled(){return bakery===2&&!/(?:^|[?&])fungal=off(?:&|$)/.test(window.location&&window.location.search||'');}
 const FUNGAL_CROPS=[
  [[34,41,357,313],[415,43,341,312],[777,43,347,311],[1179,46,341,308]],
  [[101,374,207,337],[453,511,265,200],[866,374,217,337],[1225,432,243,233]],

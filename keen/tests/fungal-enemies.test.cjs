@@ -1,10 +1,10 @@
 const{test}=require('node:test'),assert=require('node:assert/strict');const{game}=require('./game-harness.cjs');
 function pilot(scene='flight'){return game({}, {search:'?fungal=pilot&scene=fungal-'+scene});}
-test('fungal pilot is opt-in and scoped to Bakery 2; scenes use real support with no save writes',()=>{
+test('fungal release is scoped to Bakery 2; scenes use real support with no save writes',()=>{
  const a=pilot();assert.equal(a.run('bakery'),2);assert.equal(a.run('state'),'pause');assert.equal(a.run('enemies.length'),9);assert.equal(a.storage.size,0);assert.equal(a.run('collected'),0);
  for(const scene of ['opening','hopper','caster']){const b=pilot(scene);assert.notEqual(b.run('contactSurface(player)'),null);assert.ok(b.run('enemies.filter(e=>e.alive).every(e=>!collide(e,player))'));}
  for(const stage of [1,3]){a.run(`init(${stage})`);assert.equal(a.run('fungalPilotEnabled()'),false);assert.equal(a.run("enemies.filter(e=>e.type==='flyer').length"),0);}
- const b=game({}, {search:''});b.run('init(2)');assert.equal(b.run('enemies.length'),8);
+ const b=game({}, {search:''});b.run('init(2)');assert.equal(b.run('enemies.length'),9);assert.equal(b.run('fungalPilotEnabled()'),true);assert.equal(b.run("enemies.find(e=>e.type==='thrower').attackT"),30);const old=game({}, {search:'?fungal=off'});old.run('init(2)');assert.equal(old.run('enemies.length'),8);
 });
 test('moving ground enemies retain the approved simulation',()=>{
  const a=pilot(),b=game();b.run('init(2)');a.run('state="play";player.x=2000;player.y=0');b.run('player.x=2000;player.y=0');
