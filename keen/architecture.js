@@ -215,6 +215,13 @@ function drawPlungeIndicatorArt(){
 // the relay. This affects only the requested preview URL, never ordinary init.
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
+ const mechanicalScene=search.match(/(?:^|[?&])scene=mechanical-(gearling|piston|ember)(?:&|$)/);
+ if(mechanicalScene&&/(?:^|[?&])clockwork=(?:pilot|off)(?:&|$)/.test(search)){
+  init(3);const scene=mechanicalScene[1],x=scene==='gearling'?20.5:scene==='piston'?11:21;
+  const floor=scene==='ember'?43:49;
+  player.x=x*T;player.y=floor*T-player.h;player.ground=true;
+  camera=Math.max(0,player.x-W*.4);cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.62));state='pause';return;
+ }
  const fungalScene=search.match(/(?:^|[?&])scene=fungal-(flight|opening|hopper|caster)(?:&|$)/);
  if(fungalScene&&/(?:^|[?&])fungal=(?:pilot|off)(?:&|$)/.test(search)){
   init(2);
