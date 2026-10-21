@@ -100,9 +100,9 @@ function drawClockworkAscent(){
   const [fx,fy]=a.fork,px=fx*T,py=fy*T;
   // Narrow copper mast reaches the authored fork ledge; plates stay behind
   // collision tiles and actors. Keep the canopy landing above them visible.
-  rect(px-4,py-186,8,186,'#202631');rect(px-2,py-186,3,186,'#b27c4f');
-  drawClockworkPlate(0,px,py-170);
-  drawClockworkPlate(1,px,py-90);
+  rect(px-4,py-264,8,264,'#202631');rect(px-2,py-264,3,264,'#b27c4f');
+  drawClockworkPlate(0,px,py-256,128,56);
+  drawClockworkPlate(1,px,py-160,128,56);
   // The continuation arrow sits above, rather than across, the summit flag.
   drawClockworkPlate(2,76*T,13*T+8,128,56);
  }else{

@@ -40,4 +40,4 @@ Production asset: `keen/art/clockwork-route-plates.png`, generated with built-in
 
 Fork plates sit above the authored fork ledge and canopy landing. The continuation arrow is raised clear of the existing summit checkpoint flag. Return plaques hang below real ledges so their glyphs are not hidden by collision tiles. Rendering stays behind terrain and actors.
 
-Validation for the Clockwork addition: all 234 tests passed locally, including six new checks for atlas source rectangles, direction/order, return markers, fallback artwork, safe scene shortcuts, unchanged gameplay state/storage and unchanged checkpoint rendering. Existing default render baselines pass without changes. Browser and player review pending.
+Validation for the Clockwork addition: all 235 tests passed locally, including seven new checks for atlas source rectangles, direction/order, return markers, fallback artwork, safe scene shortcuts, unchanged gameplay state/storage and unchanged checkpoint rendering, and plaque clearance from every authored collision tile. Existing default render baselines pass without changes. Browser and player review pending.

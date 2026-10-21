@@ -18,7 +18,7 @@ test('loaded Clockwork fork has two text-free plates with direction order matchi
  const a=scene();ready(a);a.trace.length=0;a.run('drawClockworkAscent()');
  assert.equal(plates(a).length,2);
  assert.ok(!labels(a).some(s=>s.includes('MAIN →')||s.includes('BONUS ↑')));
- assert.equal(plates(a)[0][7],28*32-170);assert.equal(plates(a)[1][7],28*32-90);
+ assert.equal(plates(a)[0][7],28*32-256);assert.equal(plates(a)[1][7],28*32-160);
 });
 test('all three return plaques replace the original route labels without mutating gameplay state',()=>{
  const a=scene('clockwork-return');ready(a);
@@ -55,4 +55,16 @@ test('Clockwork art is scoped to Bakery 3 and checkpoint rendering is unchanged'
  a.run('init(3);assets.checkpointFlags.complete=true;assets.checkpointFlags.naturalWidth=320;');
  a.run("window.location.search='?signs=off'");a.trace.length=0;a.run('drawCheckpoints()');const before=JSON.stringify(a.trace);
  a.run("window.location.search='?signs=pilot'");a.trace.length=0;a.run('drawCheckpoints()');assert.equal(JSON.stringify(a.trace),before);
+});
+
+test('Clockwork glyph plaques do not intersect any authored collision tiles',()=>{
+ for(const name of ['clockwork','clockwork-return']){
+  const a=scene(name);ready(a);a.trace.length=0;a.run('drawClockworkAscent();drawFinalDescent()');
+  for(const c of plates(a)){
+   const [x,y,w,h]=c.slice(6);
+   for(let ty=Math.floor(y/32);ty<=Math.floor((y+h-1)/32);ty++)
+    for(let tx=Math.floor(x/32);tx<=Math.floor((x+w-1)/32);tx++)
+     assert.ok(!['#','='].includes(a.run('tile('+tx+','+ty+')')),`${name}: plate intersects ${tx},${ty}`);
+  }
+ }
 });
