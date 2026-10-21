@@ -102,7 +102,7 @@ else rect(-13,-38,26,38,'#fff0cd');
 g.restore();}
 }
 
-// Approved opening-only art pilot. AI, collision bodies and rewards stay in combat.js.
+// Approved Moonlit walker/hopper artwork. AI, collision bodies and rewards stay in combat.js.
 let openingEnemyArt=null;
 const OPENING_ENEMY_SPRITES=[[{"crop":[42,167,340,284],"w":42,"h":35},{"crop":[421,168,334,274],"w":41,"h":34},{"crop":[791,172,336,272],"w":42,"h":34},{"crop":[1164,170,332,274],"w":41,"h":34}],[{"crop":[91,648,265,301],"w":35,"h":40},{"crop":[470,628,269,277],"w":36,"h":37},{"crop":[799,560,287,300],"w":38,"h":40},{"crop":[1184,625,285,315],"w":38,"h":42}]];
 function openingEnemyPilotEnabled(){
@@ -121,7 +121,7 @@ function openingEnemyCompression(e){
  return (11-e.hopT)/10;
 }
 function drawOpeningEnemy(e){
- if(!openingEnemyPilotEnabled()||(e!==enemies[3]&&e!==enemies[4]))return false;
+ if(!openingEnemyPilotEnabled()||(e.type!=='walker'&&e.type!=='hopper'))return false;
  if(!openingEnemyArt){openingEnemyArt=new Image();openingEnemyArt.src='art/moonlit-opening-enemies.png';}
  if(!openingEnemyArt.complete||openingEnemyArt.naturalWidth!==1536||openingEnemyArt.naturalHeight!==1024)return false;
  const role=e.type==='hopper'?1:0,sprite=OPENING_ENEMY_SPRITES[role][openingEnemyPose(e)];

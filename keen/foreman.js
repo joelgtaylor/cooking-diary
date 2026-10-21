@@ -2,15 +2,30 @@
 'use strict';
 const FOREMAN_DEFEAT_TICKS=96;
 let foremanState=null;
+function foremanPolishEnabled(){return !/(?:^|[?&])foreman=off(?:&|$)/.test(window.location&&window.location.search||'');}
+function foremanRecoveryTicks(){return foremanPolishEnabled()?150:120;}
+function moveForeman(f,geo,pc){
+ f.walkStep=0;
+ if(!['idle','recovery'].includes(f.phase)||f.hurtFlash>0)return;
+ const delta=pc-geo.cx,direction=f.walkDir||-1;
+ // Do not press the player against the body. Recovery begins by walking away.
+ if(Math.abs(delta)<100&&Math.sign(delta)===direction)return;
+ let next=(f.walkOffset||0)+direction*.45;
+ if(next < -64 || next > 64){f.walkDir=-direction;next=(f.walkOffset||0)-direction*.45;}
+ next=Math.max(-64,Math.min(64,next));
+ f.walkStep=next-(f.walkOffset||0);f.walkOffset=next;
+ if(f.walkStep)f.face=Math.sign(f.walkStep);
+}
+
 function resetForeman(){
  foremanState=bakery===1&&currentVerticalLayout().forecourt?
-  {phase:'idle',timer:90,face:-1,sweepHit:false,cycles:0,attack:'sweep',health:6,maxHealth:6,inv:0,hurtFlash:0,guardCue:0,projectiles:[],engaged:false,defeatImpact:false}:null;
+  {phase:'idle',timer:90,face:-1,sweepHit:false,cycles:0,attack:'sweep',health:6,maxHealth:6,inv:0,hurtFlash:0,guardCue:0,projectiles:[],engaged:false,defeatImpact:false,...(foremanPolishEnabled()?{walkOffset:0,walkStep:0,walkDir:-1,deflectCue:0,deflectPush:0,deflectSide:0}:{})}:null;
 }
 function foremanGeometry(){
  const court=currentVerticalLayout().forecourt;
  if(bakery!==1||!court)return null;
  const {x,width,height}=court.foreman;
- return {court,cx:x*T+width*.62,base:court.floor*T,width,height};
+ return {court,cx:x*T+width*.62+(foremanPolishEnabled()?(foremanState?.walkOffset||0):0),base:court.floor*T,width,height};
 }
 function foremanSweepBox(){
  const geo=foremanGeometry();if(!geo||!foremanState)return null;
@@ -57,7 +72,13 @@ function updateForemanProjectiles(f,geo){
  f.projectiles=f.projectiles.filter(s=>!s.dead);return true;
 }
 function updateForeman(){
- const f=foremanState,geo=foremanGeometry();if(!f||!geo||state!=='play')return;
+ const f=foremanState;let geo=foremanGeometry();if(!f||!geo||state!=='play')return;
+ if(foremanPolishEnabled()){
+  if(f.deflectCue>0)f.deflectCue--;
+  // Sustain the shove briefly: normal air steering otherwise cancels it before
+  // the player clears the crown. Vertical movement and collision stay normal.
+  if(f.deflectPush>0){player.vx=f.deflectSide*14;f.deflectPush--;}
+ }
  if(f.inv>0)f.inv--;if(f.hurtFlash>0)f.hurtFlash--;if(f.guardCue>0)f.guardCue--;
  if(f.health<=0){
   f.projectiles=[];
@@ -73,12 +94,17 @@ function updateForeman(){
  const pc=player.x+player.w/2;
  const near=Math.abs(pc-geo.cx)<260&&player.y+player.h>geo.base-(f.engaged?448:256)&&
   geo.cx>camera+24&&geo.cx<camera+W-24&&geo.base>cameraY&&geo.base-100<cameraY+H;
- if(!near){f.phase='idle';f.timer=90;f.sweepHit=false;f.projectiles=[];f.engaged=false;return;}
+ if(!near){f.phase='idle';f.timer=90;f.sweepHit=false;f.projectiles=[];f.engaged=false;if(foremanPolishEnabled())f.walkStep=0;return;}
  f.engaged=true;
+ if(foremanPolishEnabled()){moveForeman(f,geo,pc);geo=foremanGeometry();}
  if(!updateForemanProjectiles(f,geo))return;
  const body=foremanBodyBox();
  if(pogoOn&&player.vy>1&&player.y+player.h<body.y+22&&collide(player,body)){
-  player.vy=-11;hurtForeman();if(f.health<=0)return;
+  if(foremanPolishEnabled()&&(f.phase!=='recovery'||f.inv>0)){
+   const side=Math.abs(pc-geo.cx)>6?Math.sign(pc-geo.cx):f.face;
+   player.vx=side*14;player.vy=-6;player.ground=false;f.deflectCue=18;f.deflectPush=12;f.deflectSide=side;
+   if(f.guardCue===0){f.guardCue=60;floater(geo.cx,geo.base-120,'HEAD GUARDED · USE THE OPENING','#ffe3a1');}
+  }else{player.vy=-11;hurtForeman();if(f.health<=0)return;}
  }
  if(f.phase==='idle'){
   if(--f.timer<=0){f.phase='windup';f.timer=60;f.face=pc<geo.cx?-1:1;f.sweepHit=false;}
@@ -86,13 +112,13 @@ function updateForeman(){
   if(--f.timer<=0){f.phase=f.attack==='sweep'?'sweep':'toss';f.timer=f.attack==='sweep'?18:24;f.cycles++;}
  }else if(f.phase==='sweep'){
   if(!f.sweepHit&&collide(player,foremanSweepBox())){f.sweepHit=true;damage();if(foremanState!==f)return;}
-  if(--f.timer<=0){f.phase='recovery';f.timer=120;}
+  if(--f.timer<=0){f.phase='recovery';f.timer=foremanRecoveryTicks();if(foremanPolishEnabled())f.walkDir=-f.face;}
  }else if(f.phase==='toss'){
   if(f.timer===24){
    f.projectiles.push({x:geo.cx+f.face*48-9,y:geo.base-42,w:18,h:16,vx:f.face*2.6,vy:-1.3,bounces:0,life:180});
    AudioKit.effect('shoot');
   }
-  if(--f.timer<=0){f.phase='recovery';f.timer=120;}
+  if(--f.timer<=0){f.phase='recovery';f.timer=foremanRecoveryTicks();if(foremanPolishEnabled())f.walkDir=-f.face;}
  }else if(f.phase==='recovery'&&--f.timer<=0){
   f.attack=f.attack==='sweep'?'toss':'sweep';f.phase='windup';f.timer=60;f.face=pc<geo.cx?-1:1;f.sweepHit=false;
  }
@@ -150,6 +176,8 @@ function drawForeman(){
   g.fillStyle='rgba(12,14,27,.36)';g.beginPath();g.ellipse(cx,base,54,5,0,0,Math.PI*2);g.fill();
   g.save();g.translate(Math.round(cx),base);g.scale(f?.face>0?-1:1,1);g.imageSmoothingEnabled=false;
   if(attacking&&sweep?.complete&&sweep.naturalWidth===1536){g.drawImage(sweep,33,125,1483,787,-149,-114,215,114);}
+  else if(foremanPolishEnabled()&&foremanCrownGuard(geo,f)&&drawForemanWalk(geo,f,true)){/* Physical brace matches the closed head guard. */}
+  else if(foremanPolishEnabled()&&['idle','recovery'].includes(f.phase)&&f.walkStep&&drawForemanWalk(geo,f)){/* Feet use the same floor anchor. */}
   else{
    const h=f?.phase==='windup'?height-2:height;
    g.drawImage(art,16,18,1314,1131,-width*.62,-h,width,h);
@@ -157,6 +185,7 @@ function drawForeman(){
   g.restore();
  }
  if(f){
+  if(foremanPolishEnabled()&&!defeated)drawForemanHeadState(geo,f);
   g.textAlign='center';g.font='bold 10px monospace';
   rect(cx-86,base-190,172,25,'#111b2c');g.fillStyle='#f6dec0';g.fillText(defeated?'FOREMAN DEFEATED':'OVERPROOFED FOREMAN '+f.health+'/'+f.maxHealth,Math.round(cx),base-178);
   for(let i=0;i<6;i++)rect(cx-72+i*25,base-173,20,5,i<f.health?'#e9bb73':'#384352');
@@ -165,7 +194,7 @@ function drawForeman(){
    const label=f.phase==='windup'?(f.attack==='sweep'?'PEEL SWEEP · JUMP':'DOUGH TOSS · WATCH'):attacking?'SWEEP':f.phase==='toss'?'DOUGH TOSS':f.inv>0?'HIT · BRIEF GUARD':'OPENING · SHOOT / POGO';
    const ink=f.phase==='recovery'?'#bde6ed':'#ffe1a0';
    rect(cx-86,base-159,172,20,'#111b2c');g.fillStyle=ink;g.fillText(label,Math.round(cx),base-145,166);
-   const duration=f.phase==='windup'?60:attacking?18:f.phase==='toss'?24:120;
+   const duration=f.phase==='windup'?60:attacking?18:f.phase==='toss'?24:foremanRecoveryTicks();
    rect(cx-82,base-136,164,3,'#25384b');rect(cx-82,base-136,Math.ceil(164*f.timer/duration),3,ink);
    if(f.phase==='windup'&&f.attack==='sweep'){
     const box=foremanSweepBox();for(let x=box.x;x<box.x+box.w;x+=12)rect(x,base-2,8,2,'#ffe1a0');
@@ -184,3 +213,30 @@ function drawForeman(){
 }
 // Keep the earlier render-only test entry point; it has no simulation effects.
 function drawForemanPreview(){drawForeman();}
+
+let foremanWalkArt=null;
+const FOREMAN_WALK_SPRITES=[[44,95,528,535],[566,94,531,538],[1115,94,543,537],[1654,99,488,530]];
+function foremanCrownGuard(geo,f){
+ return (f.phase!=='recovery'||f.inv>0)&&(f.deflectCue>0||
+  (Math.abs(player.x+player.w/2-geo.cx)<70&&player.y+player.h<geo.base-70));
+}
+function drawForemanWalk(geo,f,guard=false){
+ if(!foremanWalkArt){foremanWalkArt=new Image();foremanWalkArt.src='art/foreman-walk.png';}
+ if(!foremanWalkArt.complete||foremanWalkArt.naturalWidth!==2172||foremanWalkArt.naturalHeight!==724)return false;
+ const frame=guard?3:[0,1,2,1][Math.floor(tick/12)%4],crop=FOREMAN_WALK_SPRITES[frame];if(!crop)return false;
+ g.drawImage(foremanWalkArt,...crop,-geo.width*.62,-geo.height,geo.width,geo.height);return true;
+}
+function drawForemanHeadState(geo,f){
+ const x=Math.round(geo.cx-6),y=geo.base-geo.height+5,open=f.phase==='recovery'&&f.inv===0;
+ g.save();g.lineWidth=2;g.strokeStyle='#fff0cb';g.fillStyle='#142033';
+ if(open){
+  // Separated shield halves: an opening survives monochrome/reduced motion.
+  g.beginPath();g.moveTo(x-4,y);g.lineTo(x-10,y+2);g.lineTo(x-10,y+8);g.lineTo(x-5,y+13);g.stroke();
+  g.beginPath();g.moveTo(x+4,y);g.lineTo(x+10,y+2);g.lineTo(x+10,y+8);g.lineTo(x+5,y+13);g.stroke();
+ }else{
+  g.beginPath();g.moveTo(x,y);g.lineTo(x+8,y+3);g.lineTo(x+7,y+10);g.lineTo(x,y+15);g.lineTo(x-7,y+10);g.lineTo(x-8,y+3);g.closePath();g.fill();g.stroke();
+  g.fillStyle='#fff0cb';g.fillRect(x-4,y+5,8,2);
+ }
+ if(f.deflectCue>0){g.beginPath();g.moveTo(x-15,y+8);g.lineTo(x-23,y+4);g.moveTo(x+15,y+8);g.lineTo(x+23,y+4);g.stroke();}
+ g.restore();
+}

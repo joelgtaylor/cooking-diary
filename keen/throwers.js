@@ -14,7 +14,7 @@ function updateThrower(e){
  if(e.windup>0){
   if(--e.windup===0){
    enemyShots.push({x:e.x+(e.face<0?-10:e.w+2),y:e.y+8,w:9,h:9,vx:e.face*2.3,life:150,owner:e});
-   e.attackT=150;
+   rememberSlingerRelease(e);e.attackT=150;
   }
  }else if(--e.attackT<=0){e.face=player.x<e.x?-1:1;e.windup=36;}
 }
@@ -44,4 +44,36 @@ function drawEnemyShots(){
   rect(s.x-1,s.y+2,11,6,'#593828');rect(s.x,s.y,9,8,'#bf884e');rect(s.x+1,s.y,6,3,'#ffe0a1');
   rect(s.x+3,s.y+3,2,2,'#765039');
  }
+}
+
+// Approved Moonlit slinger artwork. AI and projectiles above remain authoritative.
+let slingerArt=null;
+const slingerReleases=new WeakMap();
+const SLINGER_SPRITES=[{"crop":[29,176,489,412],"w":41.54,"h":35.0},{"crop":[573,177,502,411],"w":42.65,"h":34.92},{"crop":[1138,176,536,412],"w":45.53,"h":35.0},{"crop":[1724,176,408,412],"w":34.66,"h":35.0}];
+function slingerPilotEnabled(){return bakery===1&&visualIndicatorEnabled('slinger');}
+function slingerPilotEnemy(e){return e.type==='thrower';}
+function rememberSlingerRelease(e){if(slingerPilotEnabled()&&slingerPilotEnemy(e))slingerReleases.set(e,tick);}
+function slingerPose(e){
+ if(e.windup>0)return 1;
+ const fired=slingerReleases.get(e),age=tick-fired;
+ if(fired!==undefined&&age>=0&&age<6)return 2;
+ if(fired!==undefined&&age>=6&&age<24)return 3;
+ return 0;
+}
+function drawDoughSlinger(e){
+ if(!slingerPilotEnabled()||!slingerPilotEnemy(e))return false;
+ if(!slingerArt){slingerArt=new Image();slingerArt.src='art/moonlit-dough-slinger.png';}
+ if(!slingerArt.complete||slingerArt.naturalWidth!==2172||slingerArt.naturalHeight!==724)return false;
+ const sprite=SLINGER_SPRITES[slingerPose(e)];if(!sprite)return false;
+ if(contactSurface(e)!==null)drawContactShadow(e,22);
+ g.save();g.imageSmoothingEnabled=false;g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale(e.face<0?-1:1,1);
+ g.drawImage(slingerArt,...sprite.crop,-sprite.w/2,-sprite.h,sprite.w,sprite.h);g.restore();
+ if(e.windup>0){
+  const cx=Math.round(e.x+e.w/2),top=Math.round(e.y+e.h-62);
+  g.save();g.fillStyle='#101826';g.strokeStyle='#ffe3a1';g.lineWidth=2;
+  g.beginPath();g.moveTo(cx,top);g.lineTo(cx+8,top+14);g.lineTo(cx-8,top+14);g.closePath();g.fill();g.stroke();
+  g.fillStyle='#fff0c4';g.fillRect(cx-1,top+4,2,5);g.fillRect(cx-1,top+10,2,2);
+  g.fillStyle='#101826';g.fillRect(cx-17,top+18,35,3);g.fillStyle='#ffe3a1';g.fillRect(cx-17,top+18,Math.ceil((36-e.windup)/36*35),2);g.restore();
+ }
+ return true;
 }

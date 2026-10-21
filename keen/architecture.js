@@ -215,6 +215,15 @@ function drawPlungeIndicatorArt(){
 // the relay. This affects only the requested preview URL, never ordinary init.
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
+ if(/(?:^|[?&])scene=foreman(?:&|$)/.test(search)&&/(?:^|[?&])foreman=(?:pilot|off)(?:&|$)/.test(search)){
+  init(1);checkpointState.current=3;player.x=92*T;player.y=54*T-player.h;player.ground=true;player.face=1;camera=2400;cameraY=rows*T-H;state='pause';return;
+ }
+ if(/(?:^|[?&])scene=moonlit-summit(?:&|$)/.test(search)&&/(?:^|[?&])enemies=(?:pilot|off)(?:&|$)/.test(search)){
+  init(1);player.x=69*T;player.y=19*T-player.h;player.ground=true;camera=player.x-W*.52;cameraY=player.y-H*.52;state='pause';return;
+ }
+ if(/(?:^|[?&])scene=slinger(?:&|$)/.test(search)&&/(?:^|[?&])slinger=(?:pilot|off)(?:&|$)/.test(search)){
+  init(1);player.x=26*T;player.y=40*T-player.h;player.ground=true;camera=600;cameraY=1000;state='pause';return;
+ }
  if(/(?:^|[?&])scene=baker-workshop(?:&|$)/.test(search)&&/(?:^|[?&])baker=(?:pilot|off)(?:&|$)/.test(search)){
   init(1);player.x=16*T;player.y=54*T-player.h;player.ground=true;camera=0;cameraY=rows*T-H;return;
  }
