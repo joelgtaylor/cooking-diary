@@ -39,6 +39,7 @@ function gremlinAnimation(e){
  return {row,frame:Math.floor(actorAnimation(e,row)/duration)%4};
 }
 function drawPlayer(){
+if(drawBakerPilot())return;
 if(player.ground&&!player.hang&&!pogoOn)drawContactShadow(player,25);
 if(!player.inv||tick%8<4){
 // CRUST_PHASE4: animation state selection follows physics without changing it.
