@@ -76,7 +76,9 @@ function apply({map}){
  }
  return {
   gems:cultures.map(([x,y])=>({x:x*T+12,y:y*T,got:false})),
-  enemies:enemies.map(([x,y,type],i)=>i===1?{x:42*T,y:38*T-25,w:25,h:25,vx:-1.1,vy:0,alive:true,type:'walker',hopT:0,encounter:{left:41.5*T,right:44*T-25}}:i===2?{x:85*T,y:24*T-25,w:25,h:25,vx:-1.1,vy:0,alive:true,type:'walker',hopT:0,encounter:{left:85*T,right:87*T-25}}:({
+  // The lower ascension walker stands ON its one-way shelf, not in it.
+  // Explicit bounds use the authored span [25,45,7], as with newer encounters.
+  enemies:enemies.map(([x,y,type],i)=>i===0?{x:x*T,y:y*T-25,w:25,h:25,vx:-1.1,alive:true,type,vy:0,hopT:30,encounter:{left:25*T,right:32*T-25}}:i===1?{x:42*T,y:38*T-25,w:25,h:25,vx:-1.1,vy:0,alive:true,type:'walker',hopT:0,encounter:{left:41.5*T,right:44*T-25}}:i===2?{x:85*T,y:24*T-25,w:25,h:25,vx:-1.1,vy:0,alive:true,type:'walker',hopT:0,encounter:{left:85*T,right:87*T-25}}:({
    x:x*T,y:y*T,w:25,h:25,vx:i%2?1.1:-1.1,alive:true,type,vy:0,hopT:30+i*9
   })).concat(encounters.map(({left,right,...e})=>({...e,w:25,h:25,vx:1.1,vy:0,alive:true,encounter:{left,right}}))).concat([{x:30*T,y:40*T-25,w:25,h:25,vx:0,vy:0,alive:true,type:'thrower',attackT:90,windup:0,face:-1},{x:73*T,y:19*T-25,w:25,h:25,vx:0,vy:0,alive:true,type:'thrower',attackT:90,windup:0,face:-1}]),
   powerups:[[38,39,'kefir'],[70,17,'banneton'],[92,33,'rye']]
