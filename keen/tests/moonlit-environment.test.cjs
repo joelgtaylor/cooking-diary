@@ -66,3 +66,29 @@ test('section shortcuts pause for inspection and never grant progress or save re
   assert.equal(g.run('collected'),0);assert.equal(g.storage.size,0);
  }
 });
+test('layout fitting adds only five one-way end cells and preserves all encounters and progression',()=>{
+ const a=game(),b=game({}, {layoutFixture:'bakery1-environment-before-fitting.js'});
+ const changes=[];
+ for(let y=0;y<56;y++)for(let x=0;x<105;x++){
+  const before=b.run(`map[${y}][${x}]`),after=a.run(`map[${y}][${x}]`);
+  if(before!==after){assert.equal(before,'.');assert.equal(after,'=');changes.push([x,y]);}
+ }
+ assert.deepEqual(changes,[[72,27],[70,29],[61,33],[39,42],[32,45]]);
+ for(const expr of ['enemies','gems','checkpointState','powerups','foremanGeometry()'])
+  assert.equal(a.run(`JSON.stringify(${expr})`),b.run(`JSON.stringify(${expr})`));
+ for(const r of a.run("moonlitPlatformRuns().filter(r=>moonlitPlatformKind(r.x,r.y)==='bridge')"))
+  assert.equal(r.w%2,0);
+});
+test('architectural panels, tower faces and full/half truss bays retain source proportions',()=>{
+ const {createHash}=require('node:crypto');
+ const hash=createHash('sha256').update('art/moonlit-architecture.png').digest('hex');
+ const g=game();ready(g);g.trace.length=0;
+ for(const [cx,cy] of [[0,1252],[760,850],[1540,430],[2400,1252]])
+  g.run(`camera=${cx};cameraY=${cy};drawMoonlitEnvironment();drawMoonlitPlatformBacking();drawMoonlitPlatformFaces()`);
+ const images=g.trace.filter(c=>c[0]==='drawImage'&&c[1]?.image===hash);
+ assert.ok(images.length>20);
+ for(const c of images){
+  const sw=c[4],sh=c[5],dw=c[8],dh=c[9];
+  assert.ok(Math.abs(dw/sw-dh/sh)<=1/Math.min(sw,sh),JSON.stringify(c));
+ }
+});

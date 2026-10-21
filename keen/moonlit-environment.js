@@ -1,5 +1,6 @@
 /* Moonlit Bakery architectural kit. Rendering only: the authored map is the
- * sole source of collision, platform extent and traversable landing height. */
+ * sole source of collision, platform extent and traversable landing height.
+ * Art modules retain their source proportions inside those authored spans. */
 'use strict';
 const MOONLIT_ENVIRONMENT_CROPS=Object.freeze([
  // Crops are filled from the reviewed production atlas, not the concept map.
@@ -12,21 +13,38 @@ function moonlitEnvironmentReady(){
   !/(?:^|[?&])environment=off(?:&|$)/.test(window.location?.search||'')&&
   a&&a.complete&&a.naturalWidth===1536&&a.naturalHeight===1024;
 }
-function moonlitPiece(cell,x,y,w,h,alpha=1){
+function moonlitPiece(cell,x,y,w,h,alpha=1,source=MOONLIT_ENVIRONMENT_CROPS[cell]){
  if(x+w<camera||x>camera+W||y+h<cameraY||y>cameraY+H)return;
  g.save();g.imageSmoothingEnabled=false;
  // Dim recessed materials without making masonry look transparent/ghostly.
  g.filter='brightness('+alpha+')';
- g.drawImage(assets.moonlitArchitecture,...MOONLIT_ENVIRONMENT_CROPS[cell],
-  Math.round(x),Math.round(y),Math.round(w),Math.round(h));g.restore();
+ const [, ,sw,sh]=source;
+ const scale=Math.min(w/sw,h/sh),dw=Math.round(sw*scale),dh=Math.round(sh*scale);
+ g.drawImage(assets.moonlitArchitecture,...source,
+  Math.round(x+(w-dw)/2),Math.round(y),dw,dh);g.restore();
+}
+function moonlitMasonry(x,y,w,h,brightness=.55){
+ g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+ g.filter='brightness('+brightness+')';
+ const a=assets.moonlitTerrain;
+ if(a&&a.complete&&a.naturalWidth===256&&a.naturalHeight===96){
+  for(let yy=y;yy<y+h;yy+=T)for(let xx=x;xx<x+w;xx+=T)
+   g.drawImage(a,((Math.floor(xx/T)+Math.floor(yy/T)*3)%8)*32,64,32,32,xx,yy,T,T);
+ }else rect(x,y,w,h,'#252332');
+ g.restore();
 }
 // Recessed walls use muted panels with no bright top coping. They sit behind
 // actors; the brighter opaque tile pass alone defines a playable boundary.
 function moonlitFacade(kind,x,y,w,h,alpha=.72){
- const panelHeight=kind===0?6*T:8*T;
+ const panelWidth=Math.min(w,kind===0?4*T:3*T);
+ const [, ,sw,sh]=MOONLIT_ENVIRONMENT_CROPS[kind];
+ const panelHeight=Math.round(panelWidth*sh/sw);
+ const bays=Math.max(1,Math.floor(w/panelWidth)),pitch=w/bays;
  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+ moonlitMasonry(x,y,w,h,alpha);
  for(let yy=y;yy<y+h;yy+=panelHeight)
-  moonlitPiece(kind,x,yy,w,panelHeight,alpha);
+  for(let bay=0;bay<bays;bay++)
+   moonlitPiece(kind,x+bay*pitch,yy,pitch,panelHeight,alpha);
  g.restore();
 }
 function drawMoonlitEnvironment(){
@@ -55,7 +73,7 @@ function drawMoonlitEnvironment(){
  moonlitFacade(0,45*T,35*T,4*T,19*T,.48);
  // Tower foundations and vertical ribs make the summit feel immense without
  // introducing a front-facing collision wall in the one-way route.
- for(const [x,y,w] of [[54,33,7],[65,29,5],[70,19,3],[73,27,5]])
+ for(const [x,y,w] of [[54,33,8],[65,29,6],[70,19,3],[72,27,6]])
   moonlitFacade(1,x*T,y*T+T,w*T,(54-y-1)*T,.58);
  // The solid watchtower and checkpoint parapet retain their full silhouette.
  moonlitFacade(1,70*T,19*T,3*T,5*T,.95);
@@ -65,7 +83,7 @@ function drawMoonlitEnvironment(){
  // Destination framing stays behind the entire Foreman encounter. No new
  // foreground objects cover attacks, the oven, flags or defeat animation.
  moonlitPiece(2,91*T,43*T,12*T,11*T,.67);
- for(const x of [89,103])moonlitFacade(1,x*T,40*T,T,14*T,.65);
+ for(const x of [89,103])moonlitMasonry(x*T,40*T,T,14*T,.65);
  return true;
 }
 
@@ -93,7 +111,15 @@ function drawMoonlitPlatformBacking(){
   const x=r.x*T,y=r.y*T,w=r.w*T;
   if(x+w<camera||x>camera+W||y+T*2<cameraY||y>cameraY+H)continue;
   const kind=moonlitPlatformKind(r.x,r.y);
-  if(kind==='bridge')moonlitPiece(4,x,y,w,2*T,.68);
+  if(kind==='bridge'){
+   for(let dx=0;dx<w;dx+=4*T){
+    const width=Math.min(4*T,w-dx);
+    // A short end bay uses the right half (including its end post), never
+    // a complete bridge squeezed to half width.
+    const crop=width===2*T?[861,740,270,188]:MOONLIT_ENVIRONMENT_CROPS[4];
+    moonlitPiece(4,x+dx,y,width,45,.85,crop);
+   }
+  }
   if(kind==='stone'){
    // Stepped cantilever corbels grow down from the real underside. Their
    // muted faces never add a second bright horizontal landing surface.
@@ -120,6 +146,7 @@ function prepareMoonlitEnvironmentPreview(search){
 function drawMoonlitPlatformFaces(){
  if(!moonlitEnvironmentReady())return;
  for(const [x,y,w,h] of [[19,44,3,4],[70,19,3,5]]){
+  moonlitMasonry(x*T,y*T,w*T,h*T,.8);
   moonlitPiece(1,x*T,y*T,w*T,h*T,.9);
   rect(x*T,y*T,w*T,4,'#d7bc91');rect(x*T,y*T+4,w*T,2,'#69505a');
  }

@@ -1,9 +1,10 @@
 # Moonlit Bakery environmental architecture
 
 October 21, 2026. Based on the approved four-section environmental concept.
-This pass changes Bakery 1 rendering only. The authored layouts, collision,
-physics, enemies, bosses, indicators, checkpoint state, music and recipes are
-unchanged. Bakery 2 and Bakery 3 retain their approved presentation.
+The initial pass changed Bakery 1 rendering only. The subsequent approved
+fitting correction adds five one-way end cells to complete two-tile bridge
+bays; all existing landing heights, physics, enemies, bosses, indicators,
+checkpoint state, music and recipes remain unchanged. Bakery 2 and Bakery 3 retain their approved presentation.
 
 `moonlit-architecture.png` is a 1536 × 1024 transparent production atlas created
 with built-in image generation. `moonlit-environment.js` owns its reviewed crop
@@ -56,7 +57,25 @@ assuming a regular grid. The window component is reserved for future sections.
 Run `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs`.
 The additional checks cover atlas bounds, loading/off fallback, stage isolation,
 actual landing alignment, pure rendering, deterministic gameplay with art on
-and off, and preview shortcuts without progress writes. Existing world render
-trace baselines remain unchanged; the new kit has its own preservation checks.
+and off, and preview shortcuts without progress writes. Bakery 1 world render
+traces include the five added tiles (including their minimap marks); Bakery 2
+and Bakery 3 traces remain unchanged. The kit has its own preservation checks.
 Four section compositions were rendered with native Canvas and visually
 inspected, including enemy/flag/pickup visibility and the Foreman arena.
+
+## Proportional fitting correction
+
+Whole facade panels and bridges previously stretched to arbitrary spans.
+Facade bays now repeat at their source aspect ratio over masonry infill. Solid
+tower fronts fit uniformly within their existing footprints. Roof strips keep
+their proportions; bridge end bays crop the right half of a truss instead of
+squeezing a whole truss.
+
+The user authorized small layout adjustments to fit the art. Exactly five
+formerly empty cells now contain one-way platforms: `(32,45)`, `(39,42)`,
+`(61,33)`, `(70,29)`, `(72,27)`. All other collision cells are identical. The
+last bridge extends left, keeping its right edge out of the descent section.
+A frozen pre-fitting layout is retained only as a regression fixture. Tests
+verify the exact delta, unchanged encounter/progression data, complete bridge
+bays, and proportional source/destination rectangles. All 322 tests pass,
+including existing normal-jump, pogo, recovery and descent route checks.

@@ -3,6 +3,8 @@ const assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 test('Oven Descent preserves approved terrain and encounters before column 78',()=>{
  const a=game(),b=game({}, {layoutFixture:'bakery1-towers.js'});const am=a.run('map'),bm=b.run('map');
+ // Include the five approved bridge-bay extensions in the earlier baseline.
+ b.run("for(const [x,y] of [[32,45],[39,42],[61,33],[70,29],[72,27]])map[y][x]='=';");
  // Historical fixture retains the sunk walker; allow only its reviewed placement/patrol fix.
  b.run('enemies[0].y-=enemies[0].h;enemies[0].encounter={left:25*T,right:32*T-25};');
  for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x>=78&&y>=20&&y<=53);
