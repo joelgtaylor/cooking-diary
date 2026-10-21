@@ -201,7 +201,7 @@ function drawPlungeIndicatorArt(){
 // the relay. This affects only the requested preview URL, never ordinary init.
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
- if(prepareSupplyPreview(search))return;
+ if(prepareSupplyPreview(search)||prepareOvenPreview(search))return;
  const scene=search.match(/(?:^|[?&])scene=(plunge|clockwork|clockwork-return)(?:&|$)/);
  if(!scene||!/(?:^|[?&])signs=(?:pilot|off)(?:&|$)/.test(search))return;
  if(scene[1]!=='plunge'){

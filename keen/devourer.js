@@ -24,7 +24,7 @@ function drawReleasedOven(f){
  g.save();
  if(!o.landed){const angle=Math.sin(o.age/48*Math.PI)*.3*Math.sign(o.targetX-o.fromX);g.translate(o.x,o.foot-57.5);g.rotate(angle);g.translate(-o.x,-o.foot+57.5);}
  drawGrandOven({x:o.x,foot:o.foot,ready:!!(collected===5&&devourerOvenReady())});g.restore();
- if(o.landed)worldBadge(collected===5&&devourerOvenReady()?'REAL OVEN — FINISH HERE':'REAL OVEN',o.x,54*T-138,'#ffe5b0');
+ if(o.landed&&!ovenGoalIndicatorReady())worldBadge(collected===5&&devourerOvenReady()?'REAL OVEN — FINISH HERE':'REAL OVEN',o.x,54*T-138,'#ffe5b0');
 }
 function resupplyDevourerCheckpoint(){
  player.health=Math.max(3,player.health);player.ammo=Math.max(65,player.ammo);player.kefirCharges=Math.max(1,player.kefirCharges||0);

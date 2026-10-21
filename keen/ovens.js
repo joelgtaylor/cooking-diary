@@ -45,16 +45,54 @@ function drawOvenFire(m,ready){
   g.save();g.globalAlpha=.8;ovenLoaf(m.emblemX,m.emblemY+6,18);g.restore();
  }
 }
+let ovenGoalArt=null;
+const OVEN_GOAL_FRAMES=[[30,32,1194,280],[30,338,1194,290],[30,652,1194,264]];
+const OVEN_GOAL_ICONS=[[48,934,228,290],[364,934,212,290],[630,930,290,296],[942,930,296,296]];
+function ovenGoalIndicatorReady(){
+ if(!/(?:^|[?&])goals=pilot(?:&|$)/.test(window.location&&window.location.search||''))return false;
+ if(bakery===3&&!devourerState?.finishOven?.landed)return false;
+ if(!ovenGoalArt){ovenGoalArt=new Image();ovenGoalArt.src='art/oven-goal-indicators.png';}
+ return ovenGoalArt.complete&&ovenGoalArt.naturalWidth===1254&&ovenGoalArt.naturalHeight===1254;
+}
+function drawOvenGoalIndicator(placement){
+ if(!ovenGoalIndicatorReady())return false;
+ const target=currentVerticalLayout().oven;
+ const cx=placement?placement.x:target.x*T+24.5;
+ const foot=placement?placement.foot:checkpointSupportRow(target.x,target.y)*T;
+ const top=foot-158,ready=collected===5&&foremanOvenReady()&&bloomrotOvenReady()&&devourerOvenReady();
+ g.save();g.imageSmoothingEnabled=false;
+ g.drawImage(ovenGoalArt,...OVEN_GOAL_FRAMES[bakery-1],cx-56,top,112,36);
+ for(let i=0;i<5;i++)g.drawImage(ovenGoalArt,...OVEN_GOAL_ICONS[i<collected?0:1],cx-44+i*13,top+9,11,18);
+ g.drawImage(ovenGoalArt,...OVEN_GOAL_ICONS[ready?3:2],cx+26,top+6,24,24);
+ g.restore();return true;
+}
+// Explicit, isolated review scenes; normal starts and progression are unchanged.
+function prepareOvenPreview(search){
+ const scene=search.match(/(?:^|[?&])scene=oven-(missing|locked|ready)-([123])(?:&|$)/);
+ if(!scene||!/(?:^|[?&])goals=(?:pilot|off)(?:&|$)/.test(search))return false;
+ const stage=Number(scene[2]),state=scene[1];init(stage);
+ collected=state==='missing'?3:5;
+ gems.forEach((gem,i)=>gem.got=i<collected);checkpointState.current=3;player.ammo=65;
+ if(state!=='locked'){
+  const boss=stage===1?foremanState:stage===2?bloomrotState:devourerState;
+  boss.health=0;boss.phase='defeated';boss.timer=0;boss.defeatImpact=true;
+  if(stage===2){const a=bloomrotArena();bloomrotGate(a.entry,false);bloomrotGate(a.exit,false);}
+  if(stage===3){boss.defeatAge=90;releaseDevourerOven(boss);for(let i=0;i<48;i++)updateReleasedOven(boss);devourerGate(false);}
+ }
+ player.x=(stage===3?(state==='locked'?103:85.5):stage===2?100:99)*T;
+ player.y=54*T-player.h;player.ground=true;camera=world-W;cameraY=rows*T-H;
+ return true;
+}
 function drawGrandOven(placement){
  const art=assets.grandOvens;
- if(!art||!art.complete||art.naturalWidth!==288||art.naturalHeight!==176){drawOvenFallback(placement);return;}
+ if(!art||!art.complete||art.naturalWidth!==288||art.naturalHeight!==176){drawOvenFallback(placement);drawOvenGoalIndicator(placement);return;}
  const target=currentVerticalLayout().oven;
  const x=placement?placement.x-32.5:target.x*T-8,base=placement?placement.foot:checkpointSupportRow(target.x,target.y)*T;
  g.save();g.translate(x,base-115);g.scale(65/96,115/176);
  g.imageSmoothingEnabled=false;
  g.drawImage(art,(bakery-1)*96,0,96,176,0,0,96,176);
  drawOvenFire(OVEN_MOUTHS[bakery-1],placement?placement.ready:(foremanOvenReady()&&bloomrotOvenReady()));
- g.restore();
+ g.restore();drawOvenGoalIndicator(placement);
 }
 function drawOvenFallback(placement){
 const ex=placement?placement.x-24.5:currentVerticalLayout().oven.x*T,y=placement?placement.foot-115:currentVerticalLayout().oven.y*T;
