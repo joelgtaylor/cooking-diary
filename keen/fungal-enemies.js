@@ -8,6 +8,7 @@ const FUNGAL_CROPS=[
 ];
 let fungalArt=null,sporewingArt=null;
 const fungalReleases=new WeakMap();
+function fungalThrowerTiming(){return fungalPilotEnabled()?{ready:30,windup:24,recovery:84}:{ready:90,windup:36,recovery:150};}
 function rememberFungalRelease(e){if(fungalPilotEnabled())fungalReleases.set(e,tick);}
 function fungalPose(e){
  if(e.type==='walker')return Math.floor(tick/9)%4;
@@ -31,7 +32,7 @@ function drawFungalEnemy(e){
  if(contactSurface(e)!==null)drawContactShadow(e,22);
  g.save();g.imageSmoothingEnabled=false;g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale((e.type==='thrower'?e.face:e.vx)<0?-1:1,1);
  g.drawImage(fungalArt,...crop,-w/2,-h,w,h);g.restore();
- if(e.type==='thrower'&&e.windup>0)drawFungalWarning(e.x+e.w/2,e.y-22,(36-e.windup)/36);
+ if(e.type==='thrower'&&e.windup>0)drawFungalWarning(e.x+e.w/2,e.y-22,(fungalThrowerTiming().windup-e.windup)/fungalThrowerTiming().windup);
  return true;
 }
 function drawFungalWarning(x,y,progress){
@@ -46,6 +47,7 @@ function drawFungalShot(s){
 }
 function addSporewingPilot(){
  if(!fungalPilotEnabled())return;
+ for(const e of enemies)if(e.type==='thrower')e.attackT=fungalThrowerTiming().ready;
  enemies.push({type:'flyer',x:3*T,y:50*T,w:25,h:25,vx:1.1,vy:0,alive:true,
   flight:{left:T,right:8*T,homeY:50*T,phase:'patrol',timer:0,cooldown:90,direction:1,targetY:0}});
 }
@@ -67,19 +69,38 @@ function updateSporewing(e){
   if(nx<f.left||nx>f.right||hit(nx,e.y,e.w,e.h))f.direction*=-1;
   else e.x=nx;
   e.vx=f.direction*1.1;
-  if(f.cooldown===0&&sporewingCanDive(e)){f.phase='warn';f.timer=36;f.targetY=Math.min(player.y+player.h-e.h,f.homeY+190);e.vx=0;}
+  if(f.cooldown===0&&sporewingCanDive(e)){f.phase='warn';f.timer=24;f.patrolX=e.x;e.vx=0;}
  }else if(f.phase==='warn'){
-  e.vx=0;if(--f.timer<=0){f.phase='dive';f.timer=45;}
+  e.vx=0;
+  if(--f.timer<=0){
+   // Aim once at release. A modest lead catches a steady walk; changing course
+   // after launch still dodges. The dive never homes on the player.
+   f.targetY=Math.min(player.y+player.h-e.h,f.homeY+190);
+   const dy=Math.max(1,f.targetY-e.y),speed=7;
+   let frames=dy/speed;
+   for(let i=0;i<3;i++){
+    f.targetX=Math.max(T,Math.min(world-e.w-T,player.x+player.w/2-e.w/2+Math.max(-80,Math.min(80,player.vx*frames))));
+    frames=Math.hypot(f.targetX-e.x,dy)/speed;
+   }
+   f.steps=Math.max(1,Math.ceil(frames));f.diveVX=(f.targetX-e.x)/f.steps;f.diveVY=dy/f.steps;
+   f.phase='dive';f.timer=f.steps;
+  }
  }else if(f.phase==='dive'){
-  const next=Math.min(e.y+5,f.targetY),support=oneWayTop(e.x,e.y+e.h,next+e.h,e.w);
-  if(hit(e.x,next,e.w,e.h)||support!==null||next>=f.targetY||--f.timer<=0){f.phase='brake';f.timer=24;}
-  else{e.vy=5;e.y=next;}
+  const nx=e.x+f.diveVX,next=Math.min(e.y+f.diveVY,f.targetY);
+  const support=oneWayTop(Math.min(e.x,nx),e.y+e.h,next+e.h,e.w+Math.abs(nx-e.x));
+  if(hit(nx,next,e.w,e.h)||support!==null){f.phase='brake';f.timer=24;e.vx=0;}
+  else{
+   e.vx=f.diveVX;e.vy=f.diveVY;e.x=nx;e.y=next;
+   if(--f.timer<=0){f.phase='brake';f.timer=24;}
+  }
  }else if(f.phase==='brake'){
   e.vx=0;if(--f.timer<=0){f.phase='return';f.timer=150;}
  }else{
-  const next=Math.max(f.homeY,e.y-2);
-  if(!hit(e.x,next,e.w,e.h)){e.vy=-2;e.y=next;}
-  if(e.y<=f.homeY){f.phase='patrol';f.cooldown=120;e.vy=0;}
+  const next=Math.max(f.homeY,e.y-2),homeX=f.patrolX??Math.max(f.left,Math.min(f.right,e.x));
+  const nx=e.x+Math.max(-2.5,Math.min(2.5,homeX-e.x));
+  if(!hit(nx,next,e.w,e.h)){e.vx=nx-e.x;e.vy=next-e.y;e.x=nx;e.y=next;}
+  else if(!hit(e.x,next,e.w,e.h)){e.vy=next-e.y;e.y=next;}
+  if(e.y<=f.homeY&&Math.abs(e.x-homeX)<.1){f.phase='patrol';f.cooldown=120;e.vy=0;}
   // Solid impact can never leave the flyer in a damaging stuck dive.
   else if(--f.timer<=0){f.phase='patrol';f.homeY=e.y;f.cooldown=120;}
  }
@@ -97,7 +118,7 @@ function drawSporewing(e){
   rect(e.x-10,e.y+4,45,7,'#bde8ea');rect(e.x,e.y,25,25,'#d8c5e8');rect(e.x+5,e.y+12,15,7,'#f9e7c6');
  }
  if(e.flight.phase==='warn'){
-  drawFungalWarning(e.x+e.w/2,e.y-12,(36-e.flight.timer)/36);
+  drawFungalWarning(e.x+e.w/2,e.y-12,(24-e.flight.timer)/24);
   const x=e.x+e.w/2,y=e.y+e.h+5;g.save();g.strokeStyle='#fff0c4';g.lineWidth=2;g.beginPath();g.moveTo(x-6,y);g.lineTo(x,y+5);g.lineTo(x+6,y);g.stroke();g.restore();
  }
 }
