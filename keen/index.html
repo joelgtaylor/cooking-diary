@@ -17,6 +17,7 @@
 <script src="art/environment-gameplay-atlas.js"></script>
 <script src="audio-engine.js"></script>
 <script src="audio.js"></script>
+<script src="performance.js"></script>
 <script src="timing.js"></script>
 <script src="camera.js"></script>
 <script src="world.js?v=clockwork-worlds-20261021"></script>
@@ -34,6 +35,7 @@
 <script src="hud.js"></script>
 <script src="ovens.js"></script>
 <script src="interactables.js"></script>
+<script src="art/moonlit-shading.js"></script>
 <script src="moonlit-environment.js?v=clockwork-worlds-20261021"></script>
 <script src="fungal-environment.js?v=clockwork-worlds-20261021"></script>
 <script src="clockwork-environment.js?v=clockwork-worlds-20261021"></script>
@@ -75,13 +77,15 @@ function codexFlip(d){codexPage=(codexPage+d+RECIPES.length)%RECIPES.length;Audi
 // CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
 for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'+q,window.__PHASE3_BG[q]);
 const simulationClock=createFixedStepClock();
+const frameMonitor=createFrameMonitor();
 function simulationStep(){if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();}
 function loop(now){try{
  AudioKit.scene?.(bakery,state);
  if(Number.isFinite(now))presentationNow=now;
  if(document.hidden){simulationClock.reset();requestAnimationFrame(loop);return;}
+ frameMonitor?.begin(now);
  simulationClock.advance(now,simulationStep);
- draw();diagnosticOverlay();drawPhase3Map();requestAnimationFrame(loop);
+ draw();diagnosticOverlay();drawPhase3Map();frameMonitor?.end();requestAnimationFrame(loop);
 }catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}
 document.addEventListener('visibilitychange',()=>simulationClock.reset());const statusEl=document.getElementById('status');
 const minimap=document.getElementById('verticalMap');

@@ -17,7 +17,7 @@ function moonlitPiece(cell,x,y,w,h,alpha=1,source=MOONLIT_ENVIRONMENT_CROPS[cell
  if(x+w<camera||x>camera+W||y+h<cameraY||y>cameraY+H)return;
  g.save();g.imageSmoothingEnabled=false;
  // Dim recessed materials without making masonry look transparent/ghostly.
- g.filter='brightness('+alpha+')';
+ g.filter=alpha===1?'none':'brightness('+alpha+')';
  const [, ,sw,sh]=source;
  const scale=Math.min(w/sw,h/sh),dw=Math.round(sw*scale),dh=Math.round(sh*scale);
  g.drawImage(assets.moonlitArchitecture,...source,
@@ -29,13 +29,17 @@ function moonlitMasonry(x,y,w,h,brightness=.55){
  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
  const a=assets.moonlitTerrain;
  const ready=a&&a.complete&&a.naturalWidth===256&&a.naturalHeight===96;
- g.filter='brightness('+brightness+')';
+ const meta=window.CrustMoonlitShading;
+ const shade=meta?.terrainBrightness.indexOf(brightness)??-1;
+ const shaded=assets['moonlitShadedTerrain'+shade];
+ const baked=!/(?:^|[?&])shading=off(?:&|$)/.test(window.location?.search||'')&&shade>=0&&shaded?.complete&&shaded.naturalWidth===256&&shaded.naturalHeight===96;
+ g.filter=baked?'none':'brightness('+brightness+')';
  if(ready){
   // Keep the original texture origin when clipping to visible tile bays.
   const x0=x+Math.max(0,Math.floor((camera-margin-x)/T))*T;
   const y0=y+Math.max(0,Math.floor((cameraY-margin-y)/T))*T;
   for(let yy=y0;yy<Math.min(y+h,cameraY+H+margin);yy+=T)for(let xx=x0;xx<Math.min(x+w,camera+W+margin);xx+=T)
-   g.drawImage(a,((Math.floor(xx/T)+Math.floor(yy/T)*3)%8)*32,64,32,32,xx,yy,T,T);
+   g.drawImage(baked?shaded:a,((Math.floor(xx/T)+Math.floor(yy/T)*3)%8)*32,64,32,32,xx,yy,T,T);
  }else rect(x,y,w,h,'#252332');
  g.restore();
 }

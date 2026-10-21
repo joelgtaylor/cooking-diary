@@ -19,8 +19,8 @@ const root=path.resolve(__dirname,'../..');const {game}=require('../tests/game-h
    const start=performance.now();for(let i=0;i<60;i++)b.run('drawWorld()');const ms=(performance.now()-start)/60;
    console.log(mode,scene,ms.toFixed(2)+' ms/frame');
    const now=ctx.getImageData(0,0,960,540).data;
-   if(mode==='before')pixels.set(scene,Buffer.from(now));
-   else if(pixels.has(scene)){require('node:assert/strict').deepEqual(Buffer.from(now),pixels.get(scene));console.log('  pixel-identical to baseline');}
+   if(mode==='before'){pixels.set(scene,Buffer.from(now));if(process.env.PROFILE_IMAGES)fs.writeFileSync('/tmp/shaded-'+scene+'-before.png',surface.toBuffer('image/png'));}
+   else if(pixels.has(scene)){let changed=0,max=0;for(let i=0;i<now.length;i++){const d=Math.abs(now[i]-pixels.get(scene)[i]);if(d)changed++;max=Math.max(max,d);}console.log('  changed channels',changed,'max delta',max);if(process.env.PROFILE_IMAGES)fs.writeFileSync('/tmp/shaded-'+scene+'-after.png',surface.toBuffer('image/png'));}
   }
  }
 })();
