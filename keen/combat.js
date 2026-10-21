@@ -51,7 +51,8 @@ function updateEncounterEnemy(e){
 }
 function updateEnemies(){
 for(const e of enemies){if(!e.alive)continue;
-if(e.type==='thrower')updateThrower(e);
+if(e.type==='flyer')updateSporewing(e);
+else if(e.type==='thrower')updateThrower(e);
 else if(e.encounter)updateEncounterEnemy(e);
 else if(e.type==='hopper'){e.hopT--;const onG=hit(e.x,e.y+e.h+1,e.w,2);if(onG){e.vy=0;const ax=e.x+Math.sign(e.vx||1)*20;if(hit(e.x+e.vx,e.y,e.w,e.h)||!hit(ax,e.y+e.h+8,4,4))e.vx*=-1;if(e.hopT<=0){e.vy=-7.5;e.hopT=50+Math.random()*40}}else e.vy=Math.min(10,(e.vy||0)+0.5);const ny2=e.y+e.vy;if(!hit(e.x,ny2,e.w,e.h))e.y=ny2;else{e.vy=0;e.y=Math.floor((e.y+e.h)/T)*T-e.h}if(e.y>620)e.alive=false;const n2=e.x+e.vx;if(!hit(n2,e.y,e.w,e.h))e.x=n2;else e.vx*=-1}
 else if(e.type==='chaser'){const dx=(player.x+player.w/2)-(e.x+e.w/2);if(Math.abs(dx)<220)e.vx+=(Math.sign(dx)*1.8-e.vx)*0.06;else e.vx+=(Math.sign(e.vx||1)*1.1-e.vx)*0.06;const n3=e.x+e.vx;if(hit(n3,e.y,e.w,e.h)||!hit(n3+Math.sign(e.vx)*14,e.y+e.h+8,4,4))e.vx*=-1;else e.x=n3}
