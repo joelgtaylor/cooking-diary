@@ -191,6 +191,7 @@ if(bakery!==3)for(let k=0;k<18;k++){
 }
 drawYeastCollectibles();
 for(const u of powerups)if(!u.got||u.kind==='ammo'){const uy=u.y+(u.got?0:Math.sin(tick*.08+u.ph)*3);
+if(drawSupplyPickup(u,uy))continue;
 if(u.kind==='ammo'){
  rect(u.x-14,uy-13,28,25,'#272633');rect(u.x-11,uy-10,22,19,u.got?'#51505b':'#a77d50');
  for(let i=0;i<3;i++){rect(u.x-8+i*6,uy-7,4,12,u.got?'#77727b':'#ffe2a4');rect(u.x-7+i*6,uy-9,2,2,u.got?'#77727b':'#fff1cf');}
