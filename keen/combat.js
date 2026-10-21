@@ -2,7 +2,7 @@
 'use strict';
 // Third-tick units give an exact 26/3-tick period: 50% faster than13ticks.
 let playerFireCooldown=0;
-function resetPlayerFire(){playerFireCooldown=0;}
+function resetPlayerFire(){playerFireCooldown=0;clearBakerShot();}
 function damage(){if(player.inv)return;if(player.shield){player.shield=false;player.inv=60;burst(player.x+14,player.y+14,'#9af3fa',12);floater(player.x+14,player.y-10,'SHIELD BLOCK','#9af3fa');AudioKit.effect('enemy');return}AudioKit.effect('hit');player.health--;player.inv=90;player.vy=-8;shake=12;burst(player.x+10,player.y+10,'#ff648e',12);if(player.health<=0){respawnCheckpoint()}}
 
 function updateCombat(shoot,aimUp=false){
@@ -18,7 +18,7 @@ function updateProjectiles(shoot,aimUp=false){
  if(playerFireCooldown>0)playerFireCooldown-=3;
  if(shoot&&playerFireCooldown<=0&&player.ammo>0){
   shots.push(aimUp?{x:player.x+player.w/2-3,y:player.y-4,w:6,h:10,vx:0,vy:-10}:{x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});
-  playerFireCooldown+=26;player.ammo--;AudioKit.effect('shoot');
+  rememberBakerShot(aimUp);playerFireCooldown+=26;player.ammo--;AudioKit.effect('shoot');
  }else if(!shoot&&playerFireCooldown<0)playerFireCooldown=0;
  for(const s of shots){
   s.x+=s.vx;s.y+=s.vy||0;if(hit(s.x,s.y,s.w,s.h))s.dead=true;
