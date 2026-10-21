@@ -45,3 +45,8 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
  const a=pilot('?baker=pilot&scene=baker-workshop');assert.equal(a.run('contactSurface(player)'),54*32);assert.equal(a.storage.size,0);assert.equal(a.run('collected'),0);
  a.run('var blob={x:100,y:100,w:10,h:6,vx:10};var beforeBlob=JSON.stringify(blob);drawDoughShot(blob)');assert.equal(a.run('JSON.stringify(blob)'),a.run('beforeBlob'));
 });
+
+test('changed baker scripts share a release version so cached clients receive them together',()=>{
+ const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
+ for(const name of ['characters','baker-pilot','combat','architecture','render'])assert.ok(html.includes('src="'+name+'.js?v=baker-20261020"'));
+});
