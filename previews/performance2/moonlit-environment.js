@@ -7,36 +7,6 @@ const MOONLIT_ENVIRONMENT_CROPS=Object.freeze([
  [90,48,418,546],[640,48,255,546],[958,49,568,546],
  [32,740,512,184],[591,740,540,188],[1194,624,258,356]
 ].map(Object.freeze));
-// Cache filtered architecture at its final display size. Immutable bitmaps
-// avoid a new GPU filter surface for every panel and the large oven arch.
-const moonlitPieceCache=new Map();
-let moonlitPieceSource=null,moonlitPiecePixels=0;
-function moonlitPreparedPiece(source,brightness,width,height){
- if(brightness===1||typeof OffscreenCanvas!=='function'||/(?:^|[?&])shading=off(?:&|$)/.test(window.location?.search||''))return null;
- const image=assets.moonlitArchitecture;
- if(moonlitPieceSource!==image){
-  for(const entry of moonlitPieceCache.values())entry.image.close?.();
-  moonlitPieceCache.clear();moonlitPiecePixels=0;moonlitPieceSource=image;
- }
- const key=[...source,brightness,width,height].join(',');
- if(moonlitPieceCache.has(key))return moonlitPieceCache.get(key).image;
- const pixels=width*height;
- if(!pixels||pixels>1024*1024)return null;
- try{
-  const surface=new OffscreenCanvas(width,height),ctx=surface.getContext('2d');
-  if(!ctx||!('filter' in ctx)||typeof surface.transferToImageBitmap!=='function')return null;
-  ctx.imageSmoothingEnabled=false;ctx.filter='brightness('+brightness+')';
-  ctx.drawImage(image,...source,0,0,width,height);
-  const prepared=surface.transferToImageBitmap();
-  // Keep retained bitmap storage below 4 MiB across repeated world visits.
-  while(moonlitPiecePixels+pixels>1024*1024&&moonlitPieceCache.size){
-   const first=moonlitPieceCache.keys().next().value,entry=moonlitPieceCache.get(first);
-   entry.image.close?.();moonlitPiecePixels-=entry.pixels;moonlitPieceCache.delete(first);
-  }
-  moonlitPieceCache.set(key,{image:prepared,pixels});moonlitPiecePixels+=pixels;
-  return prepared;
- }catch{return null;}
-}
 function moonlitEnvironmentReady(){
  const a=assets.moonlitArchitecture;
  return bakery===1&&window.__crustWorldArtEnabled!==false&&
@@ -47,14 +17,11 @@ function moonlitPiece(cell,x,y,w,h,alpha=1,source=MOONLIT_ENVIRONMENT_CROPS[cell
  if(x+w<camera||x>camera+W||y+h<cameraY||y>cameraY+H)return;
  g.save();g.imageSmoothingEnabled=false;
  // Dim recessed materials without making masonry look transparent/ghostly.
+ g.filter=alpha===1?'none':'brightness('+alpha+')';
  const [, ,sw,sh]=source;
  const scale=Math.min(w/sw,h/sh),dw=Math.round(sw*scale),dh=Math.round(sh*scale);
- const prepared=moonlitPreparedPiece(source,alpha,dw,dh);
- const dx=Math.round(x+(w-dw)/2),dy=Math.round(y);
- g.filter=prepared||alpha===1?'none':'brightness('+alpha+')';
- if(prepared)g.drawImage(prepared,dx,dy);
- else g.drawImage(assets.moonlitArchitecture,...source,dx,dy,dw,dh);
- g.restore();
+ g.drawImage(assets.moonlitArchitecture,...source,
+  Math.round(x+(w-dw)/2),Math.round(y),dw,dh);g.restore();
 }
 function moonlitMasonry(x,y,w,h,brightness=.55){
  const margin=Math.ceil(shake)+1; // Camera rounding and impact shake expose edge pixels.
