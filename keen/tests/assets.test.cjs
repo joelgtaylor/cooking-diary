@@ -13,7 +13,7 @@ test('external fallback PNGs match the original embedded bytes',()=>{
 test('production scripts and registered image files exist; HTML contains no inline image data',()=>{
  const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
  assert.doesNotMatch(html,/data:image\//);
- for(const [,src]of html.matchAll(/<script src="([^"]+)"/g))assert.ok(fs.existsSync(path.join(root,src)),src);
+ for(const [,src]of html.matchAll(/<script src="([^"]+)"/g))assert.ok(fs.existsSync(path.join(root,src.split('?')[0])),src);
  const {run}=game();
  for(const [name,src]of run('Object.entries(assets).map(([name,img])=>[name,img.src])')){
   if(src.startsWith('data:'))continue;
