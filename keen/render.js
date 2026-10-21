@@ -17,6 +17,7 @@ function drawEnv(cell,x,y,w,h){
 const terrain=assets.moonlitTerrain;
 const moonlitReady=bakery===1&&terrain&&terrain.complete&&terrain.naturalWidth===256&&terrain.naturalHeight===96;
 function drawMoonlitTerrain(tx,ty,b){
+ if(b==='='&&moonlitEnvironmentReady()&&moonlitPlatformKind(tx,ty)==='bridge')return;
  const x=tx*T,y=ty*T;
  const left=tile(tx-1,ty)!==b,right=tile(tx+1,ty)!==b;
  const surface=tile(tx,ty-1)!=='#'&&tile(tx,ty-1)!=='=';
@@ -130,12 +131,17 @@ else if(assets.background.complete&&assets.background.naturalWidth){g.drawImage(
 else rect(0,0,W,H,'#382c49');
 // Keep old flour motes only in the flat-background comparison.
 if(window.__crustParallaxEnabled===false)for(let i=0;i<35;i++){let px=(i*157-camera*.14)%W;if(px<0)px+=W;rect(px,(i*89)%410,2,2,th.mote)}
+drawFungalDepthVeil();
+drawClockworkDepthVeil();
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
 drawBloomrotChamber();
 drawBakeryArchitecture();
+drawMoonlitPlatformBacking();
+drawFungalPlatformBacking();
+drawClockworkPlatformBacking();
 let lo=Math.max(0,Math.floor(camera/T)-1),hi=Math.min(cols,Math.ceil((camera+W)/T)+1);
 let vy0=Math.max(0,Math.floor(cameraY/T)-3),vy1=Math.min(rows,Math.ceil((cameraY+H)/T)+3);
-for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
+for(let x=lo;x<hi;x++)for(let y=vy0;y<vy1;y++){let b=map[y][x];if(b==='='&&(fungalEnvironmentReady()||clockworkEnvironmentReady()))continue;if(b==='#'||b==='='){if(moonlitReady)drawMoonlitTerrain(x,y,b);
  else if(cavernReady)drawCavernTerrain(x,y,b);
  else if(forgeReady)drawForgeTerrain(x,y,b);
  else if(envReady)drawEnv(10,x*T,y*T,32,32);
@@ -168,6 +174,9 @@ for(let tx=lo;tx<hi;tx++)for(let ty=vy0;ty<vy1;ty++){
  if(ty===0||map[ty-1][tx]!=='#'){g.fillRect(xx,yy,32,5);g.fillStyle='#fff1d5';g.fillRect(xx+2,yy,14,2);}
 }
 
+drawMoonlitPlatformFaces();
+drawFungalPlatformFaces();
+drawClockworkPlatformFaces();
 // Original copper highlights are retained only for the load-failure fallback.
 if(bakery===3&&!forgeReady){
  g.save();g.imageSmoothingEnabled=false;

@@ -8,8 +8,11 @@ function loadGameArt(){
 loadArt('myceliumAtlas','art/mycelium-relay-atlas.png');
 // Bakery 1 stone coping, slate ledges and opaque masonry (8 variants/row).
 loadArt('moonlitTerrain','art/moonlit-terrain.png');
+loadArt('moonlitArchitecture','art/moonlit-architecture.png');
 loadArt('cavernTerrain','art/cavern-terrain.png');
+loadArt('fungalEnvironment','art/fungal-environment.png');
 loadArt('forgeTerrain','art/forge-terrain.png');
+loadArt('clockworkEnvironment','art/clockwork-environment.png');
 loadArt('foremanDefeated','art/foreman-defeated.png');
 loadArt('foremanSweep','art/foreman-sweep.png');
 loadArt('foremanConcept','art/foreman-concept.png');

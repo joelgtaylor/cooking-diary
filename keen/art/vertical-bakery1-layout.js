@@ -28,8 +28,10 @@ const encounters=[
  {x:64*T,y:23*T-25,type:'hopper',left:62.5*T,right:65*T-25,hopT:65},
  {x:71*T,y:19*T-25,type:'walker',left:70*T,right:72*T-25,hopT:0}
 ];
-const ascension={room:{x:35,y:32,w:10,h:6},platforms:[[24,40,8],[24,42,6],[25,45,7],[34,42,5],[31,38,5],[29,36,4],[33,34,3],[38,35,4],[45,38,4],[45,35,4],[48,32,5],[45,30,4]]};
-const highTowers={platforms:[[54,33,7],[55,30,4],[65,29,5],[73,27,5],[73,23,5],[53,28,5],[56,26,10],[60,23,5],[66,23,4],[67,19,8],[76,19,2]]};
+// Bridge bays are two tiles wide. Five one-tile extensions complete their
+// modules without moving any landing height, enemy patrol or checkpoint.
+const ascension={room:{x:35,y:32,w:10,h:6},platforms:[[24,40,8],[24,42,6],[25,45,8],[34,42,6],[31,38,5],[29,36,4],[33,34,3],[38,35,4],[45,38,4],[45,35,4],[48,32,5],[45,30,4]]};
+const highTowers={platforms:[[54,33,8],[55,30,4],[65,29,6],[72,27,6],[73,23,5],[53,28,5],[56,26,10],[60,23,5],[66,23,4],[67,19,8],[76,19,2]]};
 const ovenDescent={platforms:[[78,20,5],[82,24,5],[80,29,6],[88,28,5],[93,32,5],[98,36,6],[92,40,7],[87,44,8],[86,46,4],[82,49,5]]};
 const forecourt={left:88,right:104,floor:54,foreman:{x:94,width:154,height:132}};
 const sections=[
