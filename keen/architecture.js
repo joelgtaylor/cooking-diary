@@ -1,7 +1,7 @@
 /* Non-colliding interior backing; all solid geometry is authored in the layout. */
 'use strict';
 function drawBakeryArchitecture(){
- if(bakery===3){drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
+ if(bakery===3){drawClockworkEnvironment();drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
  if(bakery===2){drawFungalEnvironment();drawCavernFoothills();drawPlungeIndicatorArt();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  if(drawMoonlitEnvironment())return;
@@ -64,6 +64,7 @@ function drawFactoryEntrance(){
  for(const dx of [9,19]){
   rect(dx*T,51*T-6,T,6,'#ad8752');rect(dx*T+3,51*T-6,T-6,2,'#f4d5a0');
  }
+ drawClockworkRoomBacking(r);
  g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#e8d6b5';
  g.fillText('MAINTENANCE / KEFIR RESERVE',14.5*T,50*T+15);
  // A permanent control cue works for both keyboard and the existing touch UI.
@@ -96,6 +97,7 @@ function drawClockworkAscent(){
    rect(px+5,y+2*T+5,16,11,'#e3ba72');rect(px+12,y+2*T+4,3,33,'#353f47');
   }
   rect(x+T+8,y+h-15,w-2*T-16,7,'#403b34');rect(x+T+8,y+h-15,w-2*T-16,2,'#ac8551');
+  drawClockworkRoomBacking(r);
   g.textAlign='center';g.font='bold 10px monospace';g.fillStyle='#e8d6b5';g.fillText(r.name,x+w/2,y+T+15);
   for(const dx of [r.x,r.x+r.w-1]){rect(dx*T,(r.y+r.h-3)*T-6,T,6,'#ac8551');rect(dx*T+3,(r.y+r.h-3)*T-6,T-6,2,'#edcfa0');}
  }
@@ -218,6 +220,7 @@ function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
  if(prepareMoonlitEnvironmentPreview(search))return;
  if(prepareFungalEnvironmentPreview(search))return;
+ if(prepareClockworkEnvironmentPreview(search))return;
  const mechanicalScene=search.match(/(?:^|[?&])scene=mechanical-(gearling|piston|ember)(?:&|$)/);
  if(mechanicalScene&&/(?:^|[?&])clockwork=(?:pilot|off)(?:&|$)/.test(search)){
   init(3);const scene=mechanicalScene[1],x=scene==='gearling'?20.5:scene==='piston'?11:21;
