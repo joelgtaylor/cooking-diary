@@ -215,6 +215,15 @@ function drawPlungeIndicatorArt(){
 // the relay. This affects only the requested preview URL, never ordinary init.
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
+ const fungalScene=search.match(/(?:^|[?&])scene=fungal-(flight|opening|hopper|caster)(?:&|$)/);
+ if(fungalScene&&/(?:^|[?&])fungal=(?:pilot|off)(?:&|$)/.test(search)){
+  init(2);
+  const scene=fungalScene[1];
+  const x=scene==='flight'?2:scene==='opening'?16:scene==='hopper'?24:70;
+  const floor=scene==='hopper'?45:scene==='caster'?19:54;
+  player.x=x*T;player.y=floor*T-player.h;player.ground=true;
+  camera=Math.max(0,player.x-W*.35);cameraY=Math.max(0,Math.min(rows*T-H,player.y-H*.62));state='pause';return;
+ }
  if(/(?:^|[?&])scene=foreman(?:&|$)/.test(search)&&/(?:^|[?&])foreman=(?:pilot|off)(?:&|$)/.test(search)){
   init(1);checkpointState.current=3;player.x=92*T;player.y=54*T-player.h;player.ground=true;player.face=1;camera=2400;cameraY=rows*T-H;state='pause';return;
  }

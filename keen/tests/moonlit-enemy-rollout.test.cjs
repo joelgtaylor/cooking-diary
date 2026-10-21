@@ -8,7 +8,7 @@ test('all eleven authored Moonlit enemies select exactly one approved role rende
 });
 test('full-world rollout preserves simulation through 900 ticks in every bakery',()=>{
  for(const stage of [1,2,3]){
-  const a=game({}, {search:''}),b=game();a.run(`init(${stage})`);b.run(`init(${stage})`);
+  const a=game({}, {search:'?fungal=off'}),b=game();a.run(`init(${stage})`);b.run(`init(${stage})`);
   const state='JSON.stringify({map,enemies,enemyShots,player,gems,powerups,collected,checkpointState})';assert.equal(a.run(state),b.run(state));
   for(let i=0;i<900;i++){for(const c of[a,b])c.run('tick++;updateEnemies();updateEnemyShots()');}
   assert.equal(a.run(state),b.run(state));assert.deepEqual(a.audio,b.audio);
