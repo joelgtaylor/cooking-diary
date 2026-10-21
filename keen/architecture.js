@@ -2,7 +2,7 @@
 'use strict';
 function drawBakeryArchitecture(){
  if(bakery===3){drawFactoryEntrance();drawClockworkAscent();drawFinalDescent();return;}
- if(bakery===2){drawCavernFoothills();drawPlungeIndicatorArt();return;}
+ if(bakery===2){drawFungalEnvironment();drawCavernFoothills();drawPlungeIndicatorArt();return;}
  if(bakery!==1||!currentVerticalLayout().workshop)return;
  if(drawMoonlitEnvironment())return;
  const {x,y,w,h}=currentVerticalLayout().workshop,px=x*T,py=y*T;
@@ -217,6 +217,7 @@ function drawPlungeIndicatorArt(){
 function prepareWayfindingPreview(){
  const search=window.location&&window.location.search||'';
  if(prepareMoonlitEnvironmentPreview(search))return;
+ if(prepareFungalEnvironmentPreview(search))return;
  const mechanicalScene=search.match(/(?:^|[?&])scene=mechanical-(gearling|piston|ember)(?:&|$)/);
  if(mechanicalScene&&/(?:^|[?&])clockwork=(?:pilot|off)(?:&|$)/.test(search)){
   init(3);const scene=mechanicalScene[1],x=scene==='gearling'?20.5:scene==='piston'?11:21;
