@@ -11,7 +11,7 @@ const PICKUP_IDENTITY_SPRITES=Object.freeze({
  kefir:Object.freeze({sx:1200,sy:40,sw:272,sh:816,w:16,h:40})
 });
 function drawIdentityPickup(kind,cx,cy){
- if(!window.location||!/(?:^|[?&])pickups=pilot(?:&|$)/.test(window.location.search||''))return false;
+ if(!visualIndicatorEnabled('pickups'))return false;
  const sprite=PICKUP_IDENTITY_SPRITES[kind];
  if(!sprite)return false;
  if(!pickupIdentityArt){
@@ -42,7 +42,7 @@ function supplyRechargeSegments(u){
  return Math.max(0,Math.min(5,Math.floor(((u.refreshTicks||300)-(u.refreshT||0))*5/(u.refreshTicks||300))));
 }
 function drawSupplyPickup(u,uy){
- if(!window.location||!/(?:^|[?&])supplies=pilot(?:&|$)/.test(window.location.search||''))return false;
+ if(!visualIndicatorEnabled('supplies'))return false;
  const sprite=SUPPLY_PICKUP_SPRITES[u.kind==='ammo'&&u.got?'empty':u.kind];
  if(!sprite)return false;
  if(!supplyPickupArt){supplyPickupArt=new Image();supplyPickupArt.src='art/supply-pickups.png';}

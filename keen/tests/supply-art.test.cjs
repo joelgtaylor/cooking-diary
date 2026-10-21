@@ -9,7 +9,7 @@ test('supply atlas source rectangles are valid and full/empty racks use identica
 });
 test('supply art is opt-in and loading/failure preserves original rendering',()=>{
  const a=game();a.run('var supply={kind:"rye",x:100,y:100};');
- for(const query of ['', '?supplies=off','?supplies=pilotish']){a.run('window.location={search:'+JSON.stringify(query)+'}');assert.equal(a.run('drawSupplyPickup(supply,100)'),false);assert.equal(a.run('supplyPickupArt'),null);}
+ for(const query of ['?supplies=off','?supplies=pilotish']){a.run('window.location={search:'+JSON.stringify(query)+'}');assert.equal(a.run('drawSupplyPickup(supply,100)'),false);assert.equal(a.run('supplyPickupArt'),null);}
  a.run("window.location.search='?supplies=pilot'");assert.equal(a.run('drawSupplyPickup(supply,100)'),false);
  a.run('supplyPickupArt.complete=true;supplyPickupArt.naturalWidth=0');assert.equal(a.run('drawSupplyPickup(supply,100)'),false);
  a.run('supplyPickupArt.naturalWidth=64;supplyPickupArt.naturalHeight=64');assert.equal(a.run('drawSupplyPickup(supply,100)'),false);

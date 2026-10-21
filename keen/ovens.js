@@ -49,7 +49,7 @@ let ovenGoalArt=null;
 const OVEN_GOAL_FRAMES=[[30,32,1194,280],[30,338,1194,290],[30,652,1194,264]];
 const OVEN_GOAL_ICONS=[[48,934,228,290],[364,934,212,290],[630,930,290,296],[942,930,296,296]];
 function ovenGoalIndicatorReady(){
- if(!/(?:^|[?&])goals=pilot(?:&|$)/.test(window.location&&window.location.search||''))return false;
+ if(!visualIndicatorEnabled('goals'))return false;
  if(bakery===3&&!devourerState?.finishOven?.landed)return false;
  if(!ovenGoalArt){ovenGoalArt=new Image();ovenGoalArt.src='art/oven-goal-indicators.png';}
  return ovenGoalArt.complete&&ovenGoalArt.naturalWidth===1254&&ovenGoalArt.naturalHeight===1254;

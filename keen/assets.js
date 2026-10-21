@@ -54,3 +54,11 @@ loadArt('bakerPhase4','art/fallback-baker-phase4.png');
 
 loadArt('tiles','art/fallback-tiles.png');loadArt('background','art/fallback-background.png');loadArt('items','art/fallback-items.png');
 }
+
+// Approved indicators are the normal presentation. Explicit off switches remain
+// available for reproducible comparisons; unknown values use the old fallback.
+function visualIndicatorEnabled(name){
+ const search=window.location&&window.location.search||'';
+ const value=new RegExp('(?:^|[?&])'+name+'=([^&]*)(?:&|$)').exec(search);
+ return !value||value[1]==='pilot';
+}

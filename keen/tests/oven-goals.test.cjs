@@ -25,7 +25,7 @@ test('no plaque appears on a disguised or airborne Clockwork oven',()=>{
  a.run('releaseDevourerOven(devourerState)');assert.equal(a.run('ovenGoalIndicatorReady()'),false);
 });
 test('loading and disabled goals retain fallback labels and default rendering',()=>{
- const a=game();for(const search of ['', '?goals=off','?goals=pilotish']){
+ const a=game();for(const search of ['?goals=off','?goals=pilotish']){
   a.run('window.location={search:'+JSON.stringify(search)+'}');a.trace.length=0;
   assert.equal(a.run('drawOvenGoalIndicator()'),false);assert.equal(a.trace.length,0);
  }

@@ -161,7 +161,7 @@ function drawCavernFoothillsTrim(){
 let entranceIndicatorArt=null;
 const ENTRANCE_ROUTE_CROPS=[[18,298,740,392],[780,298,740,392]];
 function entranceIndicatorReady(){
- if(bakery!==3||!/(?:^|[?&])signs=pilot(?:&|$)/.test(window.location&&window.location.search||''))return false;
+ if(bakery!==3||!visualIndicatorEnabled('signs'))return false;
  if(!entranceIndicatorArt){entranceIndicatorArt=new Image();entranceIndicatorArt.src='art/clockwork-entrance-plates.png';}
  return entranceIndicatorArt.complete&&entranceIndicatorArt.naturalWidth===1536&&entranceIndicatorArt.naturalHeight===1024;
 }
@@ -170,14 +170,14 @@ function drawEntrancePlate(index,cx,top){
  g.drawImage(entranceIndicatorArt,...ENTRANCE_ROUTE_CROPS[index],cx-56,top,112,56);g.restore();
 }
 // Riveted-metal variants of the same route/destination symbols. Kept out of
-// the default render path until the cross-world sign playtest is accepted.
+// gameplay layers, with the original labels retained as loading fallbacks.
 let clockworkIndicatorArt=null;
 const CLOCKWORK_ROUTE_CROPS=Object.freeze([
  [16,200,480,256],[516,200,504,256],[1036,200,488,256],
  [16,572,488,252],[524,572,484,252],[1028,572,488,252]
 ].map(Object.freeze));
 function clockworkIndicatorReady(){
- if(bakery!==3||!window.location||!/(?:^|[?&])signs=pilot(?:&|$)/.test(window.location.search||''))return false;
+ if(bakery!==3||!visualIndicatorEnabled('signs'))return false;
  if(!clockworkIndicatorArt){clockworkIndicatorArt=new Image();clockworkIndicatorArt.src='art/clockwork-route-plates.png';}
  return clockworkIndicatorArt.complete&&clockworkIndicatorArt.naturalWidth===1536&&clockworkIndicatorArt.naturalHeight===1024;
 }
@@ -193,7 +193,7 @@ function drawClockworkPlate(index,cx,top,width=144,height=64){
 // actors. The established late text pass remains the loading/error fallback.
 let plungeIndicatorArt=null;
 function plungeIndicatorEnabled(){
- return bakery===2&&!!window.location&&/(?:^|[?&])signs=pilot(?:&|$)/.test(window.location.search||'');
+ return bakery===2&&visualIndicatorEnabled('signs');
 }
 function plungeIndicatorReady(){
  if(!plungeIndicatorEnabled())return false;

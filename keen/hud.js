@@ -18,7 +18,7 @@ g.restore();g.font='bold 16px monospace';g.fillStyle='#fff0cc';if(combo>1&&combo
 }
 
 // The symbol-map audition reuses the level data; only presentation changes.
-function symbolMapEnabled(){return !!window.location&&/(?:^|[?&])map=pilot(?:&|$)/.test(window.location.search||'');}
+function symbolMapEnabled(){return visualIndicatorEnabled('map');}
 function drawMapSymbol(ctx,kind,x,y,{reached=false,current=false}={}){
  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.lineWidth=2;
  ctx.fillStyle='#101827';ctx.fillRect(-11,-13,24,29);

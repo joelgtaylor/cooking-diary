@@ -9,7 +9,7 @@ Branch: `design/keen-world-polish`; main remains unchanged. The original audit a
 - Clockwork entrance crate/up and steps/up concepts approved for implementation. Keep its kefir control tutorial and maintenance place name.
 - Boss captions, puzzle dialogue, controls and enemy behavior remain outside this indicator pass.
 
-All artwork remains behind explicit pilot query switches pending final integrated review. Current browser/runtime verification and tests are recorded in the individual playtest documents. Earlier statements that no browser/runtime was available describe only the original audit session.
+Approved artwork is now enabled by default on the design branch for final integrated review. Explicit `pickups=off`, `supplies=off`, `signs=off`, `map=off` and `goals=off` switches retain comparison views; historical `pilot` links still work. Current browser/runtime verification and tests are recorded in the individual playtest documents. Earlier statements that no browser/runtime was available describe only the original audit session.
 
 ## Original audit (historical)
 Status at initial audit: concept direction approved; first entry pilot rejected and reverted. No gameplay changes were made during that initial audit.

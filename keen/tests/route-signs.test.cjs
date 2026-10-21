@@ -11,7 +11,7 @@ test('route sign atlas has genuine alpha and expected source dimensions',()=>{
 });
 test('default path and nonmatching queries keep the original signs',()=>{
  const a=fork();
- for(const search of ['', '?signs=off','?signs=pilotish']){
+ for(const search of ['?signs=off','?signs=pilotish']){
   a.run('window.location={search:'+JSON.stringify(search)+'}');
   a.trace.length=0;a.run('drawBakeryArchitecture();drawPlungeWayfinding()');
   assert.ok(labels(a).includes('MAIN DESCENT  ↓'));assert.ok(labels(a).includes('BONUS / DANGER  ↑'));

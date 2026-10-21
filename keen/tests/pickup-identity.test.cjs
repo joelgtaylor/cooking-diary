@@ -19,7 +19,7 @@ test('identity atlas is RGBA PNG; crop rectangles are inside the actual image',(
 });
 test('default and nonmatching preview queries preserve original art and labels',()=>{
  const {run,trace}=game();
- for(const search of ['', '?pickups=off','?pickups=pilotish']){
+ for(const search of ['?pickups=off','?pickups=pilotish']){
   run('window.location={search:'+JSON.stringify(search)+'}');
   trace.length=0;run('drawYeastCollectibles()');
   assert.equal(labels(trace).filter(s=>s==='YEAST').length,5);
