@@ -19,7 +19,7 @@ function moveForeman(f,geo,pc){
 
 function resetForeman(){
  foremanState=bakery===1&&currentVerticalLayout().forecourt?
-  {phase:'idle',timer:90,face:-1,sweepHit:false,cycles:0,attack:'sweep',health:6,maxHealth:6,inv:0,hurtFlash:0,guardCue:0,projectiles:[],engaged:false,defeatImpact:false,...(foremanPolishEnabled()?{walkOffset:0,walkStep:0,walkDir:-1,deflectCue:0}:{})}:null;
+  {phase:'idle',timer:90,face:-1,sweepHit:false,cycles:0,attack:'sweep',health:6,maxHealth:6,inv:0,hurtFlash:0,guardCue:0,projectiles:[],engaged:false,defeatImpact:false,...(foremanPolishEnabled()?{walkOffset:0,walkStep:0,walkDir:-1,deflectCue:0,deflectPush:0,deflectSide:0}:{})}:null;
 }
 function foremanGeometry(){
  const court=currentVerticalLayout().forecourt;
@@ -73,7 +73,12 @@ function updateForemanProjectiles(f,geo){
 }
 function updateForeman(){
  const f=foremanState;let geo=foremanGeometry();if(!f||!geo||state!=='play')return;
- if(foremanPolishEnabled()&&f.deflectCue>0)f.deflectCue--;
+ if(foremanPolishEnabled()){
+  if(f.deflectCue>0)f.deflectCue--;
+  // Sustain the shove briefly: normal air steering otherwise cancels it before
+  // the player clears the crown. Vertical movement and collision stay normal.
+  if(f.deflectPush>0){player.vx=f.deflectSide*14;f.deflectPush--;}
+ }
  if(f.inv>0)f.inv--;if(f.hurtFlash>0)f.hurtFlash--;if(f.guardCue>0)f.guardCue--;
  if(f.health<=0){
   f.projectiles=[];
@@ -97,7 +102,7 @@ function updateForeman(){
  if(pogoOn&&player.vy>1&&player.y+player.h<body.y+22&&collide(player,body)){
   if(foremanPolishEnabled()&&(f.phase!=='recovery'||f.inv>0)){
    const side=Math.abs(pc-geo.cx)>6?Math.sign(pc-geo.cx):f.face;
-   player.vx=side*7;player.vy=-8;player.ground=false;f.deflectCue=18;
+   player.vx=side*14;player.vy=-6;player.ground=false;f.deflectCue=18;f.deflectPush=12;f.deflectSide=side;
    if(f.guardCue===0){f.guardCue=60;floater(geo.cx,geo.base-120,'HEAD GUARDED · USE THE OPENING','#ffe3a1');}
   }else{player.vy=-11;hurtForeman();if(f.health<=0)return;}
  }

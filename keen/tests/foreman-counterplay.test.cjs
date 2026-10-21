@@ -7,7 +7,7 @@ test('Foreman walks within a small authored arena envelope and parks for warned 
 });
 test('guarded pogo is deflected sideways without health damage; open pogo remains valid',()=>{
  const a=arena();a.run("foremanState.phase='windup';foremanState.timer=60;player.x=foremanGeometry().cx-12;player.y=foremanBodyBox().y-player.h+6;player.vy=3;pogoOn=true;updateForeman()");
- assert.equal(a.run('foremanState.health'),6);assert.equal(a.run('player.health'),3);assert.equal(a.run('player.vy'),-8);assert.equal(Math.abs(a.run('player.vx')),7);assert.equal(a.run('foremanState.deflectCue'),18);
+ assert.equal(a.run('foremanState.health'),6);assert.equal(a.run('player.health'),3);assert.equal(a.run('player.vy'),-6);assert.equal(Math.abs(a.run('player.vx')),14);assert.equal(a.run('foremanState.deflectCue'),18);
  a.run("foremanState.phase='recovery';foremanState.timer=150;foremanState.inv=0;player.x=foremanGeometry().cx-12;player.y=foremanBodyBox().y-player.h+6;player.vy=3;updateForeman()");assert.equal(a.run('foremanState.health'),5);assert.equal(a.run('player.vy'),-11);
 });
 test('new timing preserves warnings and attacks and grants a longer 150-tick opening',()=>{
@@ -41,4 +41,13 @@ test('walk/brace crops fit the immutable atlas and physical guard art matches vu
  assert.equal(a.run('foremanCrownGuard(foremanGeometry(),foremanState)'),true);a.trace.length=0;const before=a.run('JSON.stringify({foremanState,player})');a.run('drawForemanWalk(foremanGeometry(),foremanState,true)');
  assert.deepEqual(a.trace.find(c=>c[0]==='drawImage').slice(2,6),Array.from(a.run('FOREMAN_WALK_SPRITES[3]')));assert.equal(a.run('JSON.stringify({foremanState,player})'),before);
  a.run("foremanState.phase='recovery';foremanState.inv=0");assert.equal(a.run('foremanCrownGuard(foremanGeometry(),foremanState)'),false);
+});
+
+test('guard shove clears the crown even while steering back toward it',()=>{
+ for(const side of [-1,1]){
+  const a=arena();a.run(`foremanState.phase='windup';foremanState.timer=60;player.x=foremanGeometry().cx+${side}*8-player.w/2;player.y=foremanBodyBox().y-player.h+6;player.vy=3;pogoOn=true;updateForeman()`);
+  for(let i=0;i<12;i++)a.run(`keys={left:${side===1},right:${side===-1}};if(hitStop>0)hitStop--;else update()`);
+  assert.ok(a.run(`(player.x+player.w/2-foremanGeometry().cx)*${side}`)>90);
+  assert.equal(a.run('player.health'),3);assert.equal(a.run('foremanState.health'),6);
+ }
 });
