@@ -16,7 +16,8 @@ test('normal combined starts do not activate review scenes or grant progress',()
  }
 });
 test('combined indicators preserve authored state and simulation in all three bakeries',()=>{
- const a=game({}, {search:''}),b=game();
+ // Compare visual indicators with the same boss rules on both sides.
+ const a=game({}, {search:'?foreman=off'}),b=game();
  const expr='JSON.stringify({map,player,gems,enemies,powerups,collected,checkpointState,foremanState,bloomrotState,devourerState})';
  for(const stage of [1,2,3]){
   a.run(`init(${stage})`);b.run(`init(${stage})`);

@@ -2,7 +2,7 @@
 'use strict';
 const FOREMAN_DEFEAT_TICKS=96;
 let foremanState=null;
-function foremanPolishEnabled(){return /(?:^|[?&])foreman=pilot(?:&|$)/.test(window.location&&window.location.search||'');}
+function foremanPolishEnabled(){return !/(?:^|[?&])foreman=off(?:&|$)/.test(window.location&&window.location.search||'');}
 function foremanRecoveryTicks(){return foremanPolishEnabled()?150:120;}
 function moveForeman(f,geo,pc){
  f.walkStep=0;

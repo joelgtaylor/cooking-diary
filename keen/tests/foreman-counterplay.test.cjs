@@ -51,3 +51,5 @@ test('guard shove clears the crown even while steering back toward it',()=>{
   assert.equal(a.run('player.health'),3);assert.equal(a.run('foremanState.health'),6);
  }
 });
+
+test('approved Foreman is enabled on a normal start',()=>{const a=game({}, {search:''});assert.equal(a.run('foremanPolishEnabled()'),true);assert.equal(a.run('foremanRecoveryTicks()'),150);assert.equal(a.run('foremanState.deflectPush'),0);});
