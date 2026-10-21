@@ -9,3 +9,9 @@ Art-only scope: the floor walker gets four boot-step poses; the hopper gets rest
 Source: art/moonlit-opening-enemies.png, 1536×1024 RGBA, four columns/two rows. Prompt: four looping patroller walk poses, four hopper poses (rest/rise/apex/descent), matching aprons and caps, facing right, transparent background, no text or effects. A follow-up extraction request removes atmospheric background/halo without redesigning the sprites. Failed/loading art retains the current gremlin rendering.
 
 Five added tests verify scope, fallback, velocity-based poses, 42px bounds, render purity, unchanged simulation and safe shortcut initialization. The combined game/audio suite has 266 tests. Review feet, facing direction, scale and hitbox readability; shoot and mixer-pogo both characters. Bosses and audio are untouched. No merge without approval.
+
+## Hopper anticipation follow-up
+
+The approved opening hopper now compresses during the last ten grounded ticks of its existing countdown (about 167ms at 60Hz). Width grows from 35px to at most 41.3px while height compresses from 40px to 28.8px; its feet remain anchored. The next launch still occurs at the original tick, with identical speed and trajectory. Airborne poses remain unchanged. Use `anticipation=off` with `enemies=pilot` for the art-only comparison.
+
+This uses a runtime squash of the approved resting sprite rather than a new raster asset. No UI marker is added. Three additional tests cover grounded/countdown gating, anchored drawing and unchanged hitboxes/timers, plus 240 ticks of identical trajectories with drawing enabled in both comparison modes. Combined game/audio suite: 269 passing tests.

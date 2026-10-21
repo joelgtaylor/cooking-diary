@@ -112,6 +112,13 @@ function openingEnemyPose(e){
  if(contactSurface(e)!==null&&Math.abs(e.vy||0)<=1)return 0;
  return e.vy < -1?1:Math.abs(e.vy||0)<=1?2:3;
 }
+// Ten existing grounded countdown ticks, with feet fixed at the collision foot.
+// This is a drawing transform: combat.js alone owns the launch timer and speed.
+function openingEnemyCompression(e){
+ if(e.type!=='hopper'||e.hopT<1||e.hopT>10||Math.abs(e.vy||0)>1||contactSurface(e)===null||
+  /(?:^|[?&])anticipation=off(?:&|$)/.test(window.location&&window.location.search||''))return 0;
+ return (11-e.hopT)/10;
+}
 function drawOpeningEnemy(e){
  if(!openingEnemyPilotEnabled()||(e!==enemies[3]&&e!==enemies[4]))return false;
  if(!openingEnemyArt){openingEnemyArt=new Image();openingEnemyArt.src='art/moonlit-opening-enemies.png';}
@@ -119,8 +126,10 @@ function drawOpeningEnemy(e){
  const role=e.type==='hopper'?1:0,sprite=OPENING_ENEMY_SPRITES[role][openingEnemyPose(e)];
  if(!sprite)return false;
  const {crop,w,h}=sprite;
+ const compression=openingEnemyCompression(e);
+ const drawW=w*(1+.18*compression),drawH=h*(1-.28*compression);
  if(contactSurface(e)!==null&&Math.abs(e.vy||0)<=1)drawContactShadow(e,22);
  g.save();g.imageSmoothingEnabled=false;
  g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale(e.vx<0?-1:1,1);
- g.drawImage(openingEnemyArt,...crop,-w/2,-h,w,h);g.restore();return true;
+ g.drawImage(openingEnemyArt,...crop,-drawW/2,-drawH,drawW,drawH);g.restore();return true;
 }
