@@ -105,7 +105,7 @@ g.restore();}
 let openingEnemyArt=null;
 const OPENING_ENEMY_SPRITES=[[{"crop":[42,167,340,284],"w":42,"h":35},{"crop":[421,168,334,274],"w":41,"h":34},{"crop":[791,172,336,272],"w":42,"h":34},{"crop":[1164,170,332,274],"w":41,"h":34}],[{"crop":[91,648,265,301],"w":35,"h":40},{"crop":[470,628,269,277],"w":36,"h":37},{"crop":[799,560,287,300],"w":38,"h":40},{"crop":[1184,625,285,315],"w":38,"h":42}]];
 function openingEnemyPilotEnabled(){
- return bakery===1&&/(?:^|[?&])enemies=pilot(?:&|$)/.test(window.location&&window.location.search||'');
+ return bakery===1&&visualIndicatorEnabled('enemies');
 }
 function openingEnemyPose(e){
  if(e.type==='walker')return Math.floor(actorAnimation(e,1)/9)%4;

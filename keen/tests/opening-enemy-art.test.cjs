@@ -7,7 +7,7 @@ test('new enemy art is restricted to the two approved Bakery 1 opening enemies',
  for(const stage of [2,3]){a.run(`init(${stage})`);assert.equal(a.run('enemies.some(e=>drawOpeningEnemy(e))'),false);}
 });
 test('off, malformed, loading and failed artwork retain existing sprites',()=>{
- for(const search of ['', '?enemies=off','?enemies=pilotish']){const a=game({}, {search});assert.equal(a.run('drawOpeningEnemy(enemies[3])'),false);assert.equal(a.run('openingEnemyArt'),null);}
+ for(const search of ['?enemies=off','?enemies=pilotish']){const a=game({}, {search});assert.equal(a.run('drawOpeningEnemy(enemies[3])'),false);assert.equal(a.run('openingEnemyArt'),null);}
  const a=pilot();assert.equal(a.run('drawOpeningEnemy(enemies[3])'),false);
  a.run('openingEnemyArt.complete=true;openingEnemyArt.naturalWidth=0');assert.equal(a.run('drawOpeningEnemy(enemies[3])'),false);
 });
@@ -25,4 +25,8 @@ test('roof comparison scene starts safely and never grants progress',()=>{
  const a=game({}, {search:'?enemies=pilot&scene=gremlins-roof'});
  assert.equal(a.run('bakery'),1);assert.equal(a.run('contactSurface(player)'),48*32);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)'),false);
  assert.equal(a.run('collected'),0);assert.equal(a.storage.size,0);
+});
+
+test('approved opening enemies are enabled on a normal production start',()=>{
+ const a=game({}, {search:''});assert.equal(a.run('openingEnemyPilotEnabled()'),true);ready(a);assert.equal(a.run('drawOpeningEnemy(enemies[3])'),true);assert.equal(a.run('drawOpeningEnemy(enemies[4])'),true);
 });

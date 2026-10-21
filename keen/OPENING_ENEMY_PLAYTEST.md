@@ -1,3 +1,7 @@
+# Shipped opening enemy artwork
+
+The approved two-enemy artwork and hopper anticipation are now enabled by default. Use enemies=off for the original art; enemies=pilot remains a compatible explicit preview setting. Other enemies retain their original artwork. The historical pilot notes below describe review URLs and scope.
+
 # Moonlit opening enemy art pilot
 
 Use `keen/index.html?enemies=pilot` for a normal Bakery 1 start with the approved flour patroller and proofing hopper at the existing opening encounters (runtime enemy slots 3 and 4). Other enemies retain their original art. `enemies=off` or omitting the parameter retains the comparison artwork.
