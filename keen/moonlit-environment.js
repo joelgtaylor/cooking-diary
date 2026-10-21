@@ -24,11 +24,17 @@ function moonlitPiece(cell,x,y,w,h,alpha=1,source=MOONLIT_ENVIRONMENT_CROPS[cell
   Math.round(x+(w-dw)/2),Math.round(y),dw,dh);g.restore();
 }
 function moonlitMasonry(x,y,w,h,brightness=.55){
+ const margin=Math.ceil(shake)+1; // Camera rounding and impact shake expose edge pixels.
+ if(x+w<camera-margin||x>camera+W+margin||y+h<cameraY-margin||y>cameraY+H+margin)return;
  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
- g.filter='brightness('+brightness+')';
  const a=assets.moonlitTerrain;
- if(a&&a.complete&&a.naturalWidth===256&&a.naturalHeight===96){
-  for(let yy=y;yy<y+h;yy+=T)for(let xx=x;xx<x+w;xx+=T)
+ const ready=a&&a.complete&&a.naturalWidth===256&&a.naturalHeight===96;
+ g.filter='brightness('+brightness+')';
+ if(ready){
+  // Keep the original texture origin when clipping to visible tile bays.
+  const x0=x+Math.max(0,Math.floor((camera-margin-x)/T))*T;
+  const y0=y+Math.max(0,Math.floor((cameraY-margin-y)/T))*T;
+  for(let yy=y0;yy<Math.min(y+h,cameraY+H+margin);yy+=T)for(let xx=x0;xx<Math.min(x+w,camera+W+margin);xx+=T)
    g.drawImage(a,((Math.floor(xx/T)+Math.floor(yy/T)*3)%8)*32,64,32,32,xx,yy,T,T);
  }else rect(x,y,w,h,'#252332');
  g.restore();
@@ -36,6 +42,8 @@ function moonlitMasonry(x,y,w,h,brightness=.55){
 // Recessed walls use muted panels with no bright top coping. They sit behind
 // actors; the brighter opaque tile pass alone defines a playable boundary.
 function moonlitFacade(kind,x,y,w,h,alpha=.72){
+ const margin=Math.ceil(shake)+1;
+ if(x+w<camera-margin||x>camera+W+margin||y+h<cameraY-margin||y>cameraY+H+margin)return;
  const panelWidth=Math.min(w,kind===0?4*T:3*T);
  const [, ,sw,sh]=MOONLIT_ENVIRONMENT_CROPS[kind];
  const panelHeight=Math.round(panelWidth*sh/sw);
