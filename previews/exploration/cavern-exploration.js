@@ -122,7 +122,7 @@ function drawCavernExploration(){
   for(let y=Math.max(l.top,Math.floor(cameraY/T));y<Math.min(l.bottom,Math.ceil((cameraY+H)/T));y+=2){rect(x-32,y*T,7,5,'#b29a70');rect(x+26,y*T,7,5,'#b29a70');}
   rect(x-27,s.liftY,54,8,'#463b36');rect(x-26,s.liftY,52,3,s.repaired?'#e7d29d':'#9c8770');
   rect(x-32,s.liftY-14,5,20,'#796649');rect(x+27,s.liftY-14,5,20,'#796649');
-  if(cavernVisible(x-95,53*T,190,32))cavernPlaque(x,53*T,s.repaired?'OLD FREIGHT LIFT':'LIFT · CABLE SEVERED');
+  if(cavernVisible(x-95,53*T,190,32))cavernPlaque(79*T,53*T,s.repaired?'OLD FREIGHT LIFT':'LIFT · CABLE SEVERED');
  }
  // The cable visibly leads from the shaft to the repair mechanism inside.
  if(cavernVisible(71*T,50*T,12*T,4*T)){
