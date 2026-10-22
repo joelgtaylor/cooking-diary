@@ -60,3 +60,8 @@ test('district map fits the deeper world and only names discovered rooms; draw c
  a.trace.length=0;a.run('camera=0;cameraY=0;drawCavernDiscoveryBackdrop();drawCavernExploration()');assert.equal(a.trace.length,0);
  assert.equal(a.run('JSON.stringify([player,map,collected,cavernExploration.liftY,tick])'),before);
 });
+test('freight lift arrival stays safe with the complete live enemy roster',()=>{
+ const a=game();a.run('init(2);cavernExploration.repaired=true;player.x=83*T-player.w/2;player.y=54*T-player.h;player.ground=true;interactCavernExploration();for(let i=0;i<1000;i++){update();updateWorldProgress()}');
+ assert.equal(a.run('player.health'),3);assert.equal(a.run('player.y+player.h'),26*32);assert.equal(a.run('cavernExploration.liftY'),26*32);assert.equal(a.run('cavernExploration.ride'),null);
+ assert.equal(a.run('cavernExploration.collected.has("freight-token")'),true);
+});

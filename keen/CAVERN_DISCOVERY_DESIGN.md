@@ -27,7 +27,7 @@ Map district labels appear after discovery; the HUD shows relic collection progr
 All additions use native pixel-art geometry and existing materials. Offscreen rooms,
 props, relics and lift details are culled. No image readback or per-frame asset generation.
 
-Validation: 364 tests pass, including real-player cellar loops, both returns, Hollow
+Validation: 365 tests pass, including real-player cellar loops, both returns, Hollow
 entry/rejoin, lift locking/repair/both directions/jump-off, persistence, pause, safe
 retry/restart and map bounds. The existing continuous five-culture relay route passes.
-Bakery 1 and Bakery 3 render hashes match exactly. Browser visual review verified the cellar, Hollow repair prompt, and lift boarding.
+Bakery 1 and Bakery 3 render hashes match exactly. Browser review verified cellar rendering, Hollow repair and lift motion. The upper patrol is bounded away from the freight landing; a 1,000-tick live-enemy test verifies a safe ride and wait at the terminal.

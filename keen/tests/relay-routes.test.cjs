@@ -48,7 +48,8 @@ test('new geometry and all encounter metadata preserve the approved arena and sy
  const a=level(),b=level(true),am=a.run('map'),bm=b.run('map');
  const edits=a.run('[...currentVerticalLayout().relayDivide.approach,...currentVerticalLayout().relayDivide.return,currentVerticalLayout().relayDivide.landing]');
  for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok((x>=4&&x<23&&y>=54)||(x>=69&&x<76&&y>=44)||x===55||edits.some(([sx,sy,w])=>y===sy&&x>=sx&&x<sx+w),`${x},${y}`);
- for(const expr of ['gems','enemies','powerups','checkpointState.spawns','currentVerticalLayout().bloomrot','relayLayout()'])assert.equal(a.run(`JSON.stringify(${expr})`),b.run(`JSON.stringify(${expr})`));
+ for(const expr of ['gems','powerups','checkpointState.spawns','currentVerticalLayout().bloomrot','relayLayout()'])assert.equal(a.run(`JSON.stringify(${expr})`),b.run(`JSON.stringify(${expr})`));
+ const roster="JSON.stringify(enemies.filter(e=>e.type!=='walker'||e.x<78*T))";assert.equal(a.run(roster),b.run(roster));
  for(let i=0;i<4;i++){a.run(`checkpointState.current=${i};respawnCheckpoint()`);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)||spike(player.x,player.y,player.w,player.h)'),false);assert.equal(a.run('player.x<55*T'),i<2);}
 });
 test('continuous entrance-to-boss-approach route collects five cultures with the real relay and checkpoint retry',()=>{
