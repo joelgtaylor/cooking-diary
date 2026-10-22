@@ -15,4 +15,4 @@ Builds on the approved Bakery 1 scale and graphical audit. Enable the combined e
 
 407 regression tests pass. Added checks for collision-free later-world spawns and 600 ticks of solid-terrain clearance, both heroes hitting every ground role from either side, enlarged flyer reset and repeated dive recovery, checkpoint draw order for both heroes in all worlds, and the relic HUD's reserved position. Existing render-command snapshots were refreshed for the intentional checkpoint layer order and HUD placement; focused behavioral checks remain separate from those snapshots.
 
-Browser review checks include the cavern canopy with touch controls, the relay checkpoint with both heroes, and the Clockwork skybridge. Physical phone multitouch/fullscreen and full playthroughs remain user/device checks.
+Browser checks confirmed the cavern canopy enemy scale/HUD and the relay checkpoint with both heroes. The browser became unavailable during the final crown-crop screenshot, so that last refinement and the enlarged Clockwork presentation still need visual confirmation. Physical phone multitouch/fullscreen and full playthroughs remain user/device checks.
