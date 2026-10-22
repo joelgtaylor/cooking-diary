@@ -11,6 +11,7 @@ function toggleMap(){
 function togglePause(){state=state==='play'?'pause':state==='pause'?'play':state;}
 function bindInput(){
  document.addEventListener('keydown',e=>{
+  if(typeof handleCharacterSelectorKey==='function'&&handleCharacterSelectorKey(e))return;
   const k=e.key.toLowerCase();
   if(state==='dialogue'){e.preventDefault();if(!e.repeat&&['e','enter','escape'].includes(k))talkMycelium();return;}
   if(['arrowleft','arrowright','arrowup',' '].includes(k))e.preventDefault();
