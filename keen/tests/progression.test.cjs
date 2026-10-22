@@ -7,7 +7,7 @@ test('three vertical bakeries initialize, render, respawn, collect and unlock re
  const {run,storage}=game();
  for(let stage=1;stage<=3;stage++){
   run(`init(${stage}); draw();`);
-  assert.equal(run('rows'),56);assert.equal(run('gems.length'),5);
+  assert.equal(run('rows'),stage===2?72:56);assert.equal(run('gems.length'),5);
   assert.equal(run('state'),'play');
   // Activate the second checkpoint by entering its proximity, then recover there.
   run('var cp=currentVerticalLayout().checkpoints[1];player.x=cp[0]*T;player.y=cp[1]*T-22;updateWorldProgress();');

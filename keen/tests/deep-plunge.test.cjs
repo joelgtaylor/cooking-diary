@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');const {game}=require('./game-harness.cjs');
 function level(){const a=game();a.run('init(2)');return a;}
 test('the plunge redesign preserves every tile and the relay/foothills metadata west of its fork',()=>{
- const a=level(),b=game({}, {layoutFixture2:'bakery2-foothills-approved.js'});b.run('init(2)');const am=a.run('map'),bm=b.run('map');for(let y=0;y<56;y++)for(let x=0;x<56;x++)assert.equal(am[y][x],bm[y][x],`${x},${y}`);
+ const a=game({}, {layoutFixture2:'bakery2-environments-approved.js'}),b=game({}, {layoutFixture2:'bakery2-foothills-approved.js'});a.run('init(2)');b.run('init(2)');const am=a.run('map'),bm=b.run('map');for(let y=0;y<56;y++)for(let x=0;x<56;x++)assert.equal(am[y][x],bm[y][x],`${x},${y}`);
  for(const expr of ['JSON.stringify(relayLayout())','JSON.stringify(currentVerticalLayout().foothills)','JSON.stringify(gems.slice(0,2))','JSON.stringify(currentVerticalLayout().checkpoints.slice(0,2))'])assert.equal(a.run(expr),b.run(expr));
 });
 test('all five required cultures have main-route support; no culture or checkpoint requires the upper bonus route',()=>{

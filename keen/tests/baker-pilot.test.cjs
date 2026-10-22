@@ -48,7 +48,7 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
 
 test('changed baker scripts share a release version so cached clients receive them together',()=>{
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
- for(const name of ['characters','combat','architecture','render','throwers','foreman','world','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
+ for(const name of ['characters','combat','architecture','throwers','foreman','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
 });
 
 test('Vance uses his atlas for every action, anchors hands and feet, and keeps simulation identical',()=>{

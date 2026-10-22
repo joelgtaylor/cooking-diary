@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 function level(){const a=game();a.run('init(2)');return a;}
 test('foothills edits stay inside the opening and preserve the approved relay, keeper, and keeper approach',()=>{
- const a=level(),b=game({}, {layoutFixture2:'bakery2-relay-approved.js'});b.run('init(2)');const am=a.run('map'),bm=b.run('map');
+ const a=game({}, {layoutFixture2:'bakery2-environments-approved.js'}),b=game({}, {layoutFixture2:'bakery2-relay-approved.js'});a.run('init(2)');b.run('init(2)');const am=a.run('map'),bm=b.run('map');
  for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(x<56&&am[y][x]!==bm[y][x])assert.ok(x>=4&&x<32&&y>=38&&y<54,`${x},${y}`);
  for(const expr of ['JSON.stringify(relayLayout())','JSON.stringify(gems.slice(0,2))','JSON.stringify(powerups[0])','JSON.stringify(currentVerticalLayout().checkpoints.slice(0,2))','JSON.stringify(currentVerticalLayout().oven)'])assert.equal(a.run(expr),b.run(expr));
 

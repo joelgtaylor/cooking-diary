@@ -4,7 +4,7 @@
  */
 'use strict';
 function rect(x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)}
-function draw(){drawWorld();drawHUD();drawMyceliumUI();syncMyceliumTalkButton();}
+function draw(){drawWorld();drawHUD();drawMyceliumUI();syncMyceliumTalkButton();if(typeof syncCavernExploreButton==='function'){syncCavernExploreButton();drawCavernDiscoveryUI();}}
 function drawWorld(){
 const hazardArt=assets.spikeHazards;
 const hazardsReady=hazardArt&&hazardArt.complete&&hazardArt.naturalWidth===96&&hazardArt.naturalHeight===32;
@@ -136,6 +136,7 @@ drawClockworkDepthVeil();
 g.save();g.translate(-Math.round(camera)+(shake>0.6?(Math.random()-.5)*shake:0),-Math.round(cameraY)+(shake>0.6?(Math.random()-.5)*shake*.6:0));
 drawBloomrotChamber();
 drawBakeryArchitecture();
+if(typeof drawCavernDiscoveryBackdrop==='function')drawCavernDiscoveryBackdrop();
 drawMoonlitPlatformBacking();
 drawFungalPlatformBacking();
 drawClockworkPlatformBacking();
@@ -198,6 +199,7 @@ if(bakery!==3)for(let k=0;k<18;k++){
   g.fillStyle=bakery===2?'#a2f6e5':'#e8d2aa';
   g.fillRect(x+drift,y+Math.sin(tick*.035+k)*9,3,3);
 }
+if(typeof drawCavernExploration==='function')drawCavernExploration();
 drawYeastCollectibles();
 for(const u of powerups)if(!u.got||u.kind==='ammo'){const uy=u.y+(u.got?0:Math.sin(tick*.08+u.ph)*3);
 if(drawSupplyPickup(u,uy))continue;
