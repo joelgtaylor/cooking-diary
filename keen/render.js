@@ -223,7 +223,7 @@ for(const e of enemies)if(e.alive){
  if(newArt){
    const {row,frame}=gremlinAnimation(e);
    // Preserve sprite sizes and physics. Only grounded frame padding is aligned.
-   const drawSize=window.__crustLargeGremlins!==false?42:32;
+   const drawSize=(window.__crustLargeGremlins!==false?42:32)*(e.visualScale||1);
    const supported=contactSurface(e)!==null&&Math.abs(e.vy||0)<=1;
    const bottoms=e.type==='hopper'?
     [[27,28,27,26],[27,26,28,27]]:[[27,28,28,27],[28,29,27,28]];
@@ -236,6 +236,10 @@ for(const e of enemies)if(e.alive){
    g.imageSmoothingEnabled=false;
    g.drawImage(atlas,frame*32,row*32,32,32,-drawSize/2,drawTop,drawSize,drawSize);
    g.restore();
+ }else if(e.visualScale){
+   // Readable loading/error fallback stays aligned with the audition body.
+   rect(e.x,e.y,e.w,e.h,'#a7764e');rect(e.x+5,e.y+7,e.w-10,10,'#f3d29a');
+   rect(e.x+9,e.y+10,4,4,'#282334');rect(e.x+e.w-13,e.y+10,4,4,'#282334');
  }else{
    if(assets.items.complete&&assets.items.naturalWidth){
      g.save();g.translate(e.x+(e.vx>0?0:25),e.y+bob);
