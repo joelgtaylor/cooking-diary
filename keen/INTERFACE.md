@@ -18,3 +18,9 @@ The simulation regression harness uses `tests/fixtures/legacy-interface.html` to
 retain the prior input contract while loading current game modules. Production
 shell tests explicitly load `/keen/index.html` with the richer DOM adapter,
 including a 150-frame equivalence check against that legacy contract.
+
+The final clear screen advances to end credits naming Joel Taylor (Producer &
+Developer) and Vance (Designer & Lead Play Tester). Credits use native HTML for
+readable names and touch/keyboard actions, without scrolling timers. Explore
+recipes returns through the pause menu to the credits; Bake again starts Bakery 1
+while preserving saved recipes, score records and character/control preferences.

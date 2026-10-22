@@ -63,3 +63,13 @@ test('production shell uses local assets and has no preview dependency or POC la
  assert.doesNotMatch(html, /<base|previews\/interface|INTERFACE POC|POC settings/);
  for(const file of ['shell.css','shell.js','input-model.js']){assert.ok(html.includes('"'+file+'?'));assert.ok(fs.existsSync(path.join(__dirname,'..',file)));}
 });
+
+test('final credits acknowledge both creators and support recipes, resume and a fresh full playthrough',()=>{
+ const a=shell();a.click('shellResume');a.run("init(3);state='clear';advanceBakery();syncGameShell()");
+ assert.equal(a.run('state'),'win');assert.equal(a.elements.get('endCredits').hidden,false);assert.equal(a.doc.activeElement.id,'creditsTitle');
+ assert.match(html,/Producer &amp; Developer<\/p><p class="credit-name">Joel Taylor/);
+ assert.match(html,/Designer &amp; Lead Play Tester<\/p><p class="credit-name">Vance/);
+ a.click('creditsRecipes');a.run('syncGameShell()');assert.equal(a.elements.get('endCredits').hidden,true);assert.equal(a.run('shellPage'),'recipes');
+ a.click('sheetBack');a.click('shellResume');a.run('syncGameShell()');assert.equal(a.elements.get('endCredits').hidden,false);
+ a.click('creditsReplay');a.run('syncGameShell()');assert.equal(a.run('bakery'),1);assert.equal(a.run('state'),'play');assert.equal(a.elements.get('endCredits').hidden,true);
+});

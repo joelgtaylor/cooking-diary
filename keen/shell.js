@@ -125,6 +125,8 @@ function bindInput(){
  click('shellResume',shellResume);click('shellPause',()=>shellPause());click('shellFullscreen',()=>shellFullscreen(!shellStarted));
  click('sheetBack',()=>shellPause());click('confirmCancel',()=>shellPause());
  click('confirmAction',()=>{shellClearInput();if(shellConfirm==='restart')restart();else respawnCheckpoint();shellPause('Ready at '+(shellConfirm==='restart'?'the bakery entrance':'your checkpoint'));});
+ click('creditsRecipes',()=>shellOpenSheet('recipes'));
+ click('creditsReplay',()=>{shellClearInput();init(1);shellSavedState='play';shellResume();});
  click('mapButton',()=>shellOpenSheet('map'));click('codexBtn',()=>shellOpenSheet('recipes'));
  click('restartBtn',()=>shellAsk('restart'));click('restartSection',()=>shellAsk('checkpoint'));
  click('audioBtn',()=>AudioKit.toggle());click('pogoBtn',()=>{if(state==='play'){AudioKit.start();togglePogo();}});
@@ -175,6 +177,9 @@ function syncGameShell(){
  if(shellPendingShoot>=0&&tick>shellPendingShoot){shellPendingShoot=-1;shellPublishInput();}
  shellEl('pogoBtn').setAttribute('aria-pressed',String(pogoOn));
  shellEl('interactIdle').style.display=shellEl('exploreBtn').style.display==='none'&&shellEl('talkBtn').style.display==='none'?'':'none';
+ const credits=shellEl('endCredits'),showCredits=state==='win';
+ if(credits.hidden===showCredits){credits.hidden=!showCredits;if(showCredits){shellClearInput();shellEl('creditsTitle').focus();}}
+ shellEl('wrap').dataset.ending=String(showCredits);
  shellEl('advanceBtn').hidden=state!=='clear';
  shellEl('shellFullscreen').textContent=!shellStarted?'Play fullscreen':document.fullscreenElement?'Exit fullscreen':'Enter fullscreen';
  shellEl('wrap').dataset.mode=state==='shell-menu'||state==='character-select'?'menu':'play';
