@@ -3,7 +3,7 @@
 'use strict';
 const FUNGAL_ENVIRONMENT_CROPS=Object.freeze({
  shelf:Object.freeze([21,200,530,202]),
- cap:Object.freeze([578,214,429,200]),
+ cap:Object.freeze([578,200,429,100]),
  root:Object.freeze([1038,200,474,232]),
  arch:Object.freeze([16,470,640,461]),
  formation:Object.freeze([644,477,307,490]),
@@ -12,7 +12,7 @@ const FUNGAL_ENVIRONMENT_CROPS=Object.freeze({
  // would introduce horizontal cuts and disconnected stem segments.
  rockBody:Object.freeze([710,490,140,150]),
  rootBody:Object.freeze([1210,510,110,180]),
- mushroomBody:Object.freeze([752,300,73,100])
+ mushroomBody:Object.freeze([756,296,68,64])
 });
 function fungalEnvironmentReady(){
  const a=assets.fungalEnvironment;
@@ -112,7 +112,7 @@ function drawFungalEnvironment(){
  // plunge keeps open sky gaps between much darker vertical rock formations.
  for(const [cx,top,bottom] of [[60,28,39],[63.5,25,43],[67.5,22,35],
   [72.5,19,43],[78.5,22,47],[81.5,26,50]])
-  fungalStem(cx*T,(top+1)*T,bottom*T,1.5*T,.50,'mushroom');
+  fungalStem(cx*T,top*T+16,bottom*T,1.5*T,.50,'mushroom');
  for(const [x,top,w] of [[56,31,3],[69,35,2],[60,39,2]])
   fungalCliff(x*T,(top+1)*T,w*T,54*T,.56);
  // Large hanging formations establish the scale of the chasm. Their dark
@@ -133,7 +133,8 @@ function drawFungalPlatformBacking(){
   if(x+w<camera||x>camera+W||y+3*T<cameraY||y>cameraY+H)continue;
   const kind=fungalPlatformKind(r.x,r.y);
   if(kind==='cap'){
-   // Each authored canopy landing becomes one proportioned, flat-rim cap.
+   // Crown-only crop: the source's short root foot must not repeat halfway
+   // down the extended support. The continuous stem is drawn behind it.
    fungalSprite(FUNGAL_ENVIRONMENT_CROPS.cap,x,y,w,.88);
   }else fungalStrip(kind,x,y,w,kind==='root'?.82:.9);
  }
