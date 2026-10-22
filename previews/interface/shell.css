@@ -3,3 +3,5 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;backgr
 @media(orientation:portrait) and (pointer:coarse){#touch{--button-size:74px}.action-pad{bottom:calc(var(--safe-bottom) + 10px)}.direction-pad{bottom:calc(var(--safe-bottom) + 14px)}}
 @media(max-height:480px){.shell-panel{padding:16px}.shell-panel h1{font-size:22px;margin-bottom:6px}.shell-panel p{margin:6px 0 10px}.menu-grid{gap:7px}.menu-grid button{padding:8px;min-height:44px}.secondary-actions .touch-control{height:42px}.interact-slot{height:42px}.action-pad{gap:8px}#touch{--button-size:62px}}
 @media(max-width:370px){.secondary-actions{gap:4px}.secondary-actions .touch-control,.interact-slot{width:58px}.direction-pad{gap:6px}#touch{--button-size:60px}}
+/* The original instructions are replaced by the accessible shell settings. */
+.guide{display:none}

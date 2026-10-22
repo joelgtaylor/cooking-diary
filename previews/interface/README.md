@@ -24,6 +24,8 @@ not real phone emulation. Phone long-press, edge gestures, real multi-finger
 comfort and platform fullscreen support require device playtesting.
 
 Validation: `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs previews/interface/shell.test.cjs`.
-378 passing tests, including source ownership, simultaneous touch, sliding/cancel,
+379 passing tests, including source ownership, simultaneous touch, sliding/cancel,
 short taps, keyboard/touch coexistence, focus loss, menus/confirmation, rotation,
-fullscreen failure and 150 frames of identical gameplay against shipped controls.
+fullscreen failure/success/visibility transitions and 150 frames of identical gameplay against shipped controls.
+
+Browser QA: desktop fitted play, pause/menu navigation and map/recipe sheets verified. The cloud browser rejected a real fullscreen request and correctly retained the fitted paused layout. Actual browser/OS fullscreen and physical phone gestures remain device acceptance checks.

@@ -5,7 +5,7 @@ function shell(){
  const elements=new Map(),listeners={},actions=[];let doc;
  const gradient={addColorStop(){}};const g=new Proxy({}, {get:(o,k)=>o[k]??(()=>gradient),set:(o,k,v)=>(o[k]=v,true)});
  function element(id,attrs=''){
-  const el={id,hidden:/\bhidden\b/.test(attrs),disabled:false,dataset:{},style:{display:attrs.match(/display:([^;"']+)/)?.[1]||'',setProperty(k,v){this[k]=v;}},textContent:'',value:'100',checked:false,clientWidth:1280,clientHeight:720,listeners:{},children:[],classList:{toggle(){},remove(){}},addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},setAttribute(k,v){this[k]=v;},focus(){doc.activeElement=this;},matches(){return false;},getContext:()=>g,getClientRects(){return this.hidden?[]:[{}];},querySelectorAll(){return [...elements.values()].filter(x=>x.tag==='button'||x.tag==='input');},replaceChildren(){this.children=[];},append(x){this.children.push(x);},setPointerCapture(){},getBoundingClientRect(){const x=this.dataset.action==='left'?0:this.dataset.action==='right'?80:200;return{left:x,right:x+70,top:500,bottom:570};},closest(){return this;}};
+  const el={id,hidden:/\bhidden\b/.test(attrs),disabled:false,dataset:{},style:{display:attrs.match(/display:([^;"']+)/)?.[1]||'',setProperty(k,v){this[k]=v;}},textContent:'',value:'100',checked:false,clientWidth:1280,clientHeight:720,listeners:{},children:[],classList:{toggle(){},remove(){}},addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},setAttribute(k,v){this[k]=v;},focus(){doc.activeElement=this;},matches(){return false;},getContext:()=>g,getClientRects(){return this.hidden?[]:[{}];},querySelectorAll(){return [...elements.values()].filter(x=>x.tag==='button'||x.tag==='input');},replaceChildren(){this.children=[];},append(x){this.children.push(x);},setPointerCapture(){},getBoundingClientRect(){const x=this.dataset.action==='left'?0:this.dataset.action==='right'?80:200;return{left:x,right:x+70,top:500,bottom:570};},closest(){return this.dataset.action?this:null;}};
   elements.set(id,el);return el;
  }
  for(const m of html.matchAll(/<([\w-]+)([^>]*\bid="([^"]+)"[^>]*)>/g)){const el=element(m[3],m[2]);el.tag=m[1];}
@@ -14,7 +14,7 @@ function shell(){
  const a=game({}, {html,context:g,globals:{document:doc,innerWidth:1280,innerHeight:720,matchMedia:()=>({matches:false})}});
  const fire=(el,type,props={})=>{const event={button:0,pointerId:1,key:'',code:'',detail:1,clientX:30,clientY:530,repeat:false,target:el,preventDefault(){},stopPropagation(){},...props};for(const fn of el?.listeners?.[type]??[])fn(event);};
  const key=(key,code=key,type='keydown')=>{for(const fn of listeners[type]??[])fn({key,code,repeat:false,target:elements.get('gameStage'),preventDefault(){}});};
- return{...a,elements,actions,doc,fire,key,click:id=>fire(elements.get(id),'click'),pointer:(action,type,props)=>fire(actions.find(x=>x.dataset.action===action),type,props)};
+ return{...a,elements,actions,doc,fire,key,click:id=>fire(elements.get(id),'click'),emitDoc:type=>{for(const fn of listeners[type]??[])fn({});},pointer:(action,type,props)=>fire(actions.find(x=>x.dataset.action===action),type,props)};
 }
 test('input sources are independent; removing one finger never releases another source',()=>{
  const i=createShellInput();i.set('touch1','left');i.set('touch2','jump');i.set('touch3','shoot');assert.deepEqual(i.snapshot(),{left:true,jump:true,shoot:true});i.release('touch2');assert.deepEqual(i.snapshot(),{left:true,shoot:true});i.set('keyboard','left');i.release('touch1');assert.equal(i.snapshot().left,true);i.clear();assert.deepEqual(i.snapshot(),{});
@@ -49,4 +49,12 @@ test('fullscreen failure still starts a fitted game, while later fullscreen tran
 test('new input adapter produces the same movement and projectiles as the shipped controls',()=>{
  const a=shell(),b=game();a.click('shellResume');a.key('d','KeyD');a.key('x','KeyX');b.run('keys={right:true,shoot:true}');
  const state='JSON.stringify({player,shots,enemies,collected,checkpointState})';for(let i=0;i<150;i++){a.run('update();syncGameShell()');b.run('update()');assert.deepEqual(JSON.parse(a.run(state)),JSON.parse(b.run(state)));}
+});
+
+test('hidden-tab return requires Resume and successful fullscreen transitions preserve pause',async()=>{
+ const a=shell();a.click('shellResume');a.key('d','KeyD');a.doc.hidden=true;a.emitDoc('visibilitychange');assert.equal(a.run('state'),'shell-menu');assert.equal(a.run('shellInput.size()'),0);
+ a.doc.hidden=false;a.emitDoc('visibilitychange');assert.equal(a.run('state'),'shell-menu');
+ a.elements.get('wrap').requestFullscreen=async()=>{a.doc.fullscreenElement=a.elements.get('wrap');a.emitDoc('fullscreenchange');};
+ await a.run('shellFullscreen(false)');assert.equal(a.run('state'),'shell-menu');assert.equal(a.doc.fullscreenElement,a.elements.get('wrap'));
+ a.click('shellResume');a.doc.fullscreenElement=null;a.emitDoc('fullscreenchange');assert.equal(a.run('state'),'shell-menu');
 });
