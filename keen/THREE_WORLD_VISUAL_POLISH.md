@@ -1,6 +1,6 @@
 # Three-world visual polish review
 
-Builds on the approved Bakery 1 scale and graphical audit. Enable the combined enemy audition with `enemyScale=pilot` in any world; the existing normal-size comparison remains available without that parameter. No merge to main is authorized by this implementation request.
+Builds on the approved Bakery 1 scale and graphical audit. The combined scale is approved for release and enabled by default in production. Use `enemyScale=off` for the original-size diagnostic comparison. Joel approved merging this work.
 
 ## Implemented
 

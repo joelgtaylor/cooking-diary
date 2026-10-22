@@ -83,7 +83,8 @@ function restart(){if(bakery===3&&window.__crustDevourerPreview){startDevourerPr
 
 // Bakery 1 scale audition; bosses and other worlds are never resized.
 function applyEnemyScale(){
- if(!/(?:^|[?&])enemyScale=pilot(?:&|$)/.test(window.location?.search||''))return;
+ const search=window.location?.search||'';
+ if(/(?:^|[?&])enemyScale=off(?:&|$)/.test(search)||(!window.__crustEnemyScaleEnabled&&!/(?:^|[?&])enemyScale=pilot(?:&|$)/.test(search)))return;
  for(const e of enemies){
   if(e.type==='flyer'){
    const centre=e.x+e.w/2,foot=e.y+e.h,extra=35-e.w;

@@ -2,7 +2,7 @@
 
 Branch: polish/moonlit-enemy-scale, building on the Vance firing-alignment preview.
 
-Enable with `?enemyScale=pilot`. Omit that parameter for original enemy sizes. Production/default sizing remains unchanged pending review.
+Approved scaling now runs by default in production. Use `?enemyScale=off` for the original-size diagnostic comparison; `?enemyScale=pilot` remains supported by isolated test fixtures.
 
 - Six walkers, three hoppers and two slingers: artwork 1.6×, bodies 40 × 54 rather than 25 × 25. Bodies now follow the taller visible silhouettes and intersect both heroes' horizontal firing lines.
 - Feet retain their authored support height. Wider patrol bodies stay inside the original support envelopes; maximum left-edge bounds shrink to account for width.
