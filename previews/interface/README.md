@@ -28,4 +28,4 @@ Validation: `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs pre
 short taps, keyboard/touch coexistence, focus loss, menus/confirmation, rotation,
 fullscreen failure/success/visibility transitions and 150 frames of identical gameplay against shipped controls.
 
-Browser QA: desktop fitted play, pause/menu navigation and map/recipe sheets verified. The cloud browser rejected a real fullscreen request and correctly retained the fitted paused layout. Actual browser/OS fullscreen and physical phone gestures remain device acceptance checks.
+Browser QA: desktop fitted play, pause/menu navigation and map/recipe sheets verified. Phone-size 844×390 and 390×844 frames fit with all controls visible, no page overflow, and the portrait rotation hint. Oversized controls are capped to the available width. The cloud browser rejected a real fullscreen request and correctly retained the fitted paused layout. Actual browser/OS fullscreen and physical phone gestures remain device acceptance checks.

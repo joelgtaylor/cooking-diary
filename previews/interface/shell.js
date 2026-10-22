@@ -58,6 +58,9 @@ async function shellFullscreen(start=false){
 }
 function shellFit(){
  const root=shellEl('wrap'),w=root.clientWidth||window.innerWidth,h=root.clientHeight||window.innerHeight,portrait=h>w,touch=root.dataset.touch==='true';
+ const base=typeof getComputedStyle==='function'?parseFloat(getComputedStyle(shellEl('touch')).getPropertyValue('--button-size'))||68:68;
+ const requested=Number(shellEl('controlSize').value)||100,effective=Math.max(.75,Math.min(requested/100,(w-60)/(base*4.16)));
+ root.style.setProperty('--control-scale',effective);shellEl('sizeValue').textContent=requested+'%'+(effective<requested/100?' · fitted':'');
  const reserved=portrait&&touch?220:0,available=Math.max(120,h-reserved),scale=Math.min(w/960,available/540);
  root.style.setProperty('--canvas-width',(960*scale)+'px');root.style.setProperty('--canvas-height',(540*scale)+'px');
  root.style.setProperty('--canvas-left',((w-960*scale)/2)+'px');root.style.setProperty('--canvas-top',((available-540*scale)/2)+'px');
@@ -65,11 +68,11 @@ function shellFit(){
  if(shellPortrait!==null&&shellPortrait!==portrait&&shellStarted&&!shellStartingFullscreen)shellPause('Orientation changed');
  shellPortrait=portrait;
 }
-function shellSettings(){
+function shellSettings(save=true){
  const touch=shellEl('showTouch').checked,size=Number(shellEl('controlSize').value),opacity=Number(shellEl('controlOpacity').value),root=shellEl('wrap');
  root.dataset.touch=String(touch);root.style.setProperty('--control-scale',size/100);root.style.setProperty('--control-opacity',opacity/100);
  shellEl('sizeValue').textContent=size+'%';shellEl('opacityValue').textContent=opacity+'%';
- try{localStorage.setItem('crustQuestShellSettings',JSON.stringify({touch,size,opacity}));}catch{}
+ try{if(save)localStorage.setItem('crustQuestShellSettings',JSON.stringify({touch,size,opacity}));}catch{}
  shellFit();
 }
 function shellLoadSettings(){
@@ -77,7 +80,7 @@ function shellLoadSettings(){
  const forcedTouch=/(?:^|[?&])touch=([01])(?:&|$)/.exec(window.location?.search||'');
  shellEl('showTouch').checked=forcedTouch?forcedTouch[1]==='1':typeof value.touch==='boolean'?value.touch:!!window.matchMedia?.('(pointer:coarse)').matches;
  shellEl('controlSize').value=Math.max(85,Math.min(120,Number(value.size)||100));
- shellEl('controlOpacity').value=Math.max(40,Math.min(90,Number(value.opacity)||65));shellSettings();
+ shellEl('controlOpacity').value=Math.max(40,Math.min(90,Number(value.opacity)||65));shellSettings(false);
 }
 function shellPointerAction(e,owner){
  if(owner.group==='direction'){
