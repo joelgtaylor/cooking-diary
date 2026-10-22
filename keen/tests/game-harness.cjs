@@ -2,7 +2,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..');
 function game(saved={},options={}) {
- const html=options.html??fs.readFileSync(path.join(root,'index.html'),'utf8');
+ // Legacy input fixture isolates simulation regressions; shell.test.cjs exercises the production UI.
+ const html=options.html??fs.readFileSync(path.join(__dirname,'fixtures/legacy-interface.html'),'utf8');
  const storage=new Map(Object.entries(saved)),elements=new Map(),listeners={},windowListeners={},audio={toggles:0,effects:[]};
  const trace=[];
  // Normalize extracted fallback paths to their original data URI identity, so
