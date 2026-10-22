@@ -9,7 +9,7 @@ const CAVERN_DISTRICT_CROPS=Object.freeze({
  shelf:[821,481,343,194],window:[1277,426,180,258],
  pin:[28,846,407,88],compass:[503,719,224,270],token:[882,775,206,202],rail:[1305,701,88,313],
  hollowTop:[419,8,349,185],hollowBase:[419,304,349,89],
- barkLeft:[447,193,45,110],barkRight:[700,193,45,110]
+ barkLeft:[447,193,45,110],barkRight:[700,193,45,110],barkBack:[545,215,90,90]
 });
 function cavernDistrictArtReady(){
  if(!cavernDiscoveryLayout()||window.__crustWorldArtEnabled===false||/(?:^|[?&])districtArt=off(?:&|$)/.test(window.location?.search||''))return false;
@@ -38,6 +38,8 @@ function drawCavernHollowArt(){
  const x=69*T,y=44*T,width=7*T,bottom=54*T;
  const topHeight=width*185/349,baseHeight=width*89/349;
  g.save();g.beginPath();g.rect(x,y,width,bottom-y);g.clip();
+ rect(x,y,width,bottom-y,'#191724');
+ const bay=width/3;for(let yy=y;yy<bottom;yy+=bay)for(let col=0;col<3;col++)cavernDistrictSprite('barkBack',x+col*bay,yy,bay);
  cavernDistrictSprite('hollowTop',x,y,width);
  // Vertical bark joints extend the stalk without stretching the source image.
  for(let yy=y+topHeight;yy<bottom-baseHeight;yy+=55*110/45){
