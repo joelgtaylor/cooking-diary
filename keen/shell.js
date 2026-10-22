@@ -19,7 +19,7 @@ function shellPause(reason='Paused'){
  shellEl('shellResume').textContent=shellStarted?'Resume':'Play';shellEl('shellResume').focus();
 }
 function shellResume(){
- if(document.hidden)return;
+ if(document.hidden||(typeof artworkLoading!=='undefined'&&artworkLoading))return;
  shellClearInput();shellStarted=true;shellEl('wrap').dataset.started='true';
  state=shellSavedState==='shell-menu'?'play':shellSavedState;
  shellEl('shellOverlay').hidden=true;shellEl('wrap').dataset.mode='play';
@@ -141,6 +141,7 @@ function bindInput(){
  for(const event of ['contextmenu','selectstart','dragstart'])shellEl('gameStage').addEventListener(event,e=>e.preventDefault());
  c.addEventListener('pointerdown',e=>{e.preventDefault();AudioKit.start();if(state==='clear'){shellClearInput();advanceBakery();}});
  document.addEventListener('keydown',e=>{
+  if(typeof artworkLoading!=='undefined'&&artworkLoading)return;
   if(handleCharacterSelectorKey(e))return;
   shellTrapFocus(e);
   const k=e.key.toLowerCase();
