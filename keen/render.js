@@ -265,7 +265,10 @@ for(const e of enemies)if(e.alive){
 }
 drawForeman();drawMycelium();drawBloomrot();drawDevourer();if(bakery===2)drawCavernFoothillsTrim();if(bakery===2)drawPlungeWayfinding();
 drawEnemyShots();
-for(const s of shots){if(drawDoughShot(s))continue;rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';drawPlayer();
-if(!window.__crustBloomrotArena&&!(bakery===3&&window.__crustDevourerPreview)){if(!devourerArena())drawGrandOven();drawCheckpoints();}
+for(const s of shots){if(drawDoughShot(s))continue;rect(s.x,s.y,s.w,s.h,'#ffff88');rect(s.x+3,s.y-2,4,2,'#fff')}for(const p of particles)rect(p.x,p.y,4,4,p.color);g.font='bold 15px monospace';g.textAlign='center';for(const fl of floaters){g.globalAlpha=Math.min(1,fl.life/30);g.fillStyle=fl.color;g.fillText(fl.txt,fl.x,fl.y)}g.globalAlpha=1;g.textAlign='left';
+// Keep the original animated checkpoint art behind the hero at retry positions.
+if(!window.__crustBloomrotArena&&!(bakery===3&&window.__crustDevourerPreview))drawCheckpoints();
+drawPlayer();
+if(!window.__crustBloomrotArena&&!(bakery===3&&window.__crustDevourerPreview)){if(!devourerArena())drawGrandOven();}
 g.restore();
 }

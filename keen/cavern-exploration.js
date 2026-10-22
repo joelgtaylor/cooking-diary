@@ -150,7 +150,7 @@ function drawCavernExploration(){
 }
 function drawCavernDiscoveryUI(){
  const s=cavernExploration;if(!s)return;
- g.save();g.font='11px monospace';g.textAlign='right';g.fillStyle='#ead8ad';g.fillText('RELICS '+s.found.size+'/3',W-14,H-13);
+ g.save();rect(W-142,52,128,22,'#142735');g.font='11px monospace';g.textAlign='right';g.fillStyle='#ead8ad';g.fillText('RELICS '+s.found.size+'/3',W-24,67);
  if(s.ride){g.textAlign='center';g.fillText('FREIGHT LIFT · JUMP TO LEAVE',W/2,H-13);}g.restore();
 }
 

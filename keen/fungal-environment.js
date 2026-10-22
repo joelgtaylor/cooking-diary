@@ -60,21 +60,35 @@ function drawFungalDepthVeil(){
 }
 // Stem textures repeat vertically at their own aspect ratio and terminate in
 // a proportioned root foot. Their dark faces sit behind all gameplay art.
+// Overlap textured samples at their native scale; feather only the join band.
+// No extra silhouettes, collision surfaces or generated per-frame textures.
+function fungalJoinedSprite(crop,x,y,width,brightness,fadeTop=0){
+ const height=Math.round(width*crop[3]/crop[2]),fade=Math.min(fadeTop,height);
+ if(!fade){fungalSprite(crop,x,y,width,brightness);return;}
+ for(let i=0;i<4;i++){
+  const top=fade*i/4,bottom=fade*(i+1)/4;
+  g.save();g.globalAlpha*=((i+1)/4);
+  fungalSprite([crop[0],crop[1]+crop[3]*top/height,crop[2],crop[3]*(bottom-top)/height],x,y+top,width,brightness);g.restore();
+ }
+ if(height>fade)fungalSprite([crop[0],crop[1]+crop[3]*fade/height,crop[2],crop[3]*(height-fade)/height],x,y+fade,width,brightness);
+}
 function fungalStem(cx,top,bottom,width=3*T,brightness=.48,kind='root'){
  const body=FUNGAL_ENVIRONMENT_CROPS[kind==='mushroom'?'mushroomBody':'rootBody'],foot=FUNGAL_ENVIRONMENT_CROPS.trunk;
  const bodyHeight=Math.round(width*body[3]/body[2]),footWidth=width*2;
  const footHeight=Math.round(footWidth*foot[3]/foot[2]);
  const join=Math.max(top,bottom-footHeight+width*.28);
  g.save();g.beginPath();g.rect(cx-width,top,width*2,Math.max(0,bottom-top));g.clip();
- for(let y=top,i=0;y<join;y+=bodyHeight,i++)
-  fungalSprite(body,cx-width/2,y,width,brightness,i%2===1);
- fungalSprite(foot,cx-footWidth/2,Math.max(top,bottom-footHeight),footWidth,brightness);
+ const overlap=Math.min(12,bodyHeight/4);
+ for(let y=top,i=0;y<join;y+=bodyHeight-overlap,i++)
+  fungalJoinedSprite(body,cx-width/2,y,width,brightness,i?overlap:0);
+ fungalJoinedSprite(foot,cx-footWidth/2,Math.max(top,bottom-footHeight),footWidth,brightness,12);
  g.restore();
 }
 function fungalCliff(x,top,width,bottom,brightness=.55){
  const body=FUNGAL_ENVIRONMENT_CROPS.rockBody,height=Math.round(width*body[3]/body[2]);
  g.save();g.beginPath();g.rect(x,top,width,Math.max(0,bottom-top));g.clip();
- for(let y=top,i=0;y<bottom;y+=height,i++)fungalSprite(body,x,y,width,brightness,i%2===1);
+ const overlap=Math.min(12,height/4);
+ for(let y=top,i=0;y<bottom;y+=height-overlap,i++)fungalJoinedSprite(body,x,y,width,brightness,i?overlap:0);
  g.restore();
 }
 function drawFungalEnvironment(){
