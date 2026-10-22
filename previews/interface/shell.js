@@ -149,6 +149,7 @@ function bindInput(){
   if(k==='q'||k==='t'||k==='r'){e.preventDefault();if(!e.repeat){if(k==='r')shellAsk('restart');else shellOpenSheet(k==='q'?'map':'recipes');}return;}
   if(k==='enter'&&state==='clear'){e.preventDefault();shellClearInput();advanceBakery();return;}
   if(state!=='play')return;
+  if((k===' '||k==='enter')&&e.target?.closest?.('[data-action]'))return;
   const actions={arrowleft:'left',a:'left',arrowright:'right',d:'right',arrowup:'jump',w:'jump',' ':'jump',x:'shoot',k:'shoot'};
   if(actions[k]){e.preventDefault();shellInput.set('key:'+e.code,actions[k]);if(!e.repeat&&actions[k]==='jump')player.buffer=9;if(!e.repeat&&actions[k]==='shoot')shellPendingShoot=tick;shellPublishInput();AudioKit.start();}
   if(!e.repeat&&k==='c'){e.preventDefault();togglePogo();}
