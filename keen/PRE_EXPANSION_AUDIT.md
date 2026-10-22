@@ -118,3 +118,8 @@ No boss balancing, level redesign, soundtrack rewrite or expansion is recommende
 ## Future expansion note
 
 Current needs justify a reliable shared scene-preview entry point and production-shell transition tests. Later, consider consolidating district inspection metadata and adding route/collision validation across every world and character solution. Defer world registration and asset-manifest refactors until a concrete new world requires them. Do not invent future world designs.
+
+
+## Implementation follow-up — October 22, 2026
+
+F1–F6 addressed on the polish branch: guarded/schema-validated save reads; legacy preview pause normalization; dialogue Escape dismissal; solution-neutral Sporekeeper response; documented mute shortcut available in play and pause; refreshed maintenance guidance. No new solution state, geometry, physics, boss balance or soundtrack changes. Production-shell regressions exercise corrupt/denied storage, all 14 environment scenes, dialogue dismissal and mute behavior. Physical-device and full encounter coverage limits above still apply.

@@ -1,47 +1,43 @@
-# Crust Quest — Maintenance and Refactoring Guide
+# Crust Quest — Maintenance Guide
 
-**Current baseline:** October 18, 2026, after the merge of the three vertical bakery worlds.
-**Working branch:** `refactor/keen-maintenance`. Do not merge to `main` until regression checks pass.
+**Current baseline:** October 22, 2026, pre-expansion polish. See `CREATIVE_CHARTER.md` for creative boundaries and `PRE_EXPANSION_AUDIT.md` for findings and coverage limits.
 
-## Shipped entry point
+**Working branch:** `polish/keen-pre-expansion`. Merge requires Joel's approval.
 
-- `keen/index.html` is the production game loaded by `/cooking-diary/keen/`.
-- Production exclusively uses the 105-column × 56-row vertical levels (32 px tiles). Classic mode and the historical `__crustCameraDemo` flag have been retired.
-- `keen/art/vertical-bakery{1,2,3}-layout.js` own the three active authored vertical layouts. Each defines platform spans, yeast cultures, checkpoints, hazards, enemies, power-ups, sections and the oven destination.
-- `keen/art/vertical-parallax.js` renders the three-layer parallax backgrounds.
-- `keen/index.html` retains recipes, shared game state and startup. Image registration lives in `assets.js`. Audio, camera follow, world lifecycle, input and rendering are external scripts.
-- Classic mode and its standalone preview dependencies have been retired; production has only the three vertical worlds.
+## Shipped architecture
 
-## Files directly loaded by production
+`keen/index.html` is the production entry point. It loads classic scripts in dependency order; shared lexical game state still lives in its final inline bootstrap. Preserve the script order in the current HTML rather than copying historical inventories.
 
-**Scripts (order matters):**
+- `world.js` owns initialization, checkpoints, completion and three-world advancement; `physics.js`, `collision.js`, `combat.js` and `gameplay.js` own simulation behavior.
+- `art/vertical-bakery{1,2,3}-layout.js` own the authored 105-column, 56-row worlds. The approved discovery geometry and districts must remain intact.
+- `characters.js`, `baker-pilot.js`, `vance-wick.js` and `character-select.js` own rendering and the two-hero roster. Both heroes share physics. Vance's root-door shot intentionally uses the same solved relay state as Loafy's puzzle.
+- `shell.js`, `shell.css` and `input-model.js` provide the production pause/menu/fullscreen/touch interface. `input.js` is the older adapter used by the legacy simulation fixture, not the production input binding.
+- `render.js`, `architecture.js`, `atmosphere.js`, the three environment modules and `cavern-discovery-art.js` compose world presentation. `assets.js` registers images; some art scripts retain intentional embedded fallbacks.
+- `audio.js` is the gesture/state facade; `audio-engine.js` contains the three approved world compositions and bounded effect/scheduler lifecycle. Preserve the scores.
+- `foreman.js`, `mycelium.js`, `bloomrot.js`, `devourer.js` and `cavern-exploration.js` implement special encounters and discovery. Preserve their balance and progression contracts.
+- Final credits are presented through the shell and retain both creators' credits, recipe access and replay.
 
-```
-art/phase3-bg.js
-art/vertical-bakery1-layout.js
-art/vertical-bakery2-layout.js
-art/vertical-bakery3-layout.js
-art/checkpoint-flags-generated.js
-art/vertical-parallax.js
-art/baker-reimagined.js
-art/environment-gameplay-atlas.js
-audio.js
-camera.js
-world.js
-input.js
-collision.js
-physics.js
-combat.js
-gameplay.js
-characters.js
-hud.js
-render.js
-assets.js
+## Save handling
+
+Best score and recipe unlocks use the existing `crustQuestBest` and `crustQuestCodex` keys. Bootstrap guards unavailable storage and normalizes recipe data to unique integer IDs 0–2. Valid progress is retained; reads do not overwrite or clear stored data. Character and control preferences use their existing independent keys. Checkpoints remain in-session; this pass does not add level-save persistence.
+
+## Validation and focused previews
+
+Run from the repository root:
+
+```sh
+node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs
 ```
 
-**Runtime images:** `bioluminescent-mushroom-city.webp`, `moonlit-bakery-city.webp`, `clockwork-oven.webp`; `bakery{1,2,3}-parallax-{far,mid,near}.webp`; `dough-gremlins-primary.png`, `dough-gremlins-expressions.png`, and `baker-ai-stable.png`, all under `keen/art/`.
+`tests/game-harness.cjs` defaults to the legacy input fixture for simulation compatibility. `tests/shell.test.cjs` explicitly loads the production HTML and exercises real shell state transitions with DOM stubs. Both are needed. Stubbed canvas/audio and simulated pointers do not certify physical phone multitouch, visual quality or native fullscreen.
 
-The remaining art scripts still carry embedded fallback images and generated atlases used by production. `index.html` no longer contains image data; its seven retained inline PNGs now live in `art/fallback-*.png`. Do not delete these fallbacks based only on their age.
+Existing `?scene=environment-NAME` links select inspection positions: courtyard, hall, towers, forecourt; foothills, grotto, canopy, plunge, bloomrot; boilerworks, shafts, skybridge, descent, ovenhall. The shell normalizes their old pause state so Play runs the scene in place. These links are inspection tools, not substitutes for full progression playthroughs. `?touch=1` exposes controls; `?perf=1` exposes local frame samples without telemetry. Measure warmed-up scenes on target hardware before optimizing.
+
+Check desktop and physical mobile input, both heroes, both relay solutions, checkpoint recovery, all three bosses, finishing oven, credits, recipes, audio interruption and fullscreen. Confirm collisions and attack timing remain unchanged after presentation work. Critical cues must not depend on red/green color differences alone.
+
+## Historical maintenance record
+
+The following sections record the October 18 extraction work. Their dated branch links, inventories and incomplete-work notes are historical; current source and tests take precedence.
 
 ## Historical preview inventory
 
@@ -57,9 +53,9 @@ The pre-cleanup snapshots remain in Git history at `b481e2b`. Use the commit-spe
 4. **Completed:** retire classic mode, its selector, generation, camera, completion path and exclusive scenery. Historical previews and their exclusive dependencies were subsequently retired.
 5. Update level-design plans against the vertical data models, then improve gameplay in separate feature branches.
 
-## Known technical debt
+## Historical technical-debt notes (October 18; superseded)
 
-- There is one global 148 BPM, 32-step procedural composition across all three worlds; no stage-specific soundtrack yet.
+- Superseded: the former global composition has been replaced by three approved world-specific themes in `audio-engine.js`. Do not use this historical note to plan audio replacement.
 - The three vertical layouts share an intentionally similar ascent–crest–descent structure. A future design pass should diversify them, **not** silently do so during refactoring.
 - The Web Audio engine has now been extracted to `keen/audio.js`, retaining its existing API. Image registration now lives in `assets.js`; older fallback art scripts still contain data URIs.
 
