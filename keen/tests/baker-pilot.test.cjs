@@ -48,5 +48,18 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
 
 test('changed baker scripts share a release version so cached clients receive them together',()=>{
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
- for(const name of ['characters','baker-pilot','combat','architecture','render','throwers','foreman','world','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
+ for(const name of ['characters','combat','architecture','render','throwers','foreman','world','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
+});
+
+test('Vance uses his atlas for every action, anchors hands and feet, and keeps simulation identical',()=>{
+ const a=pilot(''),b=pilot('');ready(a);ready(b);
+ a.run('selectCharacter("vance-wick");drawBakerPilot();vanceWickArt.complete=true;vanceWickArt.naturalWidth=1024;vanceWickArt.naturalHeight=2048');
+ for(const pose of ['player.ground=true;player.vx=0','player.vx=3.6','player.ground=false;player.vy=-4','player.vy=4','player.hang={top:100}','player.hang=null;pogoOn=true','pogoOn=false;player.ground=true;rememberBakerShot(false)','rememberBakerShot(true)']){
+  a.run(pose);a.trace.length=0;assert.equal(a.run('drawBakerPilot()'),true);
+  assert.ok(a.trace.some(c=>c[0]==='drawImage'));
+ }
+ for(const c of [a,b])c.run('player.hang=null;pogoOn=false;clearBakerShot();player.x=16*T;player.y=54*T-player.h;player.vx=0;player.vy=0;player.ground=true;keys={right:true,shoot:true}');
+ const snapshot='JSON.stringify({player,shots,enemies,collected,checkpointState})';
+ for(let i=0;i<180;i++){a.run('update()');b.run('update()');assert.equal(a.run(snapshot),b.run(snapshot));}
+ a.run('vanceWickArt.naturalWidth=0');assert.equal(a.run('drawBakerPilot()'),true);
 });
