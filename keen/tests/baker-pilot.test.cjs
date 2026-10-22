@@ -50,7 +50,7 @@ test('baker scripts carry release versions so cached clients receive updates',()
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
  for(const name of ['combat','vance-wick','baker-pilot'])assert.ok(html.includes('src="'+name+'.js?v=animation-alignment-20261022"'));
  assert.ok(html.includes('src="mycelium.js?v=pre-expansion-20261022"'));
- for(const name of ['architecture','throwers','foreman','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
+ for(const name of ['architecture','foreman','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
 });
 
 test('Vance uses his atlas for every action, anchors hands and feet, and keeps simulation identical',()=>{

@@ -81,11 +81,11 @@ function advanceBakery(){
 }
 function restart(){if(bakery===3&&window.__crustDevourerPreview){startDevourerPreview();return;}if(window.__crustBloomrotArena){startBloomrotPreview();return;}init(bakery)}
 
-// Opt-in audition: resize the small Moonlit walkers/hoppers, never other worlds.
+// Bakery 1 scale audition; bosses and other worlds are never resized.
 function applyMoonlitEnemyScale(){
  if(bakery!==1||!/(?:^|[?&])enemyScale=pilot(?:&|$)/.test(window.location?.search||''))return;
  for(const e of enemies){
-  if(e.type!=='walker'&&e.type!=='hopper')continue;
+  if(!['walker','hopper','thrower'].includes(e.type))continue;
   const foot=e.y+e.h,centre=e.x+e.w/2,extra=40-e.w;
   e.w=40;e.h=54;e.y=foot-e.h;e.x=centre-e.w/2;e.visualScale=1.6;
   if(e.encounter){e.encounter.right-=extra;e.x=Math.max(e.encounter.left,Math.min(e.encounter.right,e.x));}
