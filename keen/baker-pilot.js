@@ -27,7 +27,13 @@ function drawBakerPilot(){
  if(!bakerPilotEnabled())return false;
  if(!bakerPilotArt){bakerPilotArt=new Image();bakerPilotArt.src='art/baker-grunge-actions.png';}
  if(!bakerPilotArt.complete||bakerPilotArt.naturalWidth!==887||bakerPilotArt.naturalHeight!==1774)return false;
- const {row,frame}=bakerPilotFrame(),sprite=BAKER_PILOT_SPRITES[row]?.[frame];if(!sprite)return false;
+ const {row,frame}=bakerPilotFrame();
+ let art=bakerPilotArt,sprite=BAKER_PILOT_SPRITES[row]?.[frame];
+ if(typeof vanceWickSelected==='function'&&vanceWickSelected()){
+  if(!vanceWickArt){vanceWickArt=new Image();vanceWickArt.src='art/vance-wick-actions.webp';}
+  if(vanceWickArt.complete&&vanceWickArt.naturalWidth===1024&&vanceWickArt.naturalHeight===2048){art=vanceWickArt;sprite=VANCE_WICK_SPRITES[row]?.[frame];}
+ }
+ if(!sprite)return false;
  if(player.inv&&tick%8>=4)return true;
  if(player.ground&&!player.hang&&!pogoOn)drawContactShadow(player,25);
  const foot=Math.round(player.y+player.h),cx=Math.round(player.x+player.w/2);
@@ -35,7 +41,7 @@ function drawBakerPilot(){
  const recoil=squeeze&&!player.hang&&!pogoOn?-1:0;
  const top=player.hang?player.hang.top-2-foot:-sprite.h;
  g.save();g.imageSmoothingEnabled=false;g.translate(cx,foot);g.scale(player.face,1);
- g.drawImage(bakerPilotArt,...sprite.crop,-sprite.w/2+recoil,top,sprite.w,sprite.h);g.restore();return true;
+ g.drawImage(art,...sprite.crop,(sprite.left??-sprite.w/2)+recoil,top,sprite.w,sprite.h);g.restore();return true;
 }
 function drawDoughShot(s){
  if(!bakerPilotEnabled())return false;

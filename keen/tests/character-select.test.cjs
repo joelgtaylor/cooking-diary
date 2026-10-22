@@ -1,11 +1,11 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {game}=require('./game-harness.cjs');
 test('the original baker is Loafy; unavailable or invalid saved characters fall back safely',()=>{
- for(const saved of [undefined,'loafy','vance-wick','unknown']){
+ for(const saved of [undefined,'loafy','unknown']){
   const a=game(saved?{crustQuestCharacter:saved}:{});
   assert.equal(a.run('selectedCharacter().name'),'Loafy');
   assert.equal(a.elements.get('characterButton').textContent,'Character: Loafy');
-  assert.equal(a.run('selectCharacter("vance-wick")'),false);
+  assert.equal(a.run('selectCharacter("unknown")'),false);
  }
 });
 test('selection pauses simulation, blocks gameplay shortcuts, and restores the exact prior mode',()=>{
@@ -27,13 +27,13 @@ test('Loafy selection persists independently of recipes, score and checkpoint pr
  assert.equal(a.storage.get('crustQuestBest'),'9000');assert.equal(a.storage.get('crustQuestCodex'),'[0,1]');
  assert.equal(a.run('checkpointState.current'),2);assert.equal(a.run('collected'),1);assert.equal(a.run('player.health'),2);assert.equal(a.run('state'),'play');
 });
-test('Vance concept can be previewed without selecting an unfinished skin or changing the game',()=>{
- const a=game();a.run('openCharacterSelector()');
+test('Vance selection persists, restores prior mode and retains game progress',()=>{
+ const a=game();a.run('player.health=2;collected=3;openCharacterSelector()');
  for(const click of a.elements.get('characterVance').listeners.click)click({});
- assert.equal(a.elements.get('characterConcept').style.display,'block');
- assert.match(a.elements.get('characterMessage').textContent,/Vance Wick/);
- assert.equal(a.run('selectedCharacterId'),'loafy');assert.equal(a.storage.size,0);
- a.run('closeCharacterSelector();openCharacterSelector()');assert.equal(a.elements.get('characterConcept').style.display,'none');
+ assert.equal(a.run('selectedCharacterId'),'vance-wick');assert.equal(a.storage.get('crustQuestCharacter'),'vance-wick');
+ assert.equal(a.run('state'),'play');assert.equal(a.run('player.health'),2);assert.equal(a.run('collected'),3);
+ const b=game(Object.fromEntries(a.storage));assert.equal(b.run('selectedCharacter().name'),'Vance Wick');
+ assert.equal(b.elements.get('characterButton').textContent,'Character: Vance Wick');
 });
 test('keyboard focus stays within the selector and returns to its opener',()=>{
  const a=game();a.run('for(const id of ["characterClose","characterLoafy","characterVance","characterConceptLink","characterButton"]){const el=document.getElementById(id);el.focus=()=>document.activeElement=el;}openCharacterSelector()');
