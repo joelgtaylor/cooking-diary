@@ -2,13 +2,15 @@
 'use strict';
 const CHARACTER_ROSTER=Object.freeze([
  Object.freeze({id:'loafy',name:'Loafy',playable:true}),
- Object.freeze({id:'vance-wick',name:'Vance Wick',playable:false})
+ Object.freeze({id:'vance-wick',name:'Vance Wick',playable:true})
 ]);
 let selectedCharacterId='loafy',characterReturnState=null;
 function selectedCharacter(){return CHARACTER_ROSTER.find(c=>c.id===selectedCharacterId)||CHARACTER_ROSTER[0];}
 function refreshCharacterSelector(){
  document.getElementById('characterButton').textContent='Character: '+selectedCharacter().name;
  document.getElementById('characterLoafy').setAttribute?.('aria-pressed',String(selectedCharacterId==='loafy'));
+ document.getElementById('characterVance').setAttribute?.('aria-pressed',String(selectedCharacterId==='vance-wick'));
+ document.getElementById('characterVance').setAttribute?.('aria-pressed',String(selectedCharacterId==='vance-wick'));
 }
 function selectCharacter(id){
  const character=CHARACTER_ROSTER.find(c=>c.id===id&&c.playable);
@@ -28,14 +30,9 @@ function openCharacterSelector(){
  if(characterReturnState!==null)return;
  characterReturnState=state;state='character-select';keys={};prevJump=false;player.buffer=0;
  document.getElementById('characterConcept').style.display='none';
- document.getElementById('characterMessage').textContent='Choose your baker. Loafy is ready to play; Vance Wick is in concept development.';
+ document.getElementById('characterMessage').textContent='Choose your baker. Same moves, two heroes.';
  refreshCharacterSelector();document.getElementById('characterPanel').style.display='grid';
  document.getElementById('characterLoafy').focus?.();
-}
-function previewVanceConcept(){
- document.getElementById('characterConcept').style.display='block';
- document.getElementById('characterMessage').textContent='Vance Wick · concept preview. His full playable animation set is next.';
- document.getElementById('characterConcept').scrollIntoView?.({block:'nearest',behavior:'smooth'});
 }
 function handleCharacterSelectorKey(e){
  if(state!=='character-select')return false;
@@ -61,6 +58,6 @@ function bindCharacterSelector(){
  document.getElementById('characterButton').addEventListener('click',openCharacterSelector);
  document.getElementById('characterClose').addEventListener('click',closeCharacterSelector);
  document.getElementById('characterLoafy').addEventListener('click',()=>{selectCharacter('loafy');closeCharacterSelector();});
- document.getElementById('characterVance').addEventListener('click',previewVanceConcept);
+ document.getElementById('characterVance').addEventListener('click',()=>{selectCharacter('vance-wick');closeCharacterSelector();});
  refreshCharacterSelector();
 }
