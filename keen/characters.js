@@ -128,7 +128,8 @@ function drawOpeningEnemy(e){
  if(!sprite)return false;
  const {crop,w,h}=sprite;
  const compression=openingEnemyCompression(e);
- const drawW=w*(1+.18*compression),drawH=h*(1-.28*compression);
+ const scale=e.visualScale||1;
+ const drawW=w*scale*(1+.18*compression),drawH=h*scale*(1-(scale>1?.15:.28)*compression);
  if(contactSurface(e)!==null&&Math.abs(e.vy||0)<=1)drawContactShadow(e,22);
  g.save();g.imageSmoothingEnabled=false;
  g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale(e.vx<0?-1:1,1);

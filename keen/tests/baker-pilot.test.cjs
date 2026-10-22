@@ -48,8 +48,9 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
 
 test('baker scripts carry release versions so cached clients receive updates',()=>{
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
- for(const name of ['combat','mycelium'])assert.ok(html.includes('src="'+name+'.js?v=vance-door-20261022"'));
- for(const name of ['characters','architecture','throwers','foreman','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
+ for(const name of ['combat','vance-wick','baker-pilot'])assert.ok(html.includes('src="'+name+'.js?v=animation-alignment-20261022"'));
+ assert.ok(html.includes('src="mycelium.js?v=pre-expansion-20261022"'));
+ for(const name of ['architecture','foreman','moonlit-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
 });
 
 test('Vance uses his atlas for every action, anchors hands and feet, and keeps simulation identical',()=>{
@@ -59,8 +60,43 @@ test('Vance uses his atlas for every action, anchors hands and feet, and keeps s
   a.run(pose);a.trace.length=0;assert.equal(a.run('drawBakerPilot()'),true);
   assert.ok(a.trace.some(c=>c[0]==='drawImage'));
  }
- for(const c of [a,b])c.run('player.hang=null;pogoOn=false;clearBakerShot();player.x=16*T;player.y=54*T-player.h;player.vx=0;player.vy=0;player.ground=true;keys={right:true,shoot:true}');
+ for(const c of [a,b])c.run('player.hang=null;pogoOn=false;clearBakerShot();player.x=16*T;player.y=54*T-player.h;player.vx=0;player.vy=0;player.ground=true;keys={right:true,shoot:false}');
  const snapshot='JSON.stringify({player,shots,enemies,collected,checkpointState})';
  for(let i=0;i<180;i++){a.run('update()');b.run('update()');assert.equal(a.run(snapshot),b.run(snapshot));}
  a.run('vanceWickArt.naturalWidth=0');assert.equal(a.run('drawBakerPilot()'),true);
+});
+
+
+test('Vance shots originate at each firing pose barrel in both directions',()=>{
+ for(const face of [-1,1])for(const ground of [false,true])for(const running of [false,true])for(const up of [false,true]){
+  const a=pilot('');
+  a.run(`selectCharacter('vance-wick');map=map.map(row=>row.map(()=>'.'));enemies=[];player.x=600;player.y=600;player.face=${face};player.ground=${ground};player.vx=${running?3.6:0};resetPlayerFire();updateProjectiles(true,${up})`);
+  assert.equal(a.run('shots.length'),1);
+  const origin=a.run(`vanceWickShotOrigin(${up})`),shot=a.run('shots[0]');
+  assert.equal(shot.x+shot.w/2-shot.vx,origin.x);
+  assert.equal(shot.y+shot.h/2-(shot.vy||0),origin.y);
+  assert.equal(shot.characterId,'vance-wick');
+  assert.ok(origin.y<600,'barrel must be above the body hitbox top');
+ }
+});
+test('Vance muzzle cannot fire through rock between body and barrel or above his head',()=>{
+ for(const face of [-1,1])for(const up of [false,true]){
+  const a=pilot('');a.run(`selectCharacter('vance-wick');map=map.map(row=>row.map(()=>'.'));enemies=[];player.x=600;player.y=600;player.face=${face};player.ground=true;player.vx=0;resetPlayerFire()`);
+  // Horizontal muzzle is outside the body; upward muzzle is above its top.
+  a.run(up?`map[17][${face===1?19:18}]='#'`:`map[18][${face===1?20:17}]='#'`);
+  a.run(`updateProjectiles(true,${up})`);assert.equal(a.run('shots.length'),0,`face ${face}, up ${up}`);
+ }
+});
+test('Vance keeps fire cadence, ammo, speed and shot dimensions while Loafy keeps his origin',()=>{
+ for(const up of [false,true]){
+  const a=pilot(''),b=pilot('');
+  for(const c of [a,b])c.run("map=map.map(row=>row.map(()=>'.'));enemies=[];player.x=600;player.y=600");
+  a.run("selectCharacter('vance-wick')");
+  for(let i=0;i<10;i++){
+   a.run(`updateProjectiles(true,${up})`);b.run(`updateProjectiles(true,${up})`);
+   assert.equal(a.run('player.ammo'),b.run('player.ammo'));assert.equal(a.run('playerFireCooldown'),b.run('playerFireCooldown'));
+  }
+  assert.equal(b.run('shots[0].y'),up?600-4-100:619);
+  assert.equal(a.run('shots[0].w'),b.run('shots[0].w'));assert.equal(a.run('shots[0].h'),b.run('shots[0].h'));
+ }
 });

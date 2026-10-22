@@ -47,7 +47,7 @@ test('fullscreen failure still starts a fitted game, while later fullscreen tran
  const a=shell();await a.run('shellFullscreen(true)');assert.equal(a.run('state'),'play');assert.match(a.elements.get('shellNotice').textContent,/unavailable/);a.run('shellFullscreen(false)');assert.equal(a.run('state'),'shell-menu');
 });
 test('new input adapter produces the same movement and projectiles as the shipped controls',()=>{
- const a=shell(),b=game();a.click('shellResume');a.key('d','KeyD');a.key('x','KeyX');b.run('keys={right:true,shoot:true}');
+ const a=shell(),b=game({}, {search:'?enemyScale=pilot'});a.click('shellResume');a.key('d','KeyD');a.key('x','KeyX');b.run('keys={right:true,shoot:true}');
  const state='JSON.stringify({player,shots,enemies,collected,checkpointState})';for(let i=0;i<150;i++){a.run('update();syncGameShell()');b.run('update()');assert.deepEqual(JSON.parse(a.run(state)),JSON.parse(b.run(state)));}
 });
 
@@ -108,4 +108,10 @@ test('Escape closes Sporekeeper dialogue and cancels held input without opening 
 test('mute shortcut works in both play and pause and is documented',()=>{
  const a=shell();a.key('m');assert.equal(a.audio.toggles,1);a.click('shellResume');a.key('m');assert.equal(a.audio.toggles,2);
  assert.match(html,/M mute/);
+});
+
+test('normal production starts use approved enemy scale in every world without preview parameters',()=>{
+ const a=shell({search:''});
+ for(const stage of[1,2,3]){a.run(`init(${stage})`);assert.equal(a.run("enemies.filter(e=>e.type!=='flyer').every(e=>e.w===40&&e.h===54)"),true);}
+ const b=shell({search:'?enemyScale=off'});assert.equal(b.run('enemies.every(e=>e.w===25&&e.h===25)'),true);
 });

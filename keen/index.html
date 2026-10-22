@@ -20,39 +20,39 @@
 <script src="performance.js"></script>
 <script src="timing.js"></script>
 <script src="camera.js"></script>
-<script src="world.js?v=cavern-discovery-20261022"></script>
+<script src="world.js?v=enemy-scale-release-20261022"></script>
 <script src="character-select.js?v=vance-playable-20261022"></script>
 <script src="input-model.js?v=credits-20261022"></script>
 <script src="shell.js?v=pre-expansion-20261022"></script>
 <script src="collision.js"></script>
 <script src="physics.js"></script>
-<script src="clockwork-enemies.js?v=clockwork-worlds-20261021"></script>
-<script src="fungal-enemies.js?v=clockwork-worlds-20261021"></script>
-<script src="throwers.js?v=clockwork-worlds-20261021"></script>
-<script src="combat.js?v=vance-door-20261022"></script>
+<script src="clockwork-enemies.js?v=visual-polish-20261022"></script>
+<script src="fungal-enemies.js?v=visual-polish-20261022"></script>
+<script src="throwers.js?v=enemy-scale-all-20261022"></script>
+<script src="combat.js?v=animation-alignment-20261022"></script>
 <script src="cavern-discovery-art.js?v=cavern-art-20261022b"></script>
-<script src="cavern-exploration.js?v=cavern-art-20261022b"></script>
+<script src="cavern-exploration.js?v=cellar-plaque-20261022"></script>
 <script src="gameplay.js?v=cavern-discovery-20261022"></script>
-<script src="characters.js?v=clockwork-worlds-20261021"></script>
-<script src="vance-wick.js?v=vance-playable-20261022"></script>
-<script src="baker-pilot.js?v=vance-playable-20261022"></script>
+<script src="characters.js?v=enemy-scale-20261022"></script>
+<script src="vance-wick.js?v=animation-alignment-20261022"></script>
+<script src="baker-pilot.js?v=animation-alignment-20261022"></script>
 <script src="celebration.js"></script>
 <script src="hud.js?v=cavern-discovery-20261022"></script>
 <script src="ovens.js"></script>
 <script src="interactables.js"></script>
 <script src="art/moonlit-shading.js"></script>
 <script src="moonlit-environment.js?v=clockwork-worlds-20261021"></script>
-<script src="fungal-environment.js?v=clockwork-worlds-20261021"></script>
+<script src="fungal-environment.js?v=visual-polish-20261022"></script>
 <script src="clockwork-environment.js?v=clockwork-worlds-20261021"></script>
 <script src="architecture.js?v=clockwork-worlds-20261021"></script>
 <script src="foreman.js?v=clockwork-worlds-20261021"></script>
 <script src="mycelium.js?v=pre-expansion-20261022"></script>
 <script src="bloomrot.js"></script>
 <script src="devourer.js"></script>
-<script src="render.js?v=cavern-discovery-20261022"></script>
+<script src="render.js?v=visual-polish-20261022"></script>
 <script src="assets.js?v=clockwork-worlds-20261021"></script>
 <script>
-'use strict';window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';
+'use strict';window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';window.__crustEnemyScaleEnabled=true;
 loadGameArt();
 const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;const W=960,H=540,T=32,cols=105,world=cols*T;let rows=56;let pogoOn=false,prevPogo=false;let map=[],gems=[],enemies=[],shots=[],particles=[],player={},camera=0,cameraY=0,tick=0,state='play',collected=0,keys={},prevJump=false;
 let bakery=1;const MAXBAKERY=3;let powerups=[],floaters=[],combo=0,comboT=0,shake=0,hitStop=0,codexFrom='play',codexPage=0;

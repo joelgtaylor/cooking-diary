@@ -3,7 +3,7 @@
 'use strict';
 const FUNGAL_ENVIRONMENT_CROPS=Object.freeze({
  shelf:Object.freeze([21,200,530,202]),
- cap:Object.freeze([578,214,429,200]),
+ cap:Object.freeze([578,200,429,100]),
  root:Object.freeze([1038,200,474,232]),
  arch:Object.freeze([16,470,640,461]),
  formation:Object.freeze([644,477,307,490]),
@@ -12,7 +12,7 @@ const FUNGAL_ENVIRONMENT_CROPS=Object.freeze({
  // would introduce horizontal cuts and disconnected stem segments.
  rockBody:Object.freeze([710,490,140,150]),
  rootBody:Object.freeze([1210,510,110,180]),
- mushroomBody:Object.freeze([752,300,73,100])
+ mushroomBody:Object.freeze([756,296,68,64])
 });
 function fungalEnvironmentReady(){
  const a=assets.fungalEnvironment;
@@ -60,21 +60,35 @@ function drawFungalDepthVeil(){
 }
 // Stem textures repeat vertically at their own aspect ratio and terminate in
 // a proportioned root foot. Their dark faces sit behind all gameplay art.
+// Overlap textured samples at their native scale; feather only the join band.
+// No extra silhouettes, collision surfaces or generated per-frame textures.
+function fungalJoinedSprite(crop,x,y,width,brightness,fadeTop=0){
+ const height=Math.round(width*crop[3]/crop[2]),fade=Math.min(fadeTop,height);
+ if(!fade){fungalSprite(crop,x,y,width,brightness);return;}
+ for(let i=0;i<4;i++){
+  const top=fade*i/4,bottom=fade*(i+1)/4;
+  g.save();g.globalAlpha*=((i+1)/4);
+  fungalSprite([crop[0],crop[1]+crop[3]*top/height,crop[2],crop[3]*(bottom-top)/height],x,y+top,width,brightness);g.restore();
+ }
+ if(height>fade)fungalSprite([crop[0],crop[1]+crop[3]*fade/height,crop[2],crop[3]*(height-fade)/height],x,y+fade,width,brightness);
+}
 function fungalStem(cx,top,bottom,width=3*T,brightness=.48,kind='root'){
  const body=FUNGAL_ENVIRONMENT_CROPS[kind==='mushroom'?'mushroomBody':'rootBody'],foot=FUNGAL_ENVIRONMENT_CROPS.trunk;
  const bodyHeight=Math.round(width*body[3]/body[2]),footWidth=width*2;
  const footHeight=Math.round(footWidth*foot[3]/foot[2]);
  const join=Math.max(top,bottom-footHeight+width*.28);
  g.save();g.beginPath();g.rect(cx-width,top,width*2,Math.max(0,bottom-top));g.clip();
- for(let y=top,i=0;y<join;y+=bodyHeight,i++)
-  fungalSprite(body,cx-width/2,y,width,brightness,i%2===1);
- fungalSprite(foot,cx-footWidth/2,Math.max(top,bottom-footHeight),footWidth,brightness);
+ const overlap=Math.min(12,bodyHeight/4);
+ for(let y=top,i=0;y<join;y+=bodyHeight-overlap,i++)
+  fungalJoinedSprite(body,cx-width/2,y,width,brightness,i?overlap:0);
+ fungalJoinedSprite(foot,cx-footWidth/2,Math.max(top,bottom-footHeight),footWidth,brightness,12);
  g.restore();
 }
 function fungalCliff(x,top,width,bottom,brightness=.55){
  const body=FUNGAL_ENVIRONMENT_CROPS.rockBody,height=Math.round(width*body[3]/body[2]);
  g.save();g.beginPath();g.rect(x,top,width,Math.max(0,bottom-top));g.clip();
- for(let y=top,i=0;y<bottom;y+=height,i++)fungalSprite(body,x,y,width,brightness,i%2===1);
+ const overlap=Math.min(12,height/4);
+ for(let y=top,i=0;y<bottom;y+=height-overlap,i++)fungalJoinedSprite(body,x,y,width,brightness,i?overlap:0);
  g.restore();
 }
 function drawFungalEnvironment(){
@@ -98,7 +112,7 @@ function drawFungalEnvironment(){
  // plunge keeps open sky gaps between much darker vertical rock formations.
  for(const [cx,top,bottom] of [[60,28,39],[63.5,25,43],[67.5,22,35],
   [72.5,19,43],[78.5,22,47],[81.5,26,50]])
-  fungalStem(cx*T,(top+1)*T,bottom*T,1.5*T,.50,'mushroom');
+  fungalStem(cx*T,top*T+16,bottom*T,1.5*T,.50,'mushroom');
  for(const [x,top,w] of [[56,31,3],[69,35,2],[60,39,2]])
   fungalCliff(x*T,(top+1)*T,w*T,54*T,.56);
  // Large hanging formations establish the scale of the chasm. Their dark
@@ -119,7 +133,8 @@ function drawFungalPlatformBacking(){
   if(x+w<camera||x>camera+W||y+3*T<cameraY||y>cameraY+H)continue;
   const kind=fungalPlatformKind(r.x,r.y);
   if(kind==='cap'){
-   // Each authored canopy landing becomes one proportioned, flat-rim cap.
+   // Crown-only crop: the source's short root foot must not repeat halfway
+   // down the extended support. The continuous stem is drawn behind it.
    fungalSprite(FUNGAL_ENVIRONMENT_CROPS.cap,x,y,w,.88);
   }else fungalStrip(kind,x,y,w,kind==='root'?.82:.9);
  }
