@@ -12,6 +12,8 @@ function shell(options={}){
  for(const m of html.matchAll(/<button[^>]*data-action="([^"]+)"[^>]*>/g)){const el=element('action-'+m[1]);el.dataset.action=m[1];actions.push(el);}
  doc={hidden:false,fullscreenElement:null,activeElement:null,getElementById:id=>elements.get(id)||null,querySelectorAll:selector=>selector==='[data-action]'?actions:[],addEventListener(type,fn){(listeners[type]??=[]).push(fn);},createElement:tag=>element('created-'+Math.random()),elementFromPoint:x=>x<75?actions.find(x=>x.dataset.action==='left'):x<160?actions.find(x=>x.dataset.action==='right'):null};
  const a=game(options.saved||{}, {html,search:options.search,context:g,globals:{document:doc,innerWidth:1280,innerHeight:720,matchMedia:()=>({matches:false}),...options.globals}});
+ // Synchronous DOM fixtures assume preloaded art; loading.test.cjs exercises the async gate.
+ a.run('completeArtworkLoading()');
  const fire=(el,type,props={})=>{const event={button:0,pointerId:1,key:'',code:'',detail:1,clientX:30,clientY:530,repeat:false,target:el,preventDefault(){},stopPropagation(){},...props};for(const fn of el?.listeners?.[type]??[])fn(event);};
  const key=(key,code=key,type='keydown')=>{for(const fn of listeners[type]??[])fn({key,code,repeat:false,target:elements.get('gameStage'),preventDefault(){}});};
  return{...a,elements,actions,doc,fire,key,click:id=>fire(elements.get(id),'click'),emitDoc:type=>{for(const fn of listeners[type]??[])fn({});},pointer:(action,type,props)=>fire(actions.find(x=>x.dataset.action===action),type,props)};
@@ -114,4 +116,10 @@ test('normal production starts use approved enemy scale in every world without p
  const a=shell({search:''});
  for(const stage of[1,2,3]){a.run(`init(${stage})`);assert.equal(a.run("enemies.filter(e=>e.type!=='flyer').every(e=>e.w===40&&e.h===54)"),true);}
  const b=shell({search:'?enemyScale=off'});assert.equal(b.run('enemies.every(e=>e.w===25&&e.h===25)'),true);
+});
+test('loading gate blocks play and simulation until artwork is ready',()=>{
+ const a=shell();a.run('artworkLoading=true');const before=a.run('JSON.stringify({player,tick,enemies})');
+ a.click('shellResume');a.key('Enter');a.key('Escape');a.run('loop(0);loop(1000)');
+ assert.equal(a.run('state'),'shell-menu');assert.equal(a.run('JSON.stringify({player,tick,enemies})'),before);
+ a.run('completeArtworkLoading()');a.click('shellResume');assert.equal(a.run('state'),'play');
 });
