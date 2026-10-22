@@ -149,8 +149,8 @@ function drawCavernExploration(){
   rect(px,py,28,28,'#342c30');rect(px+1,py+1,26,25,'#ba9862');
   rect(px+3,py+3,22,21,'#182c32');rect(px+4,py+4,20,1,'#385354');
   // One high-contrast down arrow; shape conveys the entrance without colour.
-  rect(px+11,py+6,6,10,'#fff0c5');rect(px+7,py+13,14,3,'#fff0c5');
-  rect(px+9,py+16,10,3,'#fff0c5');rect(px+12,py+19,4,3,'#fff0c5');
+  rect(px+11,py+6,6,8,'#fff0c5');rect(px+4,py+13,20,3,'#fff0c5');
+  rect(px+7,py+16,14,3,'#fff0c5');rect(px+10,py+19,8,3,'#fff0c5');rect(px+13,py+22,2,1,'#fff0c5');
   for(const dx of [3,23])rect(px+dx,py+24,2,2,'#e7c68b');
  }
 }
