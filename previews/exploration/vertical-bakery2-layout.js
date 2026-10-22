@@ -34,7 +34,7 @@ const plunge={
  encounters:[
   {x:67*T,y:22*T-25,type:'hopper',left:65.5*T,right:69.5*T-25,hopT:55},
   {x:77.5*T,y:22*T-25,type:'hopper',left:76.5*T,right:80.5*T-25,hopT:70},
-  {x:81*T,y:26*T-25,type:'walker',left:79.5*T,right:83.5*T-25,hopT:0},
+  {x:80.5*T,y:26*T-25,type:'walker',left:79.5*T,right:81.5*T-25,hopT:0},
   {x:70*T,y:31*T-25,type:'hopper',left:69.5*T,right:73.5*T-25,hopT:65}
  ],
  throwers:[[72,19],[76,30]],supplies:[[72,18],[78,29]],fork:[61,31]
