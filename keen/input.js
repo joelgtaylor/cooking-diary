@@ -18,7 +18,7 @@ function bindInput(){
   keys[e.key.length===1?k:e.key]=true;AudioKit.start();
   if(e.repeat)return;
   if(k==='v'){e.preventDefault();activateKefir();}
-  if(k==='e'){e.preventDefault();talkMycelium();}
+  if(k==='e'){e.preventDefault();if(typeof interactCavernExploration!=='function'||!interactCavernExploration())talkMycelium();}
   if(k==='m')AudioKit.toggle();
   if(k==='q'){e.preventDefault();toggleMap();}
   if(k==='r')restart();
@@ -34,6 +34,7 @@ function bindInput(){
  const click=(id,fn)=>document.getElementById(id).addEventListener('click',fn);
  click('kefirBtn',()=>{AudioKit.start();activateKefir();});
  click('talkBtn',()=>{AudioKit.start();talkMycelium();});
+ if(document.getElementById('exploreBtn'))click('exploreBtn',()=>{AudioKit.start();interactCavernExploration();});
  click('pogoBtn',()=>{AudioKit.start();togglePogo();AudioKit.effect('pogo');});
  click('codexBtn',()=>{AudioKit.start();toggleCodex();});
  click('restartBtn',()=>{AudioKit.start();restart();});

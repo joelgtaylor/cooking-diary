@@ -60,7 +60,7 @@ function layoutMapMarkers(markers){
  return placed;
 }
 function symbolMapMarkers(){
- const sy=6,offset=82,oven=worldOvenTarget();
+ const sy=336/Math.max(56,rows),offset=82,oven=worldOvenTarget();
  const markers=[{kind:'baker',x:(player.x+player.w/2)/T*10,y:(player.y+player.h)/T*sy+offset-10},
   {kind:'oven',x:oven.x*10+8,y:oven.y*sy+offset-7}];
  for(const gem of gems)if(!gem.got)markers.push({kind:'culture',x:gem.x/T*10,y:gem.y/T*sy+offset-7});
@@ -74,7 +74,7 @@ function drawSymbolMap(){
  if(minimap.height!==460)minimap.height=460;
  // On phones keep glyphs legible and let the wrapper scroll horizontally.
  minimap.style.minWidth='840px';
- const ctx=minimap.getContext('2d'),sy=6,offset=82;
+ const ctx=minimap.getContext('2d'),sy=336/Math.max(56,rows),offset=82;
  ctx.save();ctx.fillStyle='#111a2a';ctx.fillRect(0,0,1050,460);
  ctx.textAlign='left';ctx.font='bold 18px monospace';ctx.fillStyle='#fff0c9';
  ctx.fillText(['MOONLIT BAKERY','FUNGAL CAVERNS','CLOCKWORK OVENS'][bakery-1],14,23);
@@ -86,6 +86,7 @@ function drawSymbolMap(){
   const v=map[y][x];if(v==='#'){ctx.fillStyle='#69768c';ctx.fillRect(x*10,y*sy+offset,10,sy);}
   else if(v==='='||v==='M'){ctx.fillStyle='#b4bdc9';ctx.fillRect(x*10,y*sy+offset,10,2);}
  }
+ if(typeof drawCavernDistrictMap==='function')drawCavernDistrictMap(ctx,sy,offset);
  ctx.strokeStyle='#9eacbf';ctx.lineWidth=1;
  ctx.strokeRect(camera/T*10,cameraY/T*sy+offset,W/T*10,H/T*sy);
  const markers=symbolMapMarkers();
@@ -104,7 +105,7 @@ function drawPhase3Map(){
  g.fillStyle='#111a2a';g.fillRect(0,0,1050,360);
  g.font='bold 14px monospace';g.textAlign='left';g.fillStyle='#dbffdf';
  g.fillText('BAKERY '+bakery+' · GREEN checkpoints · GOLD jars · PINK spikes · CYAN baker · ORANGE oven',12,17);
- const sy=6.0,offset=22;
+ const sy=336/Math.max(56,rows),offset=22;
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
    const v=map[y][x];
    if(v==='.'){continue;}g.fillStyle=v==='#'?'#706f9b':'#fa79a6';
@@ -116,6 +117,7 @@ function drawPhase3Map(){
   g.fillStyle=i<=checkpointState.current?'#82ffbf':'#5ba887';g.fillRect(x*10,y*sy+offset,10,9);
  }
  g.fillStyle='#ff985e';g.fillRect(worldOvenTarget().x*10,worldOvenTarget().y*sy+offset,16,12);
+ if(typeof drawCavernDistrictMap==='function')drawCavernDistrictMap(g,sy,offset);
  g.fillStyle='#56f4f3';g.fillRect(Math.floor(player.x/T)*10,Math.floor(player.y/T)*sy+offset,10,10);
  g.strokeStyle='#c2fff4';g.lineWidth=2;
  g.strokeRect(camera/T*10,cameraY/T*sy+offset,W/T*10,H/T*sy);

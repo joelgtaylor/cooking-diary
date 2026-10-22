@@ -1,10 +1,10 @@
 // Source-derived, equal-scale route comparison. Run from the repository root.
 const fs=require('node:fs'),vm=require('node:vm');
-function load(path){const c={window:{}};vm.runInNewContext(fs.readFileSync(path,'utf8'),c);const l=c.window.CrustVerticalBakery2,map=Array.from({length:56},()=>Array(105).fill('.'));l.apply({map});return {l,map};}
+function load(path){const c={window:{}};vm.runInNewContext(fs.readFileSync(path,'utf8'),c);const l=c.window.CrustVerticalBakery2,map=Array.from({length:l.rows},()=>Array(105).fill('.'));l.apply({map});return {l,map};}
 const before=load('keen/tests/fixtures/bakery2-environments-approved.js'),after=load('keen/art/vertical-bakery2-layout.js');
 function line(points,color,dashed=false){return `<polyline points="${points.map(([x,y])=>`${x*8},${y*8}`).join(' ')}" fill="none" stroke="${color}" stroke-width="3" ${dashed?'stroke-dasharray="6 4"':''}/>`;}
 function panel(data,changed){
- let svg='<svg viewBox="0 0 840 448" role="img" aria-label="Source-derived Bakery 2 geometry and routes"><rect width="840" height="448" fill="#111a2b"/>';
+ let svg='<svg viewBox="0 0 840 '+(data.l.rows*8)+'" role="img" aria-label="Source-derived Bakery 2 geometry and routes"><rect width="840" height="448" fill="#111a2b"/>';
  data.map.forEach((row,y)=>{for(let x=0;x<row.length;x++){const t=row[x];if(t==='.')continue;const start=x;while(x+1<row.length&&row[x+1]===t)x++;svg+=`<rect x="${start*8}" y="${y*8}" width="${(x-start+1)*8}" height="${t==='#'?8:2}" fill="${t==='#'?'#69778c':t==='M'?'#f5e6a3':t==='^'?'#ffb36b':'#adc5cf'}"/>`;}});
  svg+=line([[3,54],[7,52],[11,49],[18,51],[22,48],[25,45],[29,42],[25,40],[29,38],[34,35],[48,35],[52,31],[57,31],[63,31],[67,35],[63,39],[71,43],[78,47],[82,50],[87,54],[102,54]],'#72d6ff');
  svg+=line([[59,31],[59,28],[63,25],[67,22],[72,19],[78,22],[82,26],[77,30],[71,31],[67,35]],'#d7b5ff',true);

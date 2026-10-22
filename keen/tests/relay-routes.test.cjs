@@ -47,7 +47,7 @@ test('deep-plunge return reaches the open doorway with ordinary jumps',()=>{
 test('new geometry and all encounter metadata preserve the approved arena and systems',()=>{
  const a=level(),b=level(true),am=a.run('map'),bm=b.run('map');
  const edits=a.run('[...currentVerticalLayout().relayDivide.approach,...currentVerticalLayout().relayDivide.return,currentVerticalLayout().relayDivide.landing]');
- for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok(x===55||edits.some(([sx,sy,w])=>y===sy&&x>=sx&&x<sx+w),`${x},${y}`);
+ for(let y=0;y<56;y++)for(let x=0;x<105;x++)if(am[y][x]!==bm[y][x])assert.ok((x>=4&&x<23&&y>=54)||(x>=69&&x<76&&y>=44)||x===55||edits.some(([sx,sy,w])=>y===sy&&x>=sx&&x<sx+w),`${x},${y}`);
  for(const expr of ['gems','enemies','powerups','checkpointState.spawns','currentVerticalLayout().bloomrot','relayLayout()'])assert.equal(a.run(`JSON.stringify(${expr})`),b.run(`JSON.stringify(${expr})`));
  for(let i=0;i<4;i++){a.run(`checkpointState.current=${i};respawnCheckpoint()`);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)||spike(player.x,player.y,player.w,player.h)'),false);assert.equal(a.run('player.x<55*T'),i<2);}
 });

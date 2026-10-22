@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const rows=56,cols=105,T=32;
+const rows=72,cols=105,T=32;
 const rise=Array.from({length:17},(_,i)=>[4+i*4,52-i*2,7]);
 const crest=[[67,18,9],[72,19,8],[77,21,8]];
 const descent=Array.from({length:7},(_,i)=>[78+i*4,22+i*4,7]);
@@ -49,6 +49,17 @@ const relayDivide={column:55,gateTop:28,gateBottom:35,
  approach:[[43,51,7],[46,48,7],[46,42,7],[43,39,7]],
  return:[[58,51,4],[58,47,4],[58,43,4],[58,39,4]],
  landing:[56,35,8]};
+// Optional districts occupy the cellar below the former floor and the
+// interior of a giant stalk. Required-route metadata stays untouched.
+const exploration={
+ cellar:{bounds:[4,55,23,69],mouths:[[10,54,3],[21,54,2]],
+  shelves:[[5,57,8],[18,57,5],[5,61,6],[18,61,5],[6,65,6],[18,65,5],[11,63,4],[12,59,4]]},
+ hollow:{bounds:[69,44,76,54],shelves:[[70,47,5],[69,50,5],[70,53,5]]},
+ lift:{x:83,top:26,bottom:54,repair:[71,50]},
+ relics:[{id:'cellar-pin',name:"Founder's Rolling Pin",x:8,y:68,kind:'pin'},
+  {id:'hollow-compass',name:'Spore Compass',x:72,y:49,kind:'compass'},
+  {id:'freight-token',name:'Old Freight Token',x:83,y:25,kind:'token'}]
+};
 const oven={x:102,y:52};
 const bloomrot={left:85*T+12,right:103*T-12,floor:54*T,entry:84,exit:103};
 const altitudeTargets=[[4,54],[45,32],[77,47]];
@@ -59,7 +70,7 @@ const sections=[
  {name:'Cavern Floor',start:80,end:104,description:'lower terraces toward the ancient proofing oven'}
 ];
 function apply({map}){
- if(!map||map.length!==rows||map[0].length!==cols)throw Error('Bakery 2 expects 105x56 map');
+ if(!map||map.length!==rows||map[0].length!==cols)throw Error('Bakery 2 expects 105x72 map');
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)map[y][x]=y>=54?'#':'.';
  for(const [x,y,len] of platforms)for(let xx=x;xx<Math.min(cols,x+len);xx++)
    if(map[y][xx]!=='#')map[y][xx]='=';
@@ -86,6 +97,14 @@ function apply({map}){
  for(let y=0;y<54;y++)map[y][relayDivide.column]='#';
  for(const [x,y,len] of [...relayDivide.approach,...relayDivide.return,relayDivide.landing])
   for(let i=0;i<len;i++)map[y][x+i]='=';
+ // Excavate the cellar under the opening. The former floor remains solid
+ // everywhere else, and the relay divide extends to bedrock.
+ for(let y=55;y<69;y++)for(let x=4;x<23;x++)map[y][x]='.';
+ // Cellar hatches open only on interaction, preserving the low walking route.
+ for(const [x,y,w] of [...exploration.cellar.shelves,...exploration.hollow.shelves])
+  for(let i=0;i<w;i++)map[y][x+i]='=';
+ // A cellar partition has a generous two-ended passage and a visible window.
+ for(let y=56;y<63;y++)map[y][15]='#';
  // Tall sealing doors prevent bypassing the fight from either shelf.
  for(let y=42;y<54;y++)map[y][103]='#';
  for(const [x,y] of hazards){
@@ -104,5 +123,5 @@ function apply({map}){
 }
 window.CrustVerticalBakery2=Object.freeze({rows,cols,T,sections,platforms,
  cultures,checkpoints,hazards,enemies,oven,altitudeTargets,relay,foothills,plunge,
- bloomrot,relayDivide,apply,version:'vertical-fungal-relay-divide-v6'});
+ bloomrot,relayDivide,exploration,apply,version:'vertical-fungal-discovery-v7'});
 })();

@@ -11,9 +11,10 @@ function update(){
  tick++;
  updateAmmoCaches();
  rememberDevourerPogo();
- const movement=updatePlayer();
+ const movement=(typeof updateCavernLiftRide==='function'&&updateCavernLiftRide())?{shoot:false,aimUp:false}:updatePlayer();
  if(!movement)return;
  updateMycelium();
+ if(typeof updateCavernExploration==='function')updateCavernExploration();
  if(player.inv)player.inv--;if(player.speedT>0)player.speedT--;if(comboT>0&&--comboT===0)combo=0;if(shake>0){shake*=0.85;if(shake<0.6)shake=0}
  updateCombat(movement.shoot,movement.aimUp);
  updateEffects();
