@@ -131,7 +131,7 @@ function drawMyceliumUI(){
    meet:['A baker down here? Mind the sleepy roots above.', 'Find their sealed doorway, then come back to me.'],
    clue:['The roots remember: spiral, crescent, fork.', 'Pogo in order; hold jump for height. Watch for the reply.', 'Lower the mixer to pass a cap without waking it.', 'A second phrase will appear among the roots.'],
    echo:['You woke their memory! Now follow the root markings.', 'The second phrase waits inside the chamber.'],
-   solved:['Beautifully risen! The old mycelium still remembers.', 'Your path into the cavern is open, baker.']
+   solved:['A way through! The cavern welcomes the resourceful.', 'Your path into the cavern is open, adventurer.']
   }[s.dialogue]||[];
   g.font='15px monospace';g.fillStyle='#e2e7d5';lines.forEach((line,i)=>g.fillText(line,128,381+i*23));
   if(s.dialogue==='clue')relayLayout().sequences[0].forEach((kind,i)=>drawRelaySymbol(kind,650+i*46,340,'#efe6b5',3));

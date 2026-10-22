@@ -1,7 +1,7 @@
 const{test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const{createShellInput}=require('../input-model.js');const{game}=require('./game-harness.cjs');
 const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
-function shell(){
+function shell(options={}){
  const elements=new Map(),listeners={},actions=[];let doc;
  const gradient={addColorStop(){}};const g=new Proxy({}, {get:(o,k)=>o[k]??(()=>gradient),set:(o,k,v)=>(o[k]=v,true)});
  function element(id,attrs=''){
@@ -11,7 +11,7 @@ function shell(){
  for(const m of html.matchAll(/<([\w-]+)([^>]*\bid="([^"]+)"[^>]*)>/g)){const el=element(m[3],m[2]);el.tag=m[1];}
  for(const m of html.matchAll(/<button[^>]*data-action="([^"]+)"[^>]*>/g)){const el=element('action-'+m[1]);el.dataset.action=m[1];actions.push(el);}
  doc={hidden:false,fullscreenElement:null,activeElement:null,getElementById:id=>elements.get(id)||null,querySelectorAll:selector=>selector==='[data-action]'?actions:[],addEventListener(type,fn){(listeners[type]??=[]).push(fn);},createElement:tag=>element('created-'+Math.random()),elementFromPoint:x=>x<75?actions.find(x=>x.dataset.action==='left'):x<160?actions.find(x=>x.dataset.action==='right'):null};
- const a=game({}, {html,context:g,globals:{document:doc,innerWidth:1280,innerHeight:720,matchMedia:()=>({matches:false})}});
+ const a=game(options.saved||{}, {html,search:options.search,context:g,globals:{document:doc,innerWidth:1280,innerHeight:720,matchMedia:()=>({matches:false}),...options.globals}});
  const fire=(el,type,props={})=>{const event={button:0,pointerId:1,key:'',code:'',detail:1,clientX:30,clientY:530,repeat:false,target:el,preventDefault(){},stopPropagation(){},...props};for(const fn of el?.listeners?.[type]??[])fn(event);};
  const key=(key,code=key,type='keydown')=>{for(const fn of listeners[type]??[])fn({key,code,repeat:false,target:elements.get('gameStage'),preventDefault(){}});};
  return{...a,elements,actions,doc,fire,key,click:id=>fire(elements.get(id),'click'),emitDoc:type=>{for(const fn of listeners[type]??[])fn({});},pointer:(action,type,props)=>fire(actions.find(x=>x.dataset.action===action),type,props)};
@@ -72,4 +72,40 @@ test('final credits acknowledge both creators and support recipes, resume and a 
  a.click('creditsRecipes');a.run('syncGameShell()');assert.equal(a.elements.get('endCredits').hidden,true);assert.equal(a.run('shellPage'),'recipes');
  a.click('sheetBack');a.click('shellResume');a.run('syncGameShell()');assert.equal(a.elements.get('endCredits').hidden,false);
  a.click('creditsReplay');a.run('syncGameShell()');assert.equal(a.run('bakery'),1);assert.equal(a.run('state'),'play');assert.equal(a.elements.get('endCredits').hidden,true);
+});
+
+
+test('production bootstrap tolerates invalid saves and preserves valid recipe IDs',()=>{
+ for(const value of ['null','{}','"oops"','[', '42']){
+  const a=shell({saved:{crustQuestCodex:value,crustQuestBest:'Infinity'}});
+  assert.equal(a.run('JSON.stringify(unlocked)'),'[]');assert.equal(a.run('best'),0);
+  a.click('shellResume');a.click('codexBtn');assert.equal(a.run('shellPage'),'recipes');
+ }
+ const a=shell({saved:{crustQuestCodex:'[0,2,2,-1,3,1.5,"1",null]',crustQuestBest:'123.9'}});
+ assert.equal(a.run('JSON.stringify(unlocked)'),'[0,2]');assert.equal(a.run('best'),123);
+ assert.equal(a.storage.get('crustQuestCodex'),'[0,2,2,-1,3,1.5,"1",null]');
+});
+test('denied storage does not prevent starting, viewing recipes or selecting either hero',()=>{
+ const a=shell({globals:{localStorage:{getItem(){throw Error('denied')},setItem(){throw Error('denied')}}}});
+ a.click('shellResume');assert.equal(a.run('state'),'play');a.click('codexBtn');
+ a.click('sheetBack');a.click('characterButton');a.click('characterVance');assert.equal(a.run('selectedCharacterId'),'vance-wick');
+});
+test('all environment previews start playing in place through the production shell',()=>{
+ for(const scene of ['courtyard','hall','towers','forecourt','foothills','grotto','canopy','plunge','bloomrot','boilerworks','shafts','skybridge','descent','ovenhall']){
+  const a=shell({search:'?scene=environment-'+scene});
+  const before=a.run('JSON.stringify({x:player.x,y:player.y,camera,cameraY,bakery})');
+  assert.equal(a.run('state'),'shell-menu');a.click('shellResume');assert.equal(a.run('state'),'play',scene);
+  assert.equal(a.run('JSON.stringify({x:player.x,y:player.y,camera,cameraY,bakery})'),before,scene);
+  a.run('update();syncGameShell()');assert.equal(a.run('tick'),1,scene);
+ }
+});
+test('Escape closes Sporekeeper dialogue and cancels held input without opening pause',()=>{
+ const a=shell();a.click('shellResume');a.run("init(2);myceliumState.dialogue='meet';state='dialogue'");
+ a.key('Escape');assert.equal(a.run('state'),'play');assert.equal(a.run('myceliumState.dialogue'),null);
+ assert.equal(a.run('shellInput.size()'),0);assert.equal(a.elements.get('shellOverlay').hidden,true);
+ a.key('Escape');assert.equal(a.run('state'),'shell-menu');
+});
+test('mute shortcut works in both play and pause and is documented',()=>{
+ const a=shell();a.key('m');assert.equal(a.audio.toggles,1);a.click('shellResume');a.key('m');assert.equal(a.audio.toggles,2);
+ assert.match(html,/M mute/);
 });

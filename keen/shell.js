@@ -144,13 +144,14 @@ function bindInput(){
   if(handleCharacterSelectorKey(e))return;
   shellTrapFocus(e);
   const k=e.key.toLowerCase();
+  if(k==='escape'&&state==='dialogue'){e.preventDefault();if(!e.repeat){shellClearInput();talkMycelium();}return;}
   if(k==='escape'){e.preventDefault();if(shellPage!=='main'&&state==='shell-menu')shellPause();else if(state!=='shell-menu')shellPause();return;}
   if(e.target?.matches?.('input,select,textarea'))return;
   if(k==='p'){e.preventDefault();if(!e.repeat)togglePause();return;}
   if(k==='f'){e.preventDefault();if(!e.repeat)shellFullscreen(!shellStarted);return;}
+  if(k==='m'){if(!e.repeat)AudioKit.toggle();return;}
   if(state==='shell-menu')return;
   if(state==='dialogue'){if(!e.repeat&&['e','enter'].includes(k)){e.preventDefault();talkMycelium();}return;}
-  if(k==='m'){if(!e.repeat)AudioKit.toggle();return;}
   if(k==='q'||k==='t'||k==='r'){e.preventDefault();if(!e.repeat){if(k==='r')shellAsk('restart');else shellOpenSheet(k==='q'?'map':'recipes');}return;}
   if(k==='enter'&&state==='clear'){e.preventDefault();shellClearInput();advanceBakery();return;}
   if(state!=='play')return;
@@ -170,7 +171,7 @@ function bindInput(){
 }
 function initGameShell(){
  const recover=respawnCheckpoint;respawnCheckpoint=function(){shellClearInput();return recover();};
- shellReady=true;shellEl('wrap').dataset.started='false';shellLoadSettings();shellSavedState='play';shellPause();
+ shellReady=true;shellEl('wrap').dataset.started='false';shellLoadSettings();shellSavedState='play';if(state==='pause')state='play';shellPause();
 }
 function syncGameShell(){
  if(!shellReady)return;
