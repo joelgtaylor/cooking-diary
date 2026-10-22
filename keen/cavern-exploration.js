@@ -141,11 +141,17 @@ function drawCavernExploration(){
   }
  }
  for(const r of d.relics)if(!s.collected.has(r.id)&&cavernVisible(r.x*T-20,r.y*T-20,40,40))drawCavernRelic(r,s.found.has(r.id));
- // Entrances are marked with a tiny jar/arrow motif rather than generic loot.
+ // Fixed plaques sit on the left jamb, clear of the opening and its handle.
  for(const [i,[mx,my,mw]]of d.cellar.mouths.entries())if(cavernVisible(mx*T,my*T-50,mw*T,60)){
   if((typeof drawCavernHatchArt!=='function'||!drawCavernHatchArt(mx,my,mw,s.opened.has(i)))&&!s.opened.has(i)){rect(mx*T,my*T,mw*T,5,'#b39568');rect((mx+mw/2)*T-6,my*T+2,12,6,'#e9ce96');}
-  rect((mx+.5)*T,my*T-28,10,15,'#a2c1a2');rect((mx+.5)*T-2,my*T-31,14,4,'#c6a77b');
-  rect((mx+1)*T,my*T-10,3,9,'#e7cb95');rect((mx+1)*T-3,my*T-5,9,3,'#e7cb95');
+  const px=mx*T-26,py=my*T-40;
+  rect(px+11,py+26,6,14,'#533d30');rect(px+12,py+27,2,13,'#ad8954');
+  rect(px,py,28,28,'#342c30');rect(px+1,py+1,26,25,'#ba9862');
+  rect(px+3,py+3,22,21,'#182c32');rect(px+4,py+4,20,1,'#385354');
+  // One high-contrast down arrow; shape conveys the entrance without colour.
+  rect(px+11,py+6,6,10,'#fff0c5');rect(px+7,py+13,14,3,'#fff0c5');
+  rect(px+9,py+16,10,3,'#fff0c5');rect(px+12,py+19,4,3,'#fff0c5');
+  for(const dx of [3,23])rect(px+dx,py+24,2,2,'#e7c68b');
  }
 }
 function drawCavernDiscoveryUI(){
