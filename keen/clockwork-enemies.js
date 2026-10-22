@@ -20,7 +20,7 @@ function drawClockworkEnemy(e){
  if(!clockworkEnemyArt){clockworkEnemyArt=new Image();clockworkEnemyArt.src='art/clockwork-enemies.png';}
  if(!clockworkEnemyArt.complete||clockworkEnemyArt.naturalWidth!==1536||clockworkEnemyArt.naturalHeight!==1024)return false;
  const pose=clockworkEnemyPose(e),crop=CLOCKWORK_ENEMY_CROPS[role][pose];
- const scale=CLOCKWORK_ENEMY_SCALES[role],w=crop[2]*scale,h=crop[3]*scale;
+ const scale=CLOCKWORK_ENEMY_SCALES[role]*(e.visualScale||1),w=crop[2]*scale,h=crop[3]*scale;
  if(contactSurface(e)!==null)drawContactShadow(e,22);
  g.save();g.imageSmoothingEnabled=false;g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale((e.type==='thrower'?e.face:e.vx)<0?-1:1,1);
  g.drawImage(clockworkEnemyArt,...crop,-w/2,-h,w,h);g.restore();

@@ -28,11 +28,11 @@ function drawFungalEnemy(e){
  if(!fungalArt.complete||fungalArt.naturalWidth!==1536||fungalArt.naturalHeight!==1024)return false;
  const pose=fungalPose(e),crop=FUNGAL_CROPS[role][pose];
  const scale=role===0?40/357:role===1?42/337:34/257;
- const w=crop[2]*scale,h=crop[3]*scale;
+ const w=crop[2]*scale*(e.visualScale||1),h=crop[3]*scale*(e.visualScale||1);
  if(contactSurface(e)!==null)drawContactShadow(e,22);
  g.save();g.imageSmoothingEnabled=false;g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));g.scale((e.type==='thrower'?e.face:e.vx)<0?-1:1,1);
  g.drawImage(fungalArt,...crop,-w/2,-h,w,h);g.restore();
- if(e.type==='thrower'&&e.windup>0)drawFungalWarning(e.x+e.w/2,e.y-22,(fungalThrowerTiming().windup-e.windup)/fungalThrowerTiming().windup);
+ if(e.type==='thrower'&&e.windup>0)drawFungalWarning(e.x+e.w/2,e.y-(e.visualScale?28:22),(fungalThrowerTiming().windup-e.windup)/fungalThrowerTiming().windup);
  return true;
 }
 function drawFungalWarning(x,y,progress){
@@ -52,11 +52,11 @@ function addSporewingPilot(){
   flight:{left:T,right:8*T,homeY:50*T,phase:'patrol',timer:0,cooldown:90,direction:1,targetY:0}});
 }
 function resetSporewingPilot(){
- for(const e of enemies)if(e.type==='flyer'&&e.alive){e.x=3*T;e.y=e.flight.homeY;e.vx=1.1;e.vy=0;Object.assign(e.flight,{phase:'patrol',timer:0,cooldown:90,direction:1,targetY:0});}
+ for(const e of enemies)if(e.type==='flyer'&&e.alive){e.x=e.flight.spawnX??3*T;e.y=e.flight.homeY;e.vx=1.1;e.vy=0;Object.assign(e.flight,{phase:'patrol',timer:0,cooldown:90,direction:1,targetY:0});}
 }
 function sporewingCanDive(e){
- const f=e.flight,px=player.x+player.w/2,py=player.y+player.h/2;
- if(Math.abs(px-e.x-e.w/2)>28||py<e.y+40||py>e.y+200||e.x<camera+24||e.x+e.w>camera+W-24||e.y<cameraY+46||e.y+e.h>cameraY+H)return false;
+ const f=e.flight,body=throwerAimBody(e),px=player.x+player.w/2,py=player.y+player.h/2;
+ if(Math.abs(px-body.x-body.w/2)>28||py<body.y+40||py>body.y+200||body.x<camera+24||body.x+body.w>camera+W-24||body.y<cameraY+46||body.y+body.h>cameraY+H)return false;
  // Solid and one-way support both shelter a player underneath.
  for(let y=e.y+e.h;y<py;y+=4){if(hit(e.x,y,e.w,4)||oneWayTop(e.x,y,y+4,e.w)!==null)return false;}
  return true;
@@ -110,12 +110,13 @@ function drawSporewing(e){
  if(!sporewingArt){sporewingArt=new Image();sporewingArt.src='art/sporewing.png';}
  const pose=sporewingPose(e),crop=SPOREWING_CROPS[pose];
  if(sporewingArt.complete&&sporewingArt.naturalWidth===1536&&sporewingArt.naturalHeight===1024){
-  const scale=52/SPOREWING_CROPS[1][2],w=crop[2]*scale,h=crop[3]*scale;
+  const scale=52/SPOREWING_CROPS[1][2]*(e.visualScale||1),w=crop[2]*scale,h=crop[3]*scale;
   g.save();g.imageSmoothingEnabled=false;g.translate(Math.round(e.x+e.w/2),Math.round(e.y+e.h));
   g.scale(e.flight.direction<0?-1:1,1);g.drawImage(sporewingArt,...crop,-w/2,-h,w,h);g.restore();
  }else{
   // Wing-shaped fallback keeps the new role readable while its atlas loads.
-  rect(e.x-10,e.y+4,45,7,'#bde8ea');rect(e.x,e.y,25,25,'#d8c5e8');rect(e.x+5,e.y+12,15,7,'#f9e7c6');
+  const size=e.visualScale||1;
+  rect(e.x+e.w/2-22.5*size,e.y+4*size,45*size,7*size,'#bde8ea');rect(e.x,e.y,e.w,e.h,'#d8c5e8');rect(e.x+5*size,e.y+12*size,15*size,7*size,'#f9e7c6');
  }
  if(e.flight.phase==='warn'){
   drawFungalWarning(e.x+e.w/2,e.y-12,(24-e.flight.timer)/24);

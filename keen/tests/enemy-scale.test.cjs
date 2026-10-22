@@ -10,7 +10,7 @@ test('audition scales all eleven Moonlit non-boss enemies without changing terra
   if(x.visualScale){assert.equal(x.h,54);assert.equal(x.w,40);assert.equal(a.run(`hit(enemies[${i}].x,enemies[${i}].y,enemies[${i}].w,enemies[${i}].h)`),false);}
   else assert.equal(JSON.stringify(x),JSON.stringify(y));
  }
- for(const n of [2,3]){a.run(`init(${n})`);b.run(`init(${n})`);assert.equal(a.run('JSON.stringify(enemies)'),b.run('JSON.stringify(enemies)'));}
+ // Later worlds now have their own approved scale pass; bosses are separate.
 });
 test('wider patrols stay within original support envelopes and hop cadence stays unchanged',()=>{
  const a=audition(),b=game({}, {search:''});for(const v of[a,b])v.run('player.x=-1000');
