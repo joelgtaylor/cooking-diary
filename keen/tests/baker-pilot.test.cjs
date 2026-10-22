@@ -46,9 +46,10 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
  a.run('var blob={x:100,y:100,w:10,h:6,vx:10};var beforeBlob=JSON.stringify(blob);drawDoughShot(blob)');assert.equal(a.run('JSON.stringify(blob)'),a.run('beforeBlob'));
 });
 
-test('changed baker scripts share a release version so cached clients receive them together',()=>{
+test('baker scripts carry release versions so cached clients receive updates',()=>{
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
- for(const name of ['characters','combat','architecture','throwers','foreman','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
+ for(const name of ['combat','mycelium'])assert.ok(html.includes('src="'+name+'.js?v=vance-door-20261022"'));
+ for(const name of ['characters','architecture','throwers','foreman','fungal-enemies','clockwork-enemies','moonlit-environment','fungal-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
 });
 
 test('Vance uses his atlas for every action, anchors hands and feet, and keeps simulation identical',()=>{
