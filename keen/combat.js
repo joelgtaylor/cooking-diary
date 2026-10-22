@@ -20,6 +20,7 @@ function updateProjectiles(shoot,aimUp=false){
   rememberBakerShot(aimUp);
   const origin=vanceWickShotOrigin(aimUp);
   const shot=aimUp?{x:player.x+player.w/2-3,y:player.y-4,w:6,h:10,vx:0,vy:-10}:{x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10};
+  Object.defineProperty(shot,'characterId',{value:selectedCharacterId});
   if(origin){
    shot.x=origin.x-shot.w/2;shot.y=origin.y-shot.h/2;
    // The barrel extends outside the body: never spawn through intervening rock.
@@ -31,7 +32,6 @@ function updateProjectiles(shoot,aimUp=false){
    }
   }
   shots.push(shot);
-  Object.defineProperty(shots[shots.length-1],'characterId',{value:selectedCharacterId});
   playerFireCooldown+=26;player.ammo--;AudioKit.effect('shoot');
  }else if(!shoot&&playerFireCooldown<0)playerFireCooldown=0;
  for(const s of shots){

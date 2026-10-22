@@ -14,3 +14,11 @@ test('missed shots and ordinary rock do not open the relay; restarting restores 
 test('projectile identity follows its shooter even if the selected character changes in flight',()=>{
  const a=setup('loafy');a.run("updateProjectiles(true);selectCharacter('vance-wick')");a.run('for(let i=0;i<8;i++)updateProjectiles(false)');assert.equal(a.run('myceliumState.solved'),false);
 });
+
+test('Vance barrel-aligned shots still open the relay from either side with production art enabled',()=>{
+ for(const face of [-1,1]){
+  const a=game({}, {search:''});
+  a.run(`init(2);enemies=[];selectCharacter('vance-wick');player.x=${face===1?'54*T':'56*T'};player.y=32*T;player.face=${face};player.ammo=10`);
+  fire(a);assert.equal(a.run('myceliumState.solved'),true);assert.equal(a.run('player.ammo'),9);
+ }
+});
