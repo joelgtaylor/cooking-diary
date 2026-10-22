@@ -17,11 +17,25 @@ function updateCombat(shoot,aimUp=false){
 function updateProjectiles(shoot,aimUp=false){
  if(playerFireCooldown>0)playerFireCooldown-=3;
  if(shoot&&playerFireCooldown<=0&&player.ammo>0){
-  shots.push(aimUp?{x:player.x+player.w/2-3,y:player.y-4,w:6,h:10,vx:0,vy:-10}:{x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10});
+  rememberBakerShot(aimUp);
+  const origin=vanceWickShotOrigin(aimUp);
+  const shot=aimUp?{x:player.x+player.w/2-3,y:player.y-4,w:6,h:10,vx:0,vy:-10}:{x:player.x+11,y:player.y+19,w:10,h:6,vx:player.face*10};
+  if(origin){
+   shot.x=origin.x-shot.w/2;shot.y=origin.y-shot.h/2;
+   // The barrel extends outside the body: never spawn through intervening rock.
+   const startX=player.x+player.w/2-shot.w/2,startY=aimUp?player.y:shot.y;
+   const steps=Math.ceil(Math.max(Math.abs(shot.x-startX),Math.abs(shot.y-startY)));
+   for(let i=0;i<=steps;i++){
+    const t=steps?i/steps:0,x=startX+(shot.x-startX)*t,y=startY+(shot.y-startY)*t;
+    if(hit(x,y,shot.w,shot.h)){shot.x=x;shot.y=y;hitMyceliumGate(shot);shot.dead=true;break;}
+   }
+  }
+  shots.push(shot);
   Object.defineProperty(shots[shots.length-1],'characterId',{value:selectedCharacterId});
-  rememberBakerShot(aimUp);playerFireCooldown+=26;player.ammo--;AudioKit.effect('shoot');
+  playerFireCooldown+=26;player.ammo--;AudioKit.effect('shoot');
  }else if(!shoot&&playerFireCooldown<0)playerFireCooldown=0;
  for(const s of shots){
+  if(s.dead)continue;
   s.x+=s.vx;s.y+=s.vy||0;if(hit(s.x,s.y,s.w,s.h)){hitMyceliumGate(s);s.dead=true;}
   for(const e of enemies)if(e.alive&&collide(s,e)){e.alive=false;s.dead=true;player.score+=100;burst(e.x+12,e.y+12,'#ffad57');AudioKit.effect('enemy')}
   if(!s.dead)hitForemanShot(s);
