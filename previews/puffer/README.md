@@ -17,3 +17,7 @@ The pool removes the slice's narrow choke, retaining collision on the visible ov
 `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs previews/sunken-audio/*.test.cjs previews/flooded-entrance/audio.test.cjs previews/puffer/*.test.cjs`
 
 Tests cover attack timing/aim lock, projectile budget/lifetime/walls, pursuit, vulnerability, pops, shared player immunity, harmless defeat, both heroes, swept shots and checkpoint recovery. Human difficulty tuning remains the purpose of this isolated preview.
+
+## Approval
+
+Joel approved this encounter on October 23, 2026: “Super fun facing him! My favorite non-boss enemy design we've made so far.” Preserve its tuning while developing the other archetypes.
