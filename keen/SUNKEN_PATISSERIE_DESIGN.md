@@ -1,6 +1,6 @@
 # The Sunken Patisserie — design review
 
-Status: movement, all four enemy archetypes and World 4 music are approved. Milestone 5 connected four-section route is implemented in previews/sunken-world/ for review, ending at the boss approach. Boss development, final hero animation/art polish, production progression/recipe integration and merge remain pending. Earlier milestone descriptions below retain their historical context.
+Status: movement, all four enemy archetypes and World 4 music are approved. Milestone 5 connected four-section route and its visual corrections are approved. Milestone 6.1 isolated octopus lame attack is implemented in previews/octopus/ for review; scraper, ink and the combined encounter remain pending. Final boss development, final hero animation/art polish, production progression/recipe integration and merge remain pending. Earlier milestone descriptions below retain their historical context.
 Baseline: main c0d42c1601adef0f4fb9978f66050b0ee546813d, October 22, 2026.
 Branch: feature/keen-sunken-patisserie.
 Authority: CREATIVE_CHARTER.md. This document changes no production behavior.
