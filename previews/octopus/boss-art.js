@@ -1,45 +1,50 @@
-/* Presentation only. Sprite root and razor anchors follow approved simulation. */
+/* Generated inbetweens at one uniform scale. No longitudinal limb scaling. */
 (function(root){
 'use strict';
+const scale=1.15;
 const armFrames=[
- {crop:[18,300,700,235],tip:[60,400],root:[673,399]},
- {crop:[750,295,670,195],tip:[794,400],root:[1379,400]},
- {crop:[1460,250,700,270],tip:[1527,302],root:[2123,414]}
+ {crop:[400,88,310,183],tip:[437,127],root:[670,230]},
+ {crop:[962,64,440,215],tip:[1004,111],root:[1350,232]},
+ {crop:[190,322,493,210],tip:[230,358],root:[635,476]},
+ {crop:[830,340,572,190],tip:[867,375],root:[1358,481]},
+ {crop:[38,578,668,200],tip:[75,613],root:[660,717]},
+ {crop:[728,607,674,170],tip:[762,638],root:[1355,718]},
+ {crop:[213,821,480,202],tip:[250,852],root:[648,968]},
+ {crop:[1040,846,362,180],tip:[1078,882],root:[1350,968]}
 ];
 function pose(e){
- let x=662,y=210,arm=0;
- if(e.phase==='prepare'){x=650;y=e.lane-60;arm=e.locked?1:0;}
- if(e.phase==='sweep'){x=e.tipX;y=e.lane;arm=1;}
- if(e.phase==='recover'){const t=1-e.timer/100;x=80+580*t;y=e.lane+(310-e.lane)*t;arm=t<.45?2:0;}
- if(!e.alive){x=660;y=420;arm=2;}
- return {tip:{x,y},root:{x:700,y:292},arm,body:!e.alive||e.phase==='recover'?2:e.phase==='prepare'||e.phase==='sweep'?1:0};
+ let x=560,y=210;
+ if(e.phase==='prepare'){x=550;y=e.lane-60;}
+ if(e.phase==='sweep'){x=e.tipX;y=e.lane;}
+ if(e.phase==='recover'){const t=1-e.timer/100;x=80+480*t;y=e.lane+(210-e.lane)*t;}
+ if(!e.alive){x=570;y=390;}
+ const joint={x:752,y:292},distance=Math.hypot(x-joint.x,y-joint.y);
+ const candidates=e.phase==='recover'?[5,4,3,6,2,7,0]:e.phase==='observe'||!e.alive?[0,7,1]:[0,1,2,3,4,5];
+ let arm=candidates[0],best=Infinity;
+ for(const i of candidates){const f=armFrames[i],reach=Math.hypot(f.root[0]-f.tip[0],f.root[1]-f.tip[1])*scale;
+  // Extra length folds behind the torso; a shorter pose must not leave a gap.
+  const score=Math.abs(reach-distance)+(reach<distance?180:0);
+  if(score<best){best=score;arm=i;}
+ }
+ return {tip:{x,y},root:joint,arm,body:!e.alive||e.phase==='recover'?2:e.phase==='prepare'||e.phase==='sweep'?1:0};
 }
 function drawArm(g,image,p){
- const f=armFrames[p.arm],sx=f.tip[0]-f.root[0],sy=f.tip[1]-f.root[1],length=Math.hypot(sx,sy),ux=sx/length,uy=sy/length;
- const dx=p.tip.x-p.root.x,dy=p.tip.y-p.root.y,distance=Math.max(1,Math.hypot(dx,dy)),vx=dx/distance,vy=dy/distance;
- // The grip/razor uses uniform scale even at maximum reach. Only the limb extends.
- const cosine=vx*ux+vy*uy,sine=vy*ux-vx*uy,scale=.22;
- const cut=p.arm*724+250,join=[cut,f.tip[1]+(p.arm===0?52:p.arm===2?96:18)];
- const jx=join[0]-f.tip[0],jy=join[1]-f.tip[1];
- const worldJoin={x:p.tip.x+scale*(cosine*jx-sine*jy),y:p.tip.y+scale*(sine*jx+cosine*jy)};
- const ax=join[0]-f.root[0],ay=join[1]-f.root[1],al=Math.hypot(ax,ay),su=ax/al,sv=ay/al;
- const bx=worldJoin.x-p.root.x,by=worldJoin.y-p.root.y,bl=Math.max(1,Math.hypot(bx,by)),du=bx/bl,dv=by/bl;
- const along=bl/al,across=.20;
- const a=along*du*su+across*dv*sv,b=along*dv*su-across*du*sv;
- const c=along*du*sv-across*dv*su,d=along*dv*sv+across*du*su;
- g.save();g.translate(p.root.x,p.root.y);g.transform(a,b,c,d,0,0);g.translate(-f.root[0],-f.root[1]);
- const tail=[cut-8,f.crop[1],f.crop[0]+f.crop[2]-cut+8,f.crop[3]];
- g.drawImage(image,...tail,...tail);g.restore();
- g.save();g.translate(p.tip.x,p.tip.y);g.transform(scale*cosine,scale*sine,-scale*sine,scale*cosine,0,0);g.translate(-f.tip[0],-f.tip[1]);
- const hand=[f.crop[0],f.crop[1],cut-f.crop[0]+8,f.crop[3]];
- g.drawImage(image,...hand,...hand);g.restore();
+ const f=armFrames[p.arm];
+ const angle=Math.atan2(p.root.y-p.tip.y,p.root.x-p.tip.x)-Math.atan2(f.root[1]-f.tip[1],f.root[0]-f.tip[0]);
+ g.save();
+ // Bury the solid muscle root under the torso instead of drawing a cut end over it.
+ // The shoulder is at x≈700; this clip ends deep inside the opaque body.
+ g.beginPath();g.rect(0,62,742,450);g.clip();
+ g.translate(p.tip.x,p.tip.y);g.rotate(angle);
+ g.drawImage(image,...f.crop,(f.crop[0]-f.tip[0])*scale,(f.crop[1]-f.tip[1])*scale,f.crop[2]*scale,f.crop[3]*scale);
+ g.restore();
 }
 function draw(g,e,body,arm){
  const p=pose(e);g.save();g.imageSmoothingEnabled=false;
  if(!e.alive){const t=1-e.deathT/150;g.translate(0,t*45);g.globalAlpha=1-t*.45;}
- if(body.naturalWidth)g.drawImage(body,p.body*724,0,724,724,600,100,327,327);
  if(arm.naturalWidth)drawArm(g,arm,p);
+ if(body.naturalWidth)g.drawImage(body,p.body*724,0,724,724,600,100,327,327);
  g.restore();
 }
-const api={pose,draw,drawArm,armFrames};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
+const api={pose,draw,drawArm,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -6,15 +6,17 @@ test('sprite razor follows approved live sweep tip without changing boss state',
   if(e.phase==='sweep')assert.deepEqual(pose.tip,{x:e.tipX,y:e.lane});assert.equal(JSON.stringify(e),before);
  }
 });
-test('all attack phases draw body, textured tentacle and grip sprites without vector limb drawing',()=>{
- for(const phase of ['observe','prepare','sweep','recover','defeat']){
-  const e={...B.create(),phase,alive:phase!=='defeat',timer:20},calls=[],transforms=[];
-  const g={save(){},restore(){},translate(){},transform(...a){transforms.push(a);},drawImage(...a){calls.push(a);}};
-  Art.draw(g,e,{naturalWidth:2172},{naturalWidth:2172});assert.equal(calls.length,3);
-  assert.equal(g.imageSmoothingEnabled,false);assert.ok(calls.every(c=>c.slice(1).every(Number.isFinite)));
-  const hand=transforms[1];assert.ok(Math.abs(Math.hypot(hand[0],hand[1])-.22)<1e-10);
-  assert.ok(Math.abs(Math.hypot(hand[2],hand[3])-.22)<1e-10);
+test('generated inbetweens use one uniform scale, render behind body, and never stretch',()=>{
+ const used=new Set();
+ for(const phase of ['observe','prepare','sweep','recover','defeat'])for(let timer=1;timer<=100;timer++){
+  const e={...B.create(),phase,alive:phase!=='defeat',timer,tipX:80+610*timer/100},calls=[];
+  const g={save(){},restore(){},translate(){},rotate(){},beginPath(){},rect(){},clip(){},drawImage(...a){calls.push(a);}};
+  const body={naturalWidth:2172},arm={naturalWidth:1452};Art.draw(g,e,body,arm);
+  assert.equal(calls.length,2);assert.equal(calls[0][0],arm);assert.equal(calls[1][0],body);
+  const c=calls[0];assert.equal(c[7]/c[3],Art.scale);assert.equal(c[8]/c[4],Art.scale);
+  assert.equal(g.imageSmoothingEnabled,false);assert.ok(c.slice(1).every(Number.isFinite));used.add(Art.pose(e).arm);
  }
+ assert.ok(used.size>=6,'attack must select distinct generated intermediate poses');
 });
 test('missing images reveal no vector fallback arm',()=>{
  const g={save(){},restore(){},drawImage(){throw Error('unloaded image drawn');}};
