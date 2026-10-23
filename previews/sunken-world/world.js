@@ -104,7 +104,8 @@ function installSunkenWorld(){
  drawWorld=function(){
   const index=route.layout.sections.findIndex(s=>player.x/T>=s.from&&player.x/T<s.to),palettes=[['#183e4e','#092536'],['#184b54','#102e42'],['#22414b','#0c283a'],['#152b44','#080f27']],colors=palettes[Math.max(0,index)];
   const sea=g.createLinearGradient(0,0,0,H);sea.addColorStop(0,colors[0]);sea.addColorStop(1,colors[1]);g.fillStyle=sea;g.fillRect(0,0,W,H);R.distantCity();
-  const depth=g.createLinearGradient(0,220,0,390);depth.addColorStop(0,colors[1]+'00');depth.addColorStop(1,colors[1]);g.fillStyle=depth;g.fillRect(0,220,W,H-220);
+  const fadeEnd=Math.max(100,Math.min(370-cameraY*.05,445-cameraY*.16)-4),fadeStart=Math.max(60,fadeEnd-140);
+  const depth=g.createLinearGradient(0,fadeStart,0,fadeEnd);depth.addColorStop(0,colors[1]+'00');depth.addColorStop(1,colors[1]);g.fillStyle=depth;g.fillRect(0,fadeStart,W,H-fadeStart);
   g.save();g.translate(-Math.round(camera),-Math.round(cameraY));
   for(const r of preview.water){
    g.fillStyle='#2b88961c';g.fillRect(r.x,r.y,r.w,r.h);
@@ -126,7 +127,7 @@ function installSunkenWorld(){
   }
   const p=route.layout.pump;R.copperPipe(p.x*T,p.y*T,7,6*T);R.copperPipe(p.x*T,p.y*T,9*T,6);
   g.strokeStyle='#ead9ae';g.lineWidth=4;g.beginPath();g.arc(p.x*T,p.y*T,20,0,7);g.stroke();for(let i=0;i<4;i++){const a=i*Math.PI/2+(route.pumpOn?Math.PI/4:0);g.beginPath();g.moveTo(p.x*T,p.y*T);g.lineTo(p.x*T+Math.cos(a)*18,p.y*T+Math.sin(a)*18);g.stroke();}arrow(route.pumpOn?'→':'←',p.x+2,p.y);
-  for(const cp of route.layout.checkpoints){if(!visible(cp.x*T,cp.ground*T-100))continue;const i=route.layout.checkpoints.indexOf(cp),frame=Math.floor(tick/10)%4,row=i<=route.checkpoint?1:0;g.drawImage(flag,frame*80,row*120,80,120,cp.x*T-12,cp.ground*T-66,44,66);}
+  for(const cp of route.layout.checkpoints){if(!visible(cp.x*T,cp.ground*T-100))continue;const i=route.layout.checkpoints.indexOf(cp),frame=Math.floor(tick/10)%4,row=i<=route.checkpoint?1:0;g.drawImage(flag,frame*80,row*120,80,120,cp.x*T-12,cp.ground*T-Math.round((row?112:117)*66/120),44,66);}
   for(const gem of route.cultures)if(!gem.got&&visible(gem.x,gem.y)){g.fillStyle='#f1df9b30';g.beginPath();g.arc(gem.x,gem.y,25,0,7);g.fill();drawIdentityPickup('culture',gem.x,gem.y+Math.sin(tick*.06)*3);}
   for(const item of route.supplies)if(!item.got&&visible(item.x,item.y)){if(item.kind==='kefir')drawIdentityPickup('kefir',item.x,item.y);else drawSupplyPickup(item,item.y);}
   for(const [s,x,y]of [['↓',23,28],['→',26,32],['↓',47,34],['→',48,48],['↑',70,47],['←',66,29],['→',74,29],['↓',84,33],['→',89,49],['↑',100,46],['←',97,30],['↑',94,25]])arrow(s,x,y);
