@@ -5,8 +5,9 @@ installSunkenPrototype=function(){installBeforeDeep();installDeepArena();};
 function installDeepArena(){
  const preview=window.sunkenPreview,slice=window.floodedEntrance,R=slice.render;
  const arena={boss:null,victory:false};window.deepArena=arena;
- const sheet=new Image();sheet.src='../previews/octopus/master-frames.png';
- const startup=prepareStartupArtwork;prepareStartupArtwork=()=>[...startup(),{label:'Octopus baker animation',image:sheet}];
+ const sheet=new Image();sheet.src='../previews/octopus/pixel-master.png';
+ const limb=new Image();limb.src='../previews/octopus/pixel-lame.png';
+ const startup=prepareStartupArtwork;prepareStartupArtwork=()=>[...startup(),{label:'Pixel octopus baker animation',image:sheet},{label:'Pixel tentacle and lame animation',image:limb}];
  function reset(){arena.boss=CrustDeep.create();arena.victory=false;slice.patroller.alive=false;slice.patroller.deathT=0;preview.rings=[];preview.targets=[];shots=[];}
  const setup=init;
  init=function(){setup();map=Array.from({length:rows},(_,y)=>Array.from({length:cols},(_,x)=>x===0||x>=29||y<2||y>=16?'#':'.'));
@@ -28,20 +29,6 @@ function installDeepArena(){
  };
  updateWorldProgress=function(){if(!arena.boss.alive&&!arena.boss.deathT&&!arena.victory){arena.victory=true;AudioKit.effect('win');}};
  function line(x1,y1,x2,y2,color,width){g.strokeStyle=color;g.lineWidth=width;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();}
- function arm(e){
-  let tx=662,ty=210;
-  if(e.phase==='prepare'){tx=650;ty=e.lane-60;}
-  if(e.phase==='sweep'){tx=e.tipX;ty=e.lane;}
-  if(e.phase==='recover'){const t=1-e.timer/100;tx=80+580*t;ty=e.lane+(310-e.lane)*t;}
-  if(!e.alive){tx=660;ty=420;}
-  // Separate articulated arm keeps the razor exactly on its damage geometry.
-  g.lineCap='round';g.beginPath();g.moveTo(745,304);g.quadraticCurveTo((745+tx)/2,ty+75,tx,ty);
-  g.strokeStyle='#2a213b';g.lineWidth=25;g.stroke();g.strokeStyle='#9065a8';g.lineWidth=19;g.stroke();
-  for(let i=1;i<6;i++){const t=i/6,omt=1-t,x=omt*omt*745+2*omt*t*(745+tx)/2+t*t*tx,y=omt*omt*304+2*omt*t*(ty+75)+t*t*ty;g.fillStyle='#dfabc1';g.beginPath();g.arc(x,y,3,0,7);g.fill();}
-  // The separate razor sample follows the same tip as the damage sweep.
-  if(sheet.naturalWidth){g.save();g.translate(tx,ty);g.rotate(-.65);g.drawImage(sheet,12,608,151,56,-21,-8,45,17);g.restore();}
-  g.lineCap='butt';
- }
  drawWorld=function(){
   const e=arena.boss;g.fillStyle='#103246';g.fillRect(0,0,W,H);R.distantCity();
   const shade=g.createLinearGradient(0,100,0,420);shade.addColorStop(0,'#102e4200');shade.addColorStop(1,'#102e42');g.fillStyle=shade;g.fillRect(0,100,W,H);
@@ -53,11 +40,8 @@ function installDeepArena(){
    line(62,e.lane-34,706,e.lane-34,'#f9e9c2',2);line(62,e.lane+34,706,e.lane+34,'#f9e9c2',2);
    for(let x=90;x<690;x+=80){line(x+10,e.lane-6,x,e.lane,'#f9e9c2',2);line(x,e.lane,x+10,e.lane+6,'#f9e9c2',2);}
   }
-  if(e.phase==='sweep')line(e.previousX,e.lane,e.tipX,e.lane,'#eedcf5',9);
-  const frame=!e.alive||e.phase==='recover'?2:e.phase==='prepare'?1:0;
-  g.save();if(!e.alive){const t=1-e.deathT/150;g.translate(0,t*45);g.globalAlpha=1-t*.45;}
-  if(sheet.naturalWidth){const sw=sheet.naturalWidth/3;g.save();g.beginPath();g.rect(620,105,281,290);g.rect(640,395,261,37);g.clip();g.drawImage(sheet,frame*sw+140,0,584,680,620,105,281,327);g.restore();}
-  arm(e);g.restore();
+  if(e.phase==='sweep')for(let x=Math.min(e.previousX,e.tipX);x<=Math.max(e.previousX,e.tipX);x+=8){g.fillStyle='#eedcf5';g.fillRect(Math.round(x/2)*2,Math.round(e.lane/2)*2-2,4,4);}
+  CrustDeepArt.draw(g,e,sheet,limb);
   if(CrustDeep.vulnerable(e)){const m=CrustDeep.mantle();g.strokeStyle='#fff1c5';g.lineWidth=2;g.strokeRect(m.x-4,m.y-4,m.w+8,m.h+8);R.text('EXPOSED',m.x+15,m.y-12,12);}
   for(const s of shots){g.fillStyle='#fff3cc';g.fillRect(s.x,s.y,s.w,s.h);}
   if(!player.inv||Math.floor(player.inv/12)%2===0)drawPlayer();

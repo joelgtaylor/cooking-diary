@@ -10,6 +10,12 @@ Review dodging, tool readability and vulnerability timing first. Bench scraper, 
 
 ## Artwork provenance
 
-Built-in image-generation skill used; reference: `keen/art/sunken-patisserie/octopus-baker-concept.png`. Output: `previews/octopus/master-frames.png` (original alpha preserved). Runtime samples three expressions with stable crop geometry; articulated tentacle and separate razor follow attack coordinates. No animation frame changes collision.
+Built-in image-generation skill used; reference: `keen/art/sunken-patisserie/octopus-baker-concept.png`. Current outputs: `previews/octopus/pixel-master.png` and `previews/octopus/pixel-lame.png` (original alpha preserved). `master-frames.png` is superseded and no longer loaded. Runtime samples three aligned body expressions and three matching textured tentacle/grip poses through `boss-art.js`. The tentacle extends between explicit anchors; the gripping hand and small lame keep uniform scale. All limb drawing uses bitmap sprites; warning lines remain HUD geometry. Native smoothing is disabled. Art-only revision preserves the approved simulation module unchanged. No animation frame changes collision.
 
 Prompt: Three equal cells in one horizontal transparent sprite row, detailed pixel art of the same violet octopus baker with pale suckers, tall cream cap, stained apron, copper buckles and tool belt, facing left. Composed, angry wind-up, exhausted recovery expressions; same scale and body center. Resting arm holds bench scraper; separate small wooden-handle scoring razor beside each pose. No background, labels or swooshes. Preserve approved concept identity. Full prompt is recorded in this development conversation.
+
+## Pixel-art revision prompts
+
+Body: Three equal horizontal transparent cells, same violet octopus baker identity, cream cap/apron, copper toolbelt, resting scraper; idle, angry wind-up and exhausted recovery. Missing active front arm for separate animation. Approximately 96 by 128 logical pixels per character; coarse nearest-neighbour square clusters, stepped outlines, limited palette and three-step shading. No painterly texture, gradients or antialiasing.
+
+Attack: Three equal horizontal transparent cells containing detached violet tentacles, thick root at right and gripping hand with small wooden-handled silver scoring lame at left. Slack wind-up, tense strike and curved follow-through; consistent anchors, pink suckers. Approximately 96 by 32 logical pixels, coarse pixel clusters, hard stepped outlines and limited palette matching the body; no vector curves or painted texture.
