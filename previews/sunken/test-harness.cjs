@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const {game}=require('../../keen/tests/game-harness.cjs');
-const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
-function previewGame(){
+function previewGame(options={}){
+ const html=fs.readFileSync(options.htmlPath||path.join(__dirname,'index.html'),'utf8');
  const elements=new Map(),actions=[],events={};let doc;
  const gradient={addColorStop(){}};
  const ctx=new Proxy({}, {get:(o,k)=>o[k]??(()=>gradient),set:(o,k,v)=>(o[k]=v,true)});
