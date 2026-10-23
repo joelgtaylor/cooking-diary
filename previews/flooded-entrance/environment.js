@@ -18,6 +18,15 @@ function installFloodedEntrance(){
   jar:[1330,144,144,302],ledge:[542,514,541,132],vent:[1530,456,234,414],
   shortLedge:[720,710,330,130],coral:[1326,543,165,100]
  };
+ // Route furniture uses tight visible crops and uniform scale, bottom anchored.
+ const furnitureCrops={coldOven:[19,460,495,400],vent:[1531,463,233,397]};
+ function furniture(name,x,y,w,h,alpha=1){
+  if(!kit.complete||!kit.naturalWidth)return;
+  const crop=furnitureCrops[name]||samples[name],scale=Math.min(w/crop[2],h/crop[3]);
+  const dw=crop[2]*scale,dh=crop[3]*scale;
+  g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=false;
+  g.drawImage(kit,...crop,x+(w-dw)/2,y+h-dh,dw,dh);g.restore();
+ }
  function art(name,x,y,w,h,alpha=1){
   if(!kit.complete||!kit.naturalWidth)return;
   g.save();g.globalAlpha=alpha;g.imageSmoothingEnabled=false;g.drawImage(kit,...samples[name],x,y,w,h);g.restore();
@@ -201,7 +210,7 @@ function installFloodedEntrance(){
   const jump=document.querySelector('[data-action="jump"]');if(jump){jump.setAttribute('aria-label',player.swimming?'Aim upward while shooting':'Jump');jump.querySelector('small').textContent=player.swimming?'AIM UP':'JUMP';}
   document.getElementById('pogoBtn').textContent=pogoOn?'Mixer ON':'Mixer OFF';
  };
- slice.render={art,drawSolidTiles,distantCity,copperPipe,text};
+ slice.render={art,furniture,drawSolidTiles,distantCity,copperPipe,text};
  const pause=shellPause;
  shellPause=function(reason){pause(reason);document.getElementById('shellTitle').textContent=shellStarted?'Paused':'The Flooded Entrance';
   if(!shellStarted)document.getElementById('shellMessage').textContent='An abandoned bakery beneath the tide. Explore the first flooded room and meet its reef patroller.';

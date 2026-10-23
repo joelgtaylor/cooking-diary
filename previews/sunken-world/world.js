@@ -118,7 +118,7 @@ function installSunkenWorld(){
   }
   drawAirChamber();
   // Every foreground furnishing has an explicit solid support in layout metadata.
-  for(const [name,x,y,w,h]of route.layout.decor)if(visible(x*T,y*T,w*T,h*T))R.art(name,x*T,y*T,w*T,h*T,.85);
+  for(const [name,x,y,w,h]of route.layout.decor)if(visible(x*T,y*T,w*T,h*T))R.furniture(name,x*T,y*T,w*T,h*T,.85);
   R.drawSolidTiles();
   for(const [x,y,w,h]of route.layout.facades)if(visible(x*T,y*T,w*T,h*T))R.art('ledge',x*T,y*T,w*T,h*T);
   drawAirSeals();
@@ -127,7 +127,10 @@ function installSunkenWorld(){
   }
   const p=route.layout.pump;R.copperPipe(p.x*T,p.y*T,7,6*T);R.copperPipe(p.x*T,p.y*T,9*T,6);
   g.strokeStyle='#ead9ae';g.lineWidth=4;g.beginPath();g.arc(p.x*T,p.y*T,20,0,7);g.stroke();for(let i=0;i<4;i++){const a=i*Math.PI/2+(route.pumpOn?Math.PI/4:0);g.beginPath();g.moveTo(p.x*T,p.y*T);g.lineTo(p.x*T+Math.cos(a)*18,p.y*T+Math.sin(a)*18);g.stroke();}arrow(route.pumpOn?'→':'←',p.x+2,p.y);
-  for(const cp of route.layout.checkpoints){if(!visible(cp.x*T,cp.ground*T-100))continue;const i=route.layout.checkpoints.indexOf(cp),frame=Math.floor(tick/10)%4,row=i<=route.checkpoint?1:0;g.drawImage(flag,frame*80,row*120,80,120,cp.x*T-12,cp.ground*T-Math.round((row?112:117)*66/120),44,66);}
+  for(const cp of route.layout.checkpoints){if(!visible(cp.x*T,cp.ground*T-100))continue;const i=route.layout.checkpoints.indexOf(cp),frame=Math.floor(tick/10)%4,row=i<=route.checkpoint?1:0;const dx=cp.x*T-12,dy=cp.ground*T-Math.round((row?112:117)*66/120),xs=44/80,ys=66/120;
+   const part=(col,sx,sy,sw,sh)=>g.drawImage(flag,col*80+sx,row*120+sy,sw,sh,Math.round(dx+sx*xs),Math.round(dy+sy*ys),Math.round(sw*xs),Math.round(sh*ys));
+   // Match production: animate cloth only; keep the pole and foot on frame zero.
+   part(frame,43,0,37,87);part(0,0,0,43,87);part(0,0,87,80,33);}
   for(const gem of route.cultures)if(!gem.got&&visible(gem.x,gem.y)){g.fillStyle='#f1df9b30';g.beginPath();g.arc(gem.x,gem.y,25,0,7);g.fill();drawIdentityPickup('culture',gem.x,gem.y+Math.sin(tick*.06)*3);}
   for(const item of route.supplies)if(!item.got&&visible(item.x,item.y)){if(item.kind==='kefir')drawIdentityPickup('kefir',item.x,item.y);else drawSupplyPickup(item,item.y);}
   for(const [s,x,y]of [['↓',23,28],['→',26,32],['↓',47,34],['→',48,48],['↑',70,47],['←',66,29],['→',74,29],['↓',84,33],['→',89,49],['↑',100,46],['←',97,30],['↑',94,25]])arrow(s,x,y);

@@ -86,3 +86,18 @@ test('foreground furniture bases and facade panels are supported by collision ma
  for(const [name,x,y,w,h]of l.decor)for(let xx=x;xx<x+w;xx++)assert.equal(l.map[y+h][xx],'#',`${name} unsupported at ${xx},${y+h}`);
  for(const [x,y,w,h]of l.facades)for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)assert.equal(l.map[yy][xx],'#',`floating panel ${xx},${yy}`);
 });
+test('furniture preserves source proportions and anchors visible bases to the support',()=>{
+ const a=game();a.click('shellResume');
+ for(const name of ['coldOven','vent']){
+  const result=a.run(`(()=>{const kit=prepareStartupArtwork().find(a=>a.label==='Flooded bakery architecture').image;kit.complete=true;kit.naturalWidth=1774;const calls=[],old=g.drawImage;g.drawImage=(...args)=>calls.push(args.slice(1));floodedEntrance.render.furniture('${name}',100,200,224,128);g.drawImage=old;return calls[0]})()`);
+  const [sx,sy,sw,sh,x,y,w,h]=result;
+  assert.ok(Math.abs(w/h-sw/sh)<1e-10);assert.equal(y+h,328);assert.ok(x>=100&&x+w<=324);
+ }
+});
+test('arch clears the overhead masonry and checkpoint pole stays on frame zero',()=>{
+ const l=create(),[,x,y,w,h]=l.decor.find(d=>d[0]==='arch');
+ for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)assert.equal(l.map[yy][xx],'.');
+ const a=game();a.click('shellResume');
+ const frames=a.run(`(()=>{const results=[],old=g.drawImage;for(const t of [0,10,20,30]){tick=t;const calls=[];g.drawImage=(...args)=>{if(args[3]===43&&args[4]===87||args[3]===80&&args[4]===33)calls.push(args.slice(1));};draw();results.push(calls);}g.drawImage=old;return results})()`);
+ assert.ok(frames[0].length>0);for(const frame of frames.slice(1))assert.deepEqual(frame,frames[0]);
+});

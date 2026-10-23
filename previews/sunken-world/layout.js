@@ -10,7 +10,7 @@ const water=[{x:10,y:22,w:airChamber.x-10,h:33},
  {x:airChamber.x,y:airChamber.floor,w:airChamber.w,h:55-airChamber.floor},
  {x:airChamber.x+airChamber.w,y:22,w:104-airChamber.x-airChamber.w,h:33}];
 function isWater(layout,x,y){return layout.water.some(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h);}
-const decor=[['oven',2,16,8,6],['coldOven',12,31,7,4],['arch',28,29,9,10],
+const decor=[['oven',2,16,8,6],['coldOven',12,31,7,4],['arch',28,31,11,8],
  ['jar',35,24,2,5],['jar',42,25,2,4],['coldOven',43,38,7,4],
  ['oven',55,26,8,6],['vent',72,44,3,11],['coldOven',87,32,10,6],['oven',96,16,8,6]];
 const facades=[[33,29,11,2],[28,39,11,2],[42,42,8,2],[54,32,10,2],[87,38,10,2]];
