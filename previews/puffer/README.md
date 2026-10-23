@@ -6,7 +6,7 @@ The puffer closes distance in both axes, inflates for 48 simulation ticks, locks
 
 Four successful hits defeat him; an 18-tick damage guard prevents overlapping shots from deleting him instantly. Every phase remains vulnerable. Player bullets pop bubbles, allowing an aggressive player to carve an escape lane. Body and bubbles share the existing 90-tick player damage immunity. No damage scales with inflation frames: fixed 60×56 body, fixed 20×20 bubble boxes. Defeat clears all projectiles immediately, then the dizzy fish rises and fades for 48 ticks. Checkpoint/restart reset the complete encounter and clear hazards.
 
-The pool removes the slice's choke and lower shelf for this encounter review. The original Flooded Entrance and three campaign worlds are unchanged. Pause → Return to checkpoint / Restart mission to retry; character selection is in the same menu. Initial player immunity lasts 60 ticks. No oxygen timer.
+The pool removes the slice's narrow choke, retaining collision on the visible oven plinth for this encounter review. The original Flooded Entrance and three campaign worlds are unchanged. Pause → Return to checkpoint / Restart mission to retry; character selection is in the same menu. Initial player immunity lasts 60 ticks. No oxygen timer.
 
 ## Asset
 

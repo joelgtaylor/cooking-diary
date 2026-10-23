@@ -16,6 +16,8 @@ function installPufferEncounter(){
  init=function(){setup();
   // Broad pool with no narrow choke: all three projectile lanes are dodgeable.
   for(let y=22;y<36;y++)for(let x=10;x<38;x++)map[y][x]='.';
+  // The visible oven plinth keeps its collision; its top leaves ample dodge space.
+  for(let y=33;y<35;y++)for(let x=17;x<22;x++)map[y][x]='#';
   preview.checkpoint={x:13*T,y:28*T,swimming:true};
   player.x=13*T;player.y=28*T;player.vx=player.vy=0;player.inv=60;
   CrustSwim.sync(player,[{x:10*T,y:22*T,w:28*T,h:14*T}],hit);
