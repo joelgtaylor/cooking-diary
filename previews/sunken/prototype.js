@@ -227,7 +227,6 @@ function installSunkenPrototype(){
   const a={arrowup:'up',w:'up',arrowdown:'down',s:'down'}[e.key.toLowerCase()];if(!a)return;
   e.preventDefault();e.stopImmediatePropagation();shellInput.set('key:'+e.code,a);shellPublishInput();AudioKit.start();
  },true);
- const preset=document.getElementById('swimPreset');preset.addEventListener('change',()=>{preview.mode=preset.value==='buoyant'?'buoyant':'free';shellClearInput();});
  document.getElementById('shellMessage').textContent='Explore the flooded entrance. Swim, shoot, ride the lift, and return to dry land.';
  document.getElementById('shellResume').textContent='Try swimming';
  // Keep shell wording scoped to this preview every time it opens.

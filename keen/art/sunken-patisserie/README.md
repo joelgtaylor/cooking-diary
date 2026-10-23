@@ -5,6 +5,8 @@ Read `../../SUNKEN_PATISSERIE_DESIGN.md` and `../../CREATIVE_CHARTER.md` first.
 
 ## Review decisions
 
+- After playing the movement prototype, Joel selected free swimming over buoyant strokes. Preserve the easier, responsive controls; note the “less natural” feel for later animation/presentation polish. See `../../../previews/sunken/README.md` for the playable prototype status.
+
 - Joel approved all four aquatic enemies and the octopus baker: “excellent, no notes”.
 - The initial upright swimming proposal was rejected in favor of natural horizontal human swimming.
 - Joel approved the revised horizontal swimming sheet: “Perfect”. This is the authoritative hero pose direction.

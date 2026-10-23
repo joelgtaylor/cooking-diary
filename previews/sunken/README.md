@@ -1,6 +1,8 @@
 # Sunken Patisserie — isolated movement preview
 
-Milestone 2, ready for movement review. This is a short practice course, not World 4 campaign integration. Joel approved the prototype scope after reviewing the concept handoff.
+Milestone 2: Joel selected free swimming after playing the comparison prototype. This is a short practice course, not World 4 campaign integration.
+
+Movement decision, October 22, 2026: “Free swim feels a little less natural but easier so let's go with that.” Keep the current responsive free-swim tuning. Naturalness remains feedback for animation and later presentation polish, not permission to replace the approved control model. The comparison selector has been removed.
 
 ![Vance Wick swimming with the preview touch controls](review.jpg)
 
@@ -14,9 +16,9 @@ Serve the repository root over HTTP and open `previews/sunken/index.html`. Use t
 - **Touch:** slide around the four-direction pad, including diagonals. Hold Aim Up + Shoot for upward fire.
 - **C / Mixer:** toggles the mixer presentation. Required underwater mixer combat is deferred.
 - **V / Kefir:** stored swim-speed boost; three charges per attempt.
-- **P / Escape:** pause, choose a hero, change feel preset, return to checkpoint, restart or enter fullscreen.
+- **P / Escape:** pause, choose a hero, return to checkpoint, restart or enter fullscreen.
 
-Start with **Free swim — recommended**. The pause menu also offers **Buoyant strokes — comparison**, a deliberately different jump/stroke-like reference. No oxygen limit or combat pressure.
+The preview uses the approved free-swimming model. No oxygen limit or combat pressure. The historical buoyant reference remains in the testable helper for comparison coverage, but is not offered in the player interface.
 
 ## Course
 

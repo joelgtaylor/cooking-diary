@@ -17,6 +17,8 @@ Concept art status: generated successfully on October 22, 2026. Boards and revie
 
 ## Movement comparison and recommendation
 
+**Approved decision — October 22, 2026:** Joel played both presets and selected free swimming: “Free swim feels a little less natural but easier so let's go with that.” Use free directional swimming in water and the established platforming in dry rooms. Retain the prototype tuning; carry the naturalness feedback into later animation/presentation polish. The prototype comparison selector is retired.
+
 | Model | Strength | Main drawback | Decision |
 |---|---|---|---|
 | Free directional swimming | Responsive exploration across both axes | Open water can bypass authored routes | Use in explicit submerged regions with solid room boundaries |
