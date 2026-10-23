@@ -26,7 +26,7 @@ function create(){
   reef:[{x:16,y:31,left:12,right:23},{x:33,y:45,left:28,right:39},{x:87,y:48,left:85,right:93}],
   puffers:[{x:42,y:36,left:39,right:49,top:32,bottom:42},{x:90,y:44,left:85,right:97,top:41,bottom:54}],
   rider:{x:71,y:44,left:67,right:77,top:38,bottom:51},crab:{x:77,y:28},finish:{x:99,y:20},
-  mainRoute:[[4,20],[14,31],[20,31],[26,32],[44,34],[44,37],[40,38],[40,45],[44,48],[51,48],[70,46],[70,29],[60,30],[73,29],[79,29],[84,43],[96,49],[100,43],[100,32],[93,27],[94,20],[99,20]]};
+  mainRoute:[[4,20],[11,20],[13,30],[20,31],[26,32],[44,34],[44,37],[40,38],[40,45],[44,48],[51,48],[70,46],[70,29],[60,30],[73,29],[79,29],[84,43],[96,49],[100,43],[100,32],[93,27],[94,20],[99,20]]};
 }
 const api={create};root.SunkenRoute=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
