@@ -40,3 +40,11 @@ Build with `node previews/sunken-world/build.cjs`.
 `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs previews/sunken-audio/*.test.cjs previews/flooded-entrance/audio.test.cjs previews/puffer/*.test.cjs previews/current-rider/*.test.cjs previews/pot-crab/*.test.cjs previews/sunken-world/*.test.cjs`
 
 Route tests verify wet-body connectivity to every culture, the full-height non-bypassable crab gate, one Rider only, safe checkpoint bodies, checkpoint/restart persistence, both pump inputs, a real-control traversal from the entrance through all five cultures and the final dry exit, actual fire defeating the integrated crab, both hero renders and the map. The traversal test isolates movement by disabling enemies; existing archetype suites cover combat. These checks do not substitute for human review of the combined placements or a physical-phone playthrough.
+
+## Water / scenery coherence review
+
+Joel's phone screenshots exposed a dry kitchen drawn like open ocean, plus floating masonry from a misidentified “coral” crop. The kitchen is now an explicitly enclosed, warm pressure chamber: opaque tiled back wall, roof/floor-connected copper frames, visible permeable air seals at the actual x=54 and x=64 mode boundaries, oven heat, and an AIR POCKET marker/HUD state. Its bounds and surrounding water rectangles share layout metadata. Water surfaces are not drawn through solid floors, and ambient bubbles use the same water regions as movement and never enter the air pocket or masonry.
+
+Removed the floating pillar fragments rather than disguising them as plants. Furnishings and facade metadata now live with collision layout; tests verify their bases/panels have real solid support. The route, culture locations, dry/swim tuning and approved enemy mechanics are unchanged.
+
+Inspection links: `?scene=kitchen` and `?scene=garden-floor` start at the two screenshot locations for visual review. They do not change ordinary mission startup or save progress. Additional checks scan all reachable submerged space for rendering/movement region agreement and move through both kitchen seals in both directions.

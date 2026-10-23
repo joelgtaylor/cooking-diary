@@ -26,7 +26,15 @@ function installSunkenWorld(){
   preview.water.splice(0,preview.water.length,...l.water.map(r=>({x:r.x*T,y:r.y*T,w:r.w*T,h:r.h*T})));
   preview.currents.splice(0,preview.currents.length,{x:53*T,y:46*T,w:12*T,h:5*T,vx:-.75,vy:0},{x:74*T,y:37*T,w:3*T,h:14*T,vx:0,vy:-1.1});
   preview.checkpoint={x:l.checkpoints[0].x*T,y:l.checkpoints[0].y*T,swimming:false};player.x=preview.checkpoint.x;player.y=preview.checkpoint.y;player.health=3;
-  camera=0;cameraY=Math.max(0,player.y-H*.46);return player;
+  camera=0;cameraY=Math.max(0,player.y-H*.46);
+  const scene=/(?:^|[?&])scene=(kitchen|garden-floor)(?:&|$)/.exec(window.location?.search||'');
+  if(scene){
+   player.x=(scene[1]==='kitchen'?58:40)*T;player.y=scene[1]==='kitchen'?32*T-38:53*T;
+   CrustSwim.sync(player,preview.water,hit);
+   camera=Math.max(0,Math.min(cols*T-W,player.x-W*.45));
+   cameraY=scene[1]==='kitchen'?23*T-90:rows*T-H;
+  }
+  return player;
  };
  const recover=respawnCheckpoint;
  respawnCheckpoint=function(){
@@ -62,18 +70,57 @@ function installSunkenWorld(){
  };
  function visible(x,y,w=100,h=100){return x+w>=camera&&x<=camera+W&&y+h>=cameraY&&y<=cameraY+H;}
  function arrow(s,x,y){R.text(s,x*T,y*T,25);}
+ function drawAirChamber(){
+  const room=route.layout.airChamber,x=room.x*T,y=room.y*T,w=room.w*T,h=room.h*T;
+  if(!visible(x,y,w,h))return;
+  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+  // Opaque warm back wall replaces the submerged skyline inside the air pocket.
+  g.fillStyle='#302e2b';g.fillRect(x,y,w,h);
+  const glow=g.createRadialGradient(x+w*.4,y+h*.72,10,x+w*.4,y+h*.72,w);
+  glow.addColorStop(0,'#d6a15b55');glow.addColorStop(1,'#9b794114');g.fillStyle=glow;g.fillRect(x,y,w,h);
+  g.strokeStyle='#b8a07c28';g.lineWidth=1;
+  for(let yy=y;yy<y+h;yy+=32)for(let xx=x;xx<x+w;xx+=64){g.strokeRect(xx+(Math.floor((yy-y)/32)%2?32:0),yy,64,32);}
+  R.art('arch',x+8,y+8,w-16,h-16,.18);
+  // Gentle oven heat rises inside; water particles are excluded from this room.
+  for(let i=0;i<5;i++){const yy=y+h-72-(tick*.25+i*29)%(h-80);g.fillStyle='#ffe0a63b';g.fillRect(x+66+i*31,yy,2,2);}
+  g.restore();
+ }
+ function drawAirSeals(){
+  const room=route.layout.airChamber,x=room.x*T,y=room.y*T,w=room.w*T,h=room.h*T;
+  if(!visible(x-12,y,w+24,h))return;
+  // Door frames join the real ceiling and floor, enclosing a pressure-sealed room.
+  for(const edge of [x,x+w]){
+   g.fillStyle='#172c32';g.fillRect(edge-9,y-7,18,h+14);
+   g.fillStyle='#987c57';g.fillRect(edge-7,y-7,4,h+14);g.fillRect(edge+3,y-7,4,h+14);
+   g.strokeStyle='#e9ead6';g.lineWidth=2;g.beginPath();g.moveTo(edge,y);g.lineTo(edge,y+h);g.stroke();
+   // Tiny stationary waves indicate a permeable pressure seal rather than a wall.
+   g.strokeStyle='#a7d4db';g.lineWidth=1;g.beginPath();
+   for(let yy=y;yy<=y+h;yy+=6){const xx=edge+Math.sin(yy*.07+tick*.035)*2;yy===y?g.moveTo(xx,yy):g.lineTo(xx,yy);}g.stroke();
+   for(const yy of [y,y+h]){g.fillStyle='#d7b27b';g.fillRect(edge-12,yy-4,24,8);}
+  }
+  g.fillStyle='#d9b67e';g.fillRect(x-7,y-7,w+14,5);
+  R.text('AIR POCKET',x+w/2-39,y+23,12,'#f3dcac');
+ }
  drawWorld=function(){
   const index=route.layout.sections.findIndex(s=>player.x/T>=s.from&&player.x/T<s.to),palettes=[['#183e4e','#092536'],['#184b54','#102e42'],['#22414b','#0c283a'],['#152b44','#080f27']],colors=palettes[Math.max(0,index)];
   const sea=g.createLinearGradient(0,0,0,H);sea.addColorStop(0,colors[0]);sea.addColorStop(1,colors[1]);g.fillStyle=sea;g.fillRect(0,0,W,H);R.distantCity();
   const depth=g.createLinearGradient(0,220,0,390);depth.addColorStop(0,colors[1]+'00');depth.addColorStop(1,colors[1]);g.fillStyle=depth;g.fillRect(0,220,W,H-220);
   g.save();g.translate(-Math.round(camera),-Math.round(cameraY));
-  for(const r of preview.water){g.fillStyle='#2b88961c';g.fillRect(r.x,r.y,r.w,r.h);g.strokeStyle='#bce7dc';g.lineWidth=2;g.beginPath();for(let x=r.x;x<=r.x+r.w;x+=12){const y=r.y+Math.sin(x*.03+tick*.05)*2;x===r.x?g.moveTo(x,y):g.lineTo(x,y);}g.stroke();}
-  // Repeated structural motifs are supported by real shelves / chamber floors.
-  const decor=[['oven',2,16,8,6],['coldOven',12,31,7,4],['arch',28,29,9,10],['jar',35,24,2,5],['jar',42,25,2,4],['coldOven',43,38,7,4],['oven',55,26,8,6],['vent',72,44,3,11],['coldOven',87,32,10,6],['oven',96,16,8,6]];
-  for(const [name,x,y,w,h]of decor)if(visible(x*T,y*T,w*T,h*T))R.art(name,x*T,y*T,w*T,h*T,.85);
+  for(const r of preview.water){
+   g.fillStyle='#2b88961c';g.fillRect(r.x,r.y,r.w,r.h);
+   // A surface is visible only at open air/water, never through a solid floor.
+   g.strokeStyle='#bce7dc';g.lineWidth=2;g.beginPath();let drawing=false;
+   for(let x=r.x;x<=r.x+r.w;x+=8){
+    if(terrainHit(x-1,r.y-4,2,8)){drawing=false;continue;}
+    const y=r.y+Math.sin(x*.03+tick*.05)*2;drawing?g.lineTo(x,y):g.moveTo(x,y);drawing=true;
+   }g.stroke();
+  }
+  drawAirChamber();
+  // Every foreground furnishing has an explicit solid support in layout metadata.
+  for(const [name,x,y,w,h]of route.layout.decor)if(visible(x*T,y*T,w*T,h*T))R.art(name,x*T,y*T,w*T,h*T,.85);
   R.drawSolidTiles();
-  for(const [x,y,w]of [[33,29,11],[28,39,11],[42,42,8],[54,32,10],[87,38,10]])if(visible(x*T,y*T,w*T,64))R.art('ledge',x*T,y*T,w*T,2*T);
-  for(const [x,y]of [[30,54],[39,54],[47,54],[82,54],[90,54],[99,54]])if(visible(x*T,y*T))R.art('coral',x*T,y*T-38,68,38);
+  for(const [x,y,w,h]of route.layout.facades)if(visible(x*T,y*T,w*T,h*T))R.art('ledge',x*T,y*T,w*T,h*T);
+  drawAirSeals();
   for(const flow of preview.currents)if(visible(flow.x,flow.y,flow.w,flow.h)){
    for(let i=0;i<14;i++){const x=flow.x+((i*41+tick*flow.vx*2)%flow.w+flow.w)%flow.w,y=flow.y+((i*53+tick*flow.vy*2)%flow.h+flow.h)%flow.h;g.strokeStyle='#d5e7df70';g.lineWidth=1;g.beginPath();g.arc(x,y,2+i%2,0,7);g.stroke();}
   }
@@ -83,7 +130,7 @@ function installSunkenWorld(){
   for(const gem of route.cultures)if(!gem.got&&visible(gem.x,gem.y)){g.fillStyle='#f1df9b30';g.beginPath();g.arc(gem.x,gem.y,25,0,7);g.fill();drawIdentityPickup('culture',gem.x,gem.y+Math.sin(tick*.06)*3);}
   for(const item of route.supplies)if(!item.got&&visible(item.x,item.y)){if(item.kind==='kefir')drawIdentityPickup('kefir',item.x,item.y);else drawSupplyPickup(item,item.y);}
   for(const [s,x,y]of [['↓',23,28],['→',26,32],['↓',47,34],['→',48,48],['↑',70,47],['←',66,29],['→',74,29],['↓',84,33],['→',89,49],['↑',100,46],['←',97,30],['↑',94,25]])arrow(s,x,y);
-  for(let i=0;i<32;i++){const x=(12+i*2.8)*T;if(!visible(x,cameraY,6,H))continue;const y=22*T+(i*57+tick*.3)%(33*T);g.strokeStyle='#afdbcf40';g.beginPath();g.arc(x,y,1+i%3,0,7);g.stroke();}
+  for(let i=0;i<32;i++){const x=(12+i*2.8)*T;if(!visible(x,cameraY,6,H))continue;const y=22*T+(i*57+tick*.3)%(33*T);if(!SunkenRoute.isWater(route.layout,x/T,y/T)||terrainHit(x,y,6,6))continue;g.strokeStyle='#afdbcf40';g.beginPath();g.arc(x,y,1+i%3,0,7);g.stroke();}
   for(const a of route.actors)if(visible(a.e.x-150,a.e.y-100,400,250))drawSunkenActor(a.kind,a.e,images);
   for(const s of shots){g.fillStyle='#fff0ca';g.fillRect(s.x,s.y,s.w,s.h);}
   if(!player.inv||Math.floor(player.inv/12)%2===0)drawPlayer();
@@ -91,7 +138,7 @@ function installSunkenWorld(){
  };
  drawHUD=function(){const section=route.layout.sections.find(s=>player.x/T>=s.from&&player.x/T<s.to)||route.layout.sections[0];
   g.fillStyle='#081d2cf0';g.fillRect(0,0,W,58);R.text('THE SUNKEN PATISSERIE',18,25,17);R.text(section.name.toUpperCase(),18,45,11);
-  R.text('CULTURES '+collected+'/5',390,25,14);R.text('CHECKPOINT '+route.checkpoint+'/4',390,45,10);R.text('♥ '.repeat(Math.max(0,player.health)),590,25,17);R.text('P · PAUSE   Q · MAP',740,25,11);R.text(player.swimming?'SWIMMING':'DRY LAND',740,45,10);
+  R.text('CULTURES '+collected+'/5',390,25,14);R.text('CHECKPOINT '+route.checkpoint+'/4',390,45,10);R.text('♥ '.repeat(Math.max(0,player.health)),590,25,17);R.text('P · PAUSE   Q · MAP',740,25,11);const room=route.layout.airChamber,insideAir=player.x+player.w/2>=room.x*T&&player.x+player.w/2<(room.x+room.w)*T&&player.y+player.h/2>=room.y*T&&player.y+player.h/2<(room.y+room.h)*T;R.text(player.swimming?'SWIMMING':insideAir?'AIR POCKET':'DRY LAND',740,45,10);
   if(route.complete){g.fillStyle='#081d2be8';g.fillRect(160,H-40,640,30);R.text('ROUTE COMPLETE · OCTOPUS ENCOUNTER COMES NEXT',180,H-20,12);}
   document.getElementById('wrap').dataset.swimming=String(!!player.swimming);const jump=document.querySelector('[data-action="jump"]');if(jump){jump.querySelector('small').textContent=player.swimming?'AIM UP':'JUMP';jump.setAttribute('aria-label',player.swimming?'Aim upward while shooting':'Jump');}
   document.getElementById('pogoBtn').textContent=pogoOn?'Mixer ON':'Mixer OFF';

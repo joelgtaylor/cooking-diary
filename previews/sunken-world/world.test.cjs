@@ -62,3 +62,27 @@ test('both heroes and map render without changing progression or enemy counts',(
  const a=game();a.click('shellResume');a.run("selectCharacter('loafy');draw();selectCharacter('vance-wick');draw();shellOpenSheet('map')");
  assert.equal(a.doc.getElementById('sheetTitle').textContent,'The Sunken Patisserie · route map');assert.equal(a.run('sunkenWorld.actors.length'),7);
 });
+test('rendered air chamber and every reachable submerged point agree with the movement regions',()=>{
+ const a=game();a.click('shellResume');
+ const l=create();assert.deepEqual(l.airChamber,{x:54,y:23,w:10,h:9,roof:22,floor:32});
+ const sample=a.run(`(()=>{const result=[];for(let y=22;y<55;y++)for(let x=10;x<104;x++){
+  const cx=(x+.5)*T,cy=(y+.5)*T,body={x:cx-29,y:cy-13,w:58,h:26,swimming:false};
+  if(hit(body.x,body.y,body.w,body.h))continue;
+  result.push([x+.5,y+.5,!!CrustSwim.region(body,sunkenPreview.water,false)]);
+ }return result})()`);
+ for(const [x,y,wet]of sample){assert.equal(wet,require('./layout.js').isWater(l,x,y),`water mismatch at ${x},${y}`);if(!wet)assert.ok(x>=54&&x<64&&y>=23&&y<32);}
+});
+test('crossing either visible pressure seal switches between water and the warm air pocket safely',()=>{
+ for(const side of ['left','right']){
+  const a=game();a.click('shellResume');
+  a.run(`player.x=${side==='right'?65:52}*T;player.y=30*T;player.w=58;player.h=26;player.swimming=true;player.vx=player.vy=0;keys={${side==='right'?'left':'right'}:true};for(let i=0;i<60;i++)updatePlayer()`);
+  assert.equal(a.run('player.swimming'),false,`enter from ${side}`);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)'),false);
+  a.run(`keys={${side==='right'?'right':'left'}:true};for(let i=0;i<110;i++)updatePlayer()`);
+  assert.equal(a.run('player.swimming'),true,`exit toward ${side}`);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)'),false);
+ }
+});
+test('foreground furniture bases and facade panels are supported by collision masonry',()=>{
+ const l=create();
+ for(const [name,x,y,w,h]of l.decor)for(let xx=x;xx<x+w;xx++)assert.equal(l.map[y+h][xx],'#',`${name} unsupported at ${xx},${y+h}`);
+ for(const [x,y,w,h]of l.facades)for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)assert.equal(l.map[yy][xx],'#',`floating panel ${xx},${yy}`);
+});
