@@ -39,3 +39,14 @@ test('arrangement creates a sparse opening, deep breakdown, full chorus and rele
  const kinds=(from,to,k)=>Array.from({length:to-from},(_,i)=>theme.score(from+i).filter(e=>e.k===k).length).reduce((a,b)=>a+b,0);
  assert.ok(kinds(192,224,'glass')>kinds(64,96,'glass'));
 });
+test('all pitched voices stay in E Dorian, with a recurring hook and raised sixth',()=>{
+ const mode=new Set([4,6,7,9,11,1,2]);let sixths=0;
+ for(let i=0;i<256;i++)for(const e of theme.score(i))if(e.k!=='kick'){
+  assert.ok(mode.has(e.n%12),`step ${i}: ${e.k} pitch ${e.n} outside E Dorian`);
+  if(e.k==='bell'&&e.n%12===1)sixths++;
+ }
+ const hook=start=>[0,2,3,4,6,7].map(i=>theme.score(start+i).find(e=>e.k==='bell').n%12);
+ assert.deepEqual(hook(0),[4,7,9,11,1,11]);
+ for(const start of [32,64,192,224])assert.deepEqual(hook(start),hook(0));
+ assert.ok(sixths>=8);assert.equal(theme.mode,'E Dorian');
+});
