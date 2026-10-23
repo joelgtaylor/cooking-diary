@@ -31,3 +31,11 @@ test('new theme uses existing transport bounds, scene switching and hidden-tab l
  await a.start('sunken');a.mute(true);assert.equal(timers,0);assert.equal(a.status().playing,false);
  a.mute(false);await a.start('sunken');a.stop();assert.equal(a.status().step,0);assert.equal(timers,0);
 });
+test('arrangement creates a sparse opening, deep breakdown, full chorus and release',()=>{
+ const count=(from,to)=>Array.from({length:to-from},(_,i)=>theme.score(from+i).length).reduce((a,b)=>a+b,0);
+ assert.ok(count(64,96)>count(0,32));
+ assert.ok(count(192,224)>count(128,160));
+ assert.ok(count(224,240)>count(240,256));
+ const kinds=(from,to,k)=>Array.from({length:to-from},(_,i)=>theme.score(from+i).filter(e=>e.k===k).length).reduce((a,b)=>a+b,0);
+ assert.ok(kinds(192,224,'glass')>kinds(64,96,'glass'));
+});
