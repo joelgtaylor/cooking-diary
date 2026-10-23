@@ -6,7 +6,7 @@ function installDeepArena(){
  const preview=window.sunkenPreview,slice=window.floodedEntrance,R=slice.render;
  const arena={boss:null,victory:false};window.deepArena=arena;
  const sheet=new Image();sheet.src='../previews/octopus/joined-master.png';
- const limb=new Image();limb.src='../previews/octopus/lame-inbetweens.png';
+ const limb=new Image();limb.src='../previews/octopus/lame-slender.png';
  const startup=prepareStartupArtwork;prepareStartupArtwork=()=>[...startup(),{label:'Pixel octopus baker animation',image:sheet},{label:'Pixel tentacle and lame animation',image:limb}];
  function reset(){arena.boss=CrustDeep.create();arena.victory=false;slice.patroller.alive=false;slice.patroller.deathT=0;preview.rings=[];preview.targets=[];shots=[];}
  const setup=init;
