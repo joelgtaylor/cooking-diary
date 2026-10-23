@@ -57,6 +57,12 @@ function installCrabEncounter(){
    const frame=!e.alive?3:e.phase==='open'?2:e.phase==='rattle'||e.phase==='tuck'?1:0;
    g.save();g.translate(e.x+48,e.y);
    if(!e.alive){g.globalAlpha=e.deathT/48;g.translate((48-e.deathT)*1.5,(48-e.deathT)*.3);}
+   if(CrustCrabClaws.pose(e)){
+    // Replace the tucked hands rather than giving the crab a second pair.
+    g.beginPath();g.rect(-100,-50,200,200);
+    for(const side of [-1,1]){g.moveTo(side*58,65);g.lineTo(side*18,67);g.lineTo(side*12,101);g.lineTo(side*62,101);g.closePath();}
+    g.clip('evenodd');
+   }
    if(sheet.naturalWidth){const sw=sheet.naturalWidth/4;g.drawImage(sheet,frame*sw,140,sw,460,-72,-12,144,122);}
    g.restore();
    if(e.alive){
