@@ -8,7 +8,7 @@ function installSunkenPrototype(){
  const start={x:4*T,y:22*T-38};
  const preview={mode:'free',checkpoint:null,finished:false,targets:[],rings:[],sprites:[],lastShot:-100};
  window.sunkenPreview=preview;
- const sheet=new Image();sheet.src='art/sunken-patisserie/heroes-horizontal-swim-concept.png';
+ const sheet=new Image();sheet.crossOrigin='anonymous';sheet.src='art/sunken-patisserie/heroes-horizontal-swim-concept.png';
  const backdrop=new Image();backdrop.src='art/sunken-patisserie/environment-concepts.png';
  // Concept poses are temporary runtime samples, not production animation art.
  // The runtime sprite material keys only the connected teal backdrop. Original
@@ -20,7 +20,14 @@ function installSunkenPrototype(){
   preview.sprites=crops.map(row=>row.map(([x,y,w,h])=>{
    const c=document.createElement('canvas');c.width=w;c.height=h;
    const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(sheet,x,y,w,h,0,0,w,h);
-   const pixels=ctx.getImageData(0,0,w,h),p=pixels.data,seen=new Uint8Array(w*h),queue=[];
+   let pixels;
+   try{pixels=ctx.getImageData(0,0,w,h);}catch(error){
+    // A host may redirect images without CORS. Keep the reference crop usable
+    // rather than trapping the entire preview behind the artwork gate.
+    if(error.name!=='SecurityError')throw error;
+    return c;
+   }
+   const p=pixels.data,seen=new Uint8Array(w*h),queue=[];
    const ocean=i=>{const q=i*4,r=p[q],g=p[q+1],b=p[q+2];return r<45&&g<110&&b<120&&g>r+12&&b>r+12;};
    const push=i=>{if(!seen[i]&&ocean(i)){seen[i]=1;queue.push(i);}};
    for(let xx=0;xx<w;xx++){push(xx);push((h-1)*w+xx);}for(let yy=0;yy<h;yy++){push(yy*w);push(yy*w+w-1);}
