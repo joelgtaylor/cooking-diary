@@ -1,6 +1,6 @@
 # The Sunken Patisserie — design review
 
-Status: free swimming approved after playtest; Milestone 3 Flooded Entrance environment and first reef patroller implemented for review. Full world remains proposed. Boss/enemy concepts and horizontal hero swimming direction are approved; see art/sunken-patisserie/README.md. Movement prototype: ../previews/sunken/README.md. Environmental slice: ../previews/flooded-entrance/README.md.
+Status: movement, all four enemy archetypes and World 4 music are approved. Milestone 5 connected four-section route is implemented in previews/sunken-world/ for review, ending at the boss approach. Boss development, final hero animation/art polish, production progression/recipe integration and merge remain pending. Earlier milestone descriptions below retain their historical context.
 Baseline: main c0d42c1601adef0f4fb9978f66050b0ee546813d, October 22, 2026.
 Branch: feature/keen-sunken-patisserie.
 Authority: CREATIVE_CHARTER.md. This document changes no production behavior.
@@ -161,6 +161,8 @@ Success gate: Joel and Vance can steer, stop, descend, fire and leave water comf
 
 ## Audio brief for later audition
 
+Superseded by the approved **Where the Starter Sleeps**, audition revision 04: 104 BPM, 4/4, E Dorian, open-water opening/return and underwater mix. Integrated in the Flooded Entrance and connected route previews. See ../previews/sunken-audio/README.md.
+
 Rounded bass, soft FM-inspired bells, sparse bubbling percussion and spacious, slightly mysterious phrases. Sketch an original lilting 6/8 candidate to contrast the existing worlds; audition before committing. Keep stroke and bubble effects sparse and voice-budgeted, with no continuous noisy blanket. Preserve the three approved scores and all lifecycle behavior.
 
 ## Validation and review boundary
@@ -179,3 +181,7 @@ Next review: environmental readability, water/air contrast, the first patroller 
 ## Approved Current Rider placement — October 23, 2026
 
 The isolated Current Rider encounter is approved. Joel's placement direction: it is tricky and annoying, so use **one Current Rider total in the full World 4 map**, at a key point that keeps the player alert. Do not repeat it across sections or include multiple simultaneous Riders. Preserve its reviewed dash/telegraph/recovery behavior. Final location remains a world-construction decision; provide clear dash lanes, perpendicular escape space and wall-stun opportunities, then review the placement in context.
+
+## Milestone 5 connected route — October 23, 2026
+
+The crab and final claw animation are approved. The connected route preview reuses all approved archetypes: three reef patrols, two Puffers, exactly one Current Rider in the pressure shaft, and one required crab passage. Five cultures, four forward checkpoints, optional supply branches, a shared shootable/Interact pump, dry pockets, vertical baffles and an actual route map are implemented. Checkpoint retry retains cultures, supplies, pump state and defeated enemies. The ending is explicitly the boss approach, with no recipe/campaign completion. Review ../previews/sunken-world/README.md and play the route before broader placement/art polish or boss development.

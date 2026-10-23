@@ -113,7 +113,7 @@ function installFloodedEntrance(){
    }
    masonryPattern=g.createPattern(material,'repeat');
   }
-  const x0=Math.max(0,Math.floor(camera/T)),x1=Math.min(48,Math.ceil((camera+W)/T));
+  const x0=Math.max(0,Math.floor(camera/T)),x1=Math.min(Math.ceil(slice.width/T),Math.ceil((camera+W)/T));
   const y0=Math.max(0,Math.floor(cameraY/T)),y1=Math.min(rows,Math.ceil((cameraY+H)/T));
   for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(tile(x,y)==='#'){
    const px=x*T,py=y*T;
@@ -201,6 +201,7 @@ function installFloodedEntrance(){
   const jump=document.querySelector('[data-action="jump"]');if(jump){jump.setAttribute('aria-label',player.swimming?'Aim upward while shooting':'Jump');jump.querySelector('small').textContent=player.swimming?'AIM UP':'JUMP';}
   document.getElementById('pogoBtn').textContent=pogoOn?'Mixer ON':'Mixer OFF';
  };
+ slice.render={art,drawSolidTiles,distantCity,copperPipe,text};
  const pause=shellPause;
  shellPause=function(reason){pause(reason);document.getElementById('shellTitle').textContent=shellStarted?'Paused':'The Flooded Entrance';
   if(!shellStarted)document.getElementById('shellMessage').textContent='An abandoned bakery beneath the tide. Explore the first flooded room and meet its reef patroller.';

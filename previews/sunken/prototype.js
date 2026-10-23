@@ -10,7 +10,7 @@ function installSunkenPrototype(){
   {x:51*T,y:29*T,w:8*T,h:18*T,vx:0,vy:-1.35}];
  const start={x:4*T,y:22*T-38};
  const preview={mode:'free',checkpoint:null,finished:false,targets:[],rings:[],sprites:[],lastShot:-100,blockDryJump:false};
- window.sunkenPreview=preview;
+ window.sunkenPreview=preview;preview.water=water;preview.currents=currents;
  const sheet=new Image();sheet.crossOrigin='anonymous';sheet.src='art/sunken-patisserie/heroes-horizontal-swim-concept.png';
  const backdrop=new Image();backdrop.src='art/sunken-patisserie/environment-concepts.png';
  // Concept poses are temporary runtime samples, not production animation art.
