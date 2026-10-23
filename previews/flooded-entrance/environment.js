@@ -7,10 +7,12 @@ function installFloodedEntrance(){
  const slice={width:48*T,height:38*T,patroller:null,hitFlash:0,checkpoint:false,finished:false};
  window.floodedEntrance=slice;
  const kit=new Image();kit.src='../previews/flooded-entrance/environment-kit.png';
+ const masonry=new Image();masonry.src='../previews/flooded-entrance/masonry.png';
+ let masonryPattern=null;
  const fishArt=new Image();fishArt.src='../previews/flooded-entrance/reef-patroller.png';
  const background=new Image();background.src='art/sunken-patisserie/environment-concepts.png';
  const gate=prepareStartupArtwork;
- prepareStartupArtwork=()=>[...gate(),{label:'Flooded bakery architecture',image:kit},{label:'Reef patroller animation',image:fishArt}];
+ prepareStartupArtwork=()=>[...gate(),{label:'Flooded bakery architecture',image:kit},{label:'Continuous masonry',image:masonry},{label:'Reef patroller animation',image:fishArt}];
  const samples={
   arch:[12,8,645,436],oven:[678,15,627,430],coldOven:[13,453,501,417],
   jar:[1330,144,144,302],ledge:[542,514,541,132],vent:[1530,456,234,414],
@@ -99,14 +101,26 @@ function installFloodedEntrance(){
   for(let i=0;i<3;i++){g.fillStyle='#e4bb7166';g.fillRect(4*T+i*28,19*T+Math.sin(tick*.03+i)*2,2,2);}
  }
  function drawSolidTiles(){
+  if(!masonryPattern&&masonry.complete&&masonry.naturalWidth){
+   // One world-anchored material spans many collision cells. Mirror adjacent
+   // 256px sheets in a cached 512px pattern so their boundary pixels meet even
+   // when the source's opposite edges have slightly different weathering.
+   const material=document.createElement('canvas');material.width=material.height=512;
+   const ctx=material.getContext('2d');ctx.imageSmoothingEnabled=false;
+   for(let yy=0;yy<2;yy++)for(let xx=0;xx<2;xx++){
+    ctx.save();ctx.translate(xx*256+(xx?256:0),yy*256+(yy?256:0));ctx.scale(xx?-1:1,yy?-1:1);
+    ctx.drawImage(masonry,0,0,256,256);ctx.restore();
+   }
+   masonryPattern=g.createPattern(material,'repeat');
+  }
   const x0=Math.max(0,Math.floor(camera/T)),x1=Math.min(48,Math.ceil((camera+W)/T));
   const y0=Math.max(0,Math.floor(cameraY/T)),y1=Math.min(rows,Math.ceil((cameraY+H)/T));
   for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(tile(x,y)==='#'){
    const px=x*T,py=y*T;
-   // Interior ceramic sample repeats at native 2:1 source-to-world scale.
-   g.drawImage(kit,680+(x%3)*64,550,64,64,px,py,T,T);
+   // Do not add grout, outlines or weathering at each 32px collision cell:
+   // the running-bond material provides those details continuously instead.
+   g.fillStyle=masonryPattern||'#b9bea5';g.fillRect(px,py,T,T);
    g.fillStyle=y<22?'#73573735':'#0b3b4555';g.fillRect(px,py,T,T);
-   g.fillStyle='#203e43';g.fillRect(px,py+30,T,2);g.fillRect(px+(y%2?12:24),py,1,T);
    if(tile(x,y-1)!=='#'){g.fillStyle='#eee4bd';g.fillRect(px,py,T,4);g.fillStyle='#9bb19c';g.fillRect(px,py+4,T,2);}
    if(tile(x-1,y)!=='#'){g.fillStyle='#c6ccb0';g.fillRect(px,py,3,T);}
    if(tile(x+1,y)!=='#'){g.fillStyle='#97b1a0';g.fillRect(px+29,py,3,T);}
