@@ -14,7 +14,7 @@ function createMix(ctx){
  function set(value){enabled=!!value;const t=ctx.currentTime;submerged.gain.setTargetAtTime(enabled?1:0,t,.045);clear.gain.setTargetAtTime(enabled?0:1,t,.045);wet.gain.setTargetAtTime(enabled?.18:0,t,.045);}
  function depth(step){
   // A small opening in the final chorus; never a dramatic filter sweep.
-  const cutoff=step<32?1000:step<128?1180:step<160?820:step<192?1050:step<240?1350:1000;
+  const cutoff=step<64?1350:step<128?1180:step<160?950:step<192?1050:1350;
   low.frequency.setTargetAtTime(cutoff,ctx.currentTime,.7);
  }
  function flush(){

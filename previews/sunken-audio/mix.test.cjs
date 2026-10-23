@@ -11,7 +11,7 @@ test('underwater graph has bounded feedback, gentle filtering and smooth bypass'
  const feedback=ctx.nodes.find(n=>n.gain.value===.16);assert.ok(feedback.connections.includes(delay));
  m.set(false);assert.ok(ctx.nodes.some(n=>n.gain.targets.at(-1)?.[0]===0));
  for(const s of [0,64,128,160,192,240])m.depth(s);
- assert.deepEqual(filters[0].frequency.targets.map(t=>t[0]),[1000,1180,820,1050,1350,1000]);
+ assert.deepEqual(filters[0].frequency.targets.map(t=>t[0]),[1350,1180,950,1050,1350,1350]);
  m.flush();m.flush();assert.equal(feedback.connections.length,0);
  m.resume();assert.deepEqual(feedback.connections,[delay]);m.resume();assert.deepEqual(feedback.connections,[delay]);
 });

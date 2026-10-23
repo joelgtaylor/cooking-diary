@@ -1,4 +1,4 @@
-# Sunken Patisserie music audition 03
+# Sunken Patisserie music audition 04
 
 **Where the Starter Sleeps** — an original procedural composition, October 23, 2026. No samples, external recordings, or borrowed melodies. Uses the approved production FM instrument palette and transport without modifying them.
 
@@ -9,3 +9,7 @@ Open `index.html` through a static server. Tap Play; compare switches to the app
 Score lives in `theme.js`, presentation in `player.js`, isolated output routing in `underwater-mix.js`. Approval is required before integration; boss music and underwater effects remain separate future work. Stubbed audio tests validate event structure and transport but cannot establish listening quality. Human audition is the purpose of this page.
 
 Run `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs previews/sunken-audio/*.test.cjs`.
+
+## Revision 04 — open-water theme as the home
+
+The approved revision-03 open-water melody, harmony and full instrumental texture now open the piece. Eight bars of exploration develop the hook; eight bars over B minor / F-sharp minor / A9 / B suspended harmony gather mild tension with a rising line. The final eight bars reprise the opening melody and harmony, resolve to E minor, and leave a short breath before the loop. No sparse entrance or half-time breakdown remains. Underwater processing is retained, with the clearer open-water cutoff framing the slightly murkier middle.

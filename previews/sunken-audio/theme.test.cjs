@@ -31,13 +31,16 @@ test('new theme uses existing transport bounds, scene switching and hidden-tab l
  await a.start('sunken');a.mute(true);assert.equal(timers,0);assert.equal(a.status().playing,false);
  a.mute(false);await a.start('sunken');a.stop();assert.equal(a.status().step,0);assert.equal(timers,0);
 });
-test('arrangement creates a sparse opening, deep breakdown, full chorus and release',()=>{
- const count=(from,to)=>Array.from({length:to-from},(_,i)=>theme.score(from+i).length).reduce((a,b)=>a+b,0);
- assert.ok(count(64,96)>count(0,32));
- assert.ok(count(192,224)>count(128,160));
- assert.ok(count(224,240)>count(240,256));
- const kinds=(from,to,k)=>Array.from({length:to-from},(_,i)=>theme.score(from+i).filter(e=>e.k===k).length).reduce((a,b)=>a+b,0);
- assert.ok(kinds(192,224,'glass')>kinds(64,96,'glass'));
+test('open-water theme frames a contrasting middle with a tonic resolution',()=>{
+ const lead=start=>Array.from({length:64},(_,i)=>theme.score(start+i).find(e=>e.k==='bell')).map(e=>e&&e.n);
+ assert.deepEqual(lead(0),lead(192));
+ assert.notDeepEqual(lead(128),lead(0));
+ assert.equal(theme.score(0).find(e=>e.k==='bass').n,40);
+ assert.equal(theme.score(240).find(e=>e.k==='bass').n,40);
+ assert.equal(theme.score(176).find(e=>e.k==='bass').n,47);
+ assert.ok(theme.score(2).some(e=>e.k==='glass'));
+ const count=start=>Array.from({length:64},(_,i)=>theme.score(start+i).length).reduce((a,b)=>a+b,0);
+ assert.ok(count(128)>count(64));
 });
 test('all pitched voices stay in E Dorian, with a recurring hook and raised sixth',()=>{
  const mode=new Set([4,6,7,9,11,1,2]);let sixths=0;
