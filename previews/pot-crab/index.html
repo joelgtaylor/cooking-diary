@@ -1,0 +1,109 @@
+<!doctype html><html lang="en"><head><base href="../../keen/"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Copper Pot Crab · Crust Quest encounter</title><style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#101522;color:#f3e6c9;font-family:monospace}#wrap{max-width:1040px;margin:auto;padding:18px 14px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}h1{font-size:22px;letter-spacing:2px;margin:0}header p{margin:5px 0;color:#aebbd0;font-size:12px;letter-spacing:1px}.edition{color:#d6b779;font-size:11px;text-align:right}canvas{display:block;width:100%;image-rendering:pixelated;border:3px solid #9b8051;box-shadow:0 5px 0 #080d17;background:#111}button{font: bold 12px monospace;border:1px solid #69758b;border-bottom:3px solid #080d17;border-radius:3px;background:#263348;color:#f3e6c9;padding:11px 14px;cursor:pointer;min-height:44px}button:hover{background:#36465d}button:focus-visible,summary:focus-visible{outline:3px solid #ffe3a1;outline-offset:3px}button:active{transform:translateY(1px)}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 10px}.toolbar .secondary{margin-left:auto}#touch{display:flex;gap:8px;justify-content:center;margin:14px 0;touch-action:none}#touch button{min-width:54px;flex:1;max-width:110px;font-size:16px;padding:13px 5px;user-select:none;touch-action:none}#pogoBtn{max-width:150px!important;font-size:12px!important;border-color:#b39861}#status{color:#bfccd9;font-size:12px;line-height:1.6;min-height:20px;margin:10px 0}.guide{border-top:1px solid #39465c;padding-top:12px;color:#b9c5d5;font-size:12px;line-height:1.8}.guide p{margin:8px 0}summary{cursor:pointer;color:#e4cd9c}kbd{color:#fff0cc;font:inherit}#mapViewport{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}#verticalMap{margin:12px 0;border-color:#69758b}@media(max-width:540px){#wrap{padding:10px 8px}h1{font-size:17px}.edition{display:none}header p{font-size:10px}.toolbar{gap:5px}.toolbar button{flex:1;padding:9px 8px}.toolbar .secondary{margin-left:0}#touch{gap:4px}#touch button{min-width:42px;font-size:14px}}
+</style><link rel="stylesheet" href="character-select.css?v=vance-playable-20261022"><link rel="stylesheet" href="shell.css?v=startup-art-20261022"><link rel="stylesheet" href="../previews/sunken/preview.css"></head><body><main id="wrap" data-loading="true">
+<section id="loadingOverlay" class="loading-overlay" role="dialog" aria-modal="true" aria-labelledby="loadingTitle" tabindex="-1"><div class="loading-card"><p class="eyebrow">CRUST QUEST</p><div class="loading-spinner" aria-hidden="true"></div><h1 id="loadingTitle">Warming the ovens</h1><p id="loadingMessage" role="status">Preparing the bakeries…</p><progress id="loadingProgress" aria-label="Artwork loading progress" max="1" value="0"></progress><button id="loadingRetry" hidden>Retry loading</button></div></section>
+<section id="gameStage" aria-label="Game play surface" tabindex="-1"><canvas id="c" width="960" height="540" aria-label="Crust Quest platform game">Your browser does not support canvas.</canvas><button id="shellPause" class="pause-control" aria-label="Pause game">Ⅱ</button><button id="advanceBtn" hidden>Next bakery →</button><div id="touch" aria-label="Touch game controls"><div id="directionPad" class="direction-pad"><button class="touch-control direction" data-action="up" aria-label="Swim up">▲</button><button class="touch-control direction" data-action="down" aria-label="Swim down">▼</button><button class="touch-control direction" data-action="left" aria-label="Move left">◀</button><button class="touch-control direction" data-action="right" aria-label="Move right">▶</button></div><div class="action-pad"><div class="secondary-actions"><button id="pogoBtn" class="touch-control secondary" aria-pressed="false">Mixer OFF</button><button id="kefirBtn" class="touch-control secondary">Kefir</button><div class="interact-slot"><button id="exploreBtn" class="touch-control secondary" style="display:none">Interact (E)</button><button id="talkBtn" class="touch-control secondary" style="display:none">Talk (E)</button><button id="interactIdle" class="touch-control secondary" disabled>Interact</button></div></div><div class="primary-actions"><button class="touch-control fire" data-action="shoot" aria-label="Shoot">✦<small>SHOOT</small></button><button class="touch-control jump" data-action="jump" aria-label="Jump">↑<small>JUMP</small></button></div></div></div><section id="endCredits" class="end-credits" aria-labelledby="creditsTitle" hidden><div class="credits-card"><p class="eyebrow">THREE BAKERIES · ONE SHARED ADVENTURE</p><h1 id="creditsTitle" tabindex="-1">Crust Quest</h1><p class="credits-subtitle">Rise of the Starter</p><div class="credits-loaf" aria-hidden="true"></div><p class="credit-role">Producer &amp; Developer</p><p class="credit-name">Joel Taylor</p><p class="credit-role">Designer &amp; Lead Play Tester</p><p class="credit-name">Vance</p><p class="credits-thanks">Made together. Baked to perfection.<br>Thank you for playing!</p><div class="credits-actions"><button id="creditsRecipes">Explore recipes</button><button id="creditsReplay">Bake again</button></div></div></section></section><div id="rotateHint" hidden><span>Rotate your phone for a larger view</span><button id="dismissRotate" aria-label="Dismiss rotation hint">×</button></div>
+<div id="shellOverlay" class="shell-overlay" role="dialog" aria-modal="true" aria-labelledby="shellTitle"><section class="shell-panel"><div id="shellMain"><p class="eyebrow">CRUST QUEST</p><h1 id="shellTitle">Rise of the Starter</h1><p id="shellMessage">Your bakery adventure is ready.</p><div class="menu-grid"><button id="shellResume" class="primary-menu">Play</button><button id="shellFullscreen">Play fullscreen</button><button id="characterButton" type="button">Character: Loafy</button><button id="audioBtn" type="button">♫ Sound: ON</button><span class="session-only"><button id="mapButton" type="button">World map (Q)</button></span><span class="session-only"><button id="codexBtn" type="button">Recipes (T)</button></span><span class="session-only"><button id="restartSection" type="button">Return to checkpoint</button></span><span class="session-only"><button id="restartBtn" class="secondary" type="button">Restart mission</button></span></div><details id="shellSettings"><summary>Controls &amp; display</summary><label class="check-setting"><input id="showTouch" type="checkbox"> Show touch controls</label><label>Control size <output id="sizeValue"></output><input id="controlSize" type="range" min="85" max="120" step="5" value="100"></label><label>Control opacity <output id="opacityValue"></output><input id="controlOpacity" type="range" min="40" max="90" step="5" value="65"></label><p>Arrows / WASD swim · Space + Shoot aim up<br>On land: Space / W / ↑ jump · X / K shoot<br>C mixer · V kefir · Esc / P pause · F fullscreen · M mute</p><p>Touch: slide around the direction pad, including diagonals. Hold Aim Up + Shoot to fire upward underwater. Mixer toggles once per press.</p><p class="scope-note">Control settings are saved. Level progress uses the existing game rules.</p></details><p id="shellNotice" role="status"></p></div><div id="shellSheet" hidden><button id="sheetBack">← Pause menu</button><h2 id="sheetTitle">Map</h2><div id="mapViewport" role="region" aria-label="World map; scroll sideways on small screens"><canvas id="verticalMap" width="1050" height="360" style="display:none" aria-label="Current bakery exploration map"></canvas></div><div id="recipeSheet" hidden><h3 id="recipeTitle"></h3><div id="recipeBody"></div><div class="recipe-navigation"><button id="recipePrevious">← Previous</button><span id="recipePage"></span><button id="recipeNext">Next →</button></div></div><div id="confirmSheet" hidden><p id="confirmMessage"></p><button id="confirmAction" class="danger">Restart bakery</button><button id="confirmCancel">Cancel</button></div></div></section></div>
+
+
+<p id="status" role="status">Wait for the lid to lift, then shoot. Clear the guarded passage.</p>
+<div class="guide"><details><summary>How to play · keyboard controls</summary><p><kbd>← → / A D</kbd> move · <kbd>Space / W / ↑</kbd> jump · <kbd>C</kbd> toggle mixer pogo · <kbd>X / K</kbd> shoot · <kbd>Jump + shoot</kbd> fire up · <kbd>V</kbd> use stored kefir<br><kbd>E</kbd> talk / interact · <kbd>P</kbd> pause · <kbd>M</kbd> mute · <kbd>Q</kbd> map · <kbd>R</kbd> restart · <kbd>T</kbd> recipes · <kbd>Enter / tap</kbd> next bakery</p><p>Gather five wild yeast cultures in each bakery. Flags save your checkpoint; the grand oven unlocks a real recipe.</p></details></div><div id="characterPanel" class="character-overlay" style="display:none"><section class="character-dialog" role="dialog" aria-modal="true" aria-labelledby="characterTitle" aria-describedby="characterMessage"><div class="character-heading"><div><h2 id="characterTitle">CHOOSE YOUR BAKER</h2><p>Crust Quest · the starter crew</p></div><button id="characterClose" class="character-close" type="button" aria-label="Close character selector">✕</button></div><div class="character-cards"><button id="characterLoafy" class="character-card" type="button" aria-pressed="true"><span class="character-art loafy-art"><img src="art/baker-grunge-actions.png" alt="Loafy, the original baker with a chef hat and red scarf" loading="lazy"></span><strong>LOAFY</strong><span class="character-tag">ORIGINAL BAKER</span><small>Play as Loafy</small></button><button id="characterVance" class="character-card" type="button" aria-pressed="false"><span class="character-art vance-art"><img src="art/vance-wick-concept.webp" alt="Vance Wick, wearing a gray hoodie and camouflage vest" loading="lazy"></span><strong>VANCE WICK</strong><span class="character-tag">CANADIAN CREW</span><small>Play as Vance Wick</small></button></div><p id="characterMessage" role="status">Choose your baker. Same moves, two heroes.</p><a id="characterConceptLink" class="character-concept-link" href="art/vance-wick-concept.webp" target="_blank" rel="noopener">Open Vance Wick’s full concept sheet ↗</a><div id="characterConcept" class="character-concept" style="display:none"><img src="art/vance-wick-concept.webp" alt="Vance Wick concept poses: idle, dough blaster, running and mixer pogo" loading="lazy"></div></section></div></main><script src="art/phase3-bg.js"></script>
+<script src="art/vertical-bakery1-layout.js?v=clockwork-worlds-20261021"></script>
+<script src="art/vertical-bakery2-layout.js?v=cavern-discovery-20261022"></script>
+<script src="art/vertical-bakery3-layout.js"></script>
+<script src="art/checkpoint-flags-generated.js"></script>
+<script src="atmosphere.js"></script>
+<script src="art/vertical-parallax.js"></script>
+<script src="art/baker-reimagined.js"></script>
+<script src="art/environment-gameplay-atlas.js"></script>
+<script src="../previews/flooded-entrance/audio-engine.js"></script><script src="../previews/sunken-audio/theme.js"></script><script src="../previews/sunken-audio/underwater-mix.js"></script><script src="../previews/flooded-entrance/soundtrack.js"></script>
+<script src="../previews/flooded-entrance/audio.js"></script>
+<script src="performance.js"></script>
+<script src="timing.js"></script>
+<script src="camera.js"></script>
+<script src="world.js?v=enemy-scale-release-20261022"></script>
+<script src="character-select.js?v=vance-playable-20261022"></script>
+<script src="input-model.js?v=credits-20261022"></script>
+<script src="shell.js?v=startup-art-20261022"></script>
+<script src="collision.js"></script>
+<script src="physics.js"></script>
+<script src="clockwork-enemies.js?v=visual-polish-20261022"></script>
+<script src="fungal-enemies.js?v=visual-polish-20261022"></script>
+<script src="throwers.js?v=enemy-scale-all-20261022"></script>
+<script src="combat.js?v=animation-alignment-20261022"></script>
+<script src="cavern-discovery-art.js?v=cavern-art-20261022b"></script>
+<script src="cavern-exploration.js?v=cellar-plaque-20261022"></script>
+<script src="gameplay.js?v=pickup-feedback-20261022"></script>
+<script src="characters.js?v=enemy-scale-20261022"></script>
+<script src="vance-wick.js?v=animation-alignment-20261022"></script>
+<script src="baker-pilot.js?v=animation-alignment-20261022"></script>
+<script src="celebration.js"></script>
+<script src="hud.js?v=cavern-discovery-20261022"></script>
+<script src="ovens.js"></script>
+<script src="interactables.js"></script>
+<script src="art/moonlit-shading.js"></script>
+<script src="moonlit-environment.js?v=clockwork-worlds-20261021"></script>
+<script src="fungal-environment.js?v=visual-polish-20261022"></script>
+<script src="clockwork-environment.js?v=clockwork-worlds-20261021"></script>
+<script src="architecture.js?v=clockwork-worlds-20261021"></script>
+<script src="foreman.js?v=clockwork-worlds-20261021"></script>
+<script src="mycelium.js?v=pre-expansion-20261022"></script>
+<script src="bloomrot.js"></script>
+<script src="devourer.js"></script>
+<script src="render.js?v=visual-polish-20261022"></script>
+<script src="assets.js?v=clockwork-worlds-20261021"></script>
+<script src="loading.js?v=startup-art-20261022"></script>
+<script src="../previews/sunken/swim-physics.js"></script><script src="../previews/sunken/prototype.js"></script><script src="../previews/flooded-entrance/reef-patroller.js"></script><script src="../previews/flooded-entrance/environment.js"></script><script src="../previews/pot-crab/pot-crab.js"></script><script src="../previews/pot-crab/encounter.js"></script><script>
+'use strict';window.__crustCameraDebug=false;window.__crustCameraSnap=false;window.__crustParallaxEnabled=true;window.__crustParallaxProfile='dramatic';window.__crustEnemyScaleEnabled=true;
+loadGameArt();
+const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;const W=960,H=540,T=32,cols=105,world=cols*T;let rows=56;let pogoOn=false,prevPogo=false;let map=[],gems=[],enemies=[],shots=[],particles=[],player={},camera=0,cameraY=0,tick=0,state='play',collected=0,keys={},prevJump=false;
+let bakery=1;const MAXBAKERY=3;let powerups=[],floaters=[],combo=0,comboT=0,shake=0,hitStop=0,codexFrom='play',codexPage=0;
+let best=0,unlocked=[];
+// Storage may be unavailable or contain valid JSON of the wrong shape.
+// Keep valid progress without rewriting or clearing the user's saved data.
+try{const value=Number(localStorage.getItem('crustQuestBest'));if(Number.isFinite(value)&&value>=0)best=Math.floor(value);}catch{}
+try{const value=JSON.parse(localStorage.getItem('crustQuestCodex')||'[]');if(Array.isArray(value))unlocked=[...new Set(value.filter(id=>Number.isInteger(id)&&id>=0&&id<MAXBAKERY))];}catch{}
+const RECIPES=[
+{name:'Artisan Sourdough Bread',sub:'Starter: "Doughnald Knuth" - Joel\'s signature loaf',
+ ing:['100g active starter','320g water','500g all-purpose flour','10g salt'],
+ steps:['Mix + stretch & folds','Bulk ferment (watch the temp)','Cold retard overnight','Bake with steam']},
+{name:'Milk Kefir',sub:'Wild culture, maintained with love',
+ ing:['Kefir grains','Whole milk'],
+ steps:['Add grains to fresh milk','Ferment ~24h at room temp','Strain; restart with fresh milk']},
+{name:'High-Fat Cultured Kefir Ranch',sub:'Yield ~1.5 cups - 10 min + 30 min chill',
+ ing:['1/2 cup Kewpie mayo','1/2 cup strained whole-milk kefir','1/4-1/2 cup kefir buttermilk','1 tsp garlic powder','1 tsp dried parsley','1 tbsp fresh dill'],
+ steps:['Whisk mayo + strained kefir smooth','Fold in herbs & spices','Whisk in buttermilk to taste','Chill 30 min before serving']}
+];
+const THEMES=[
+{name:'Night Bakery',tint:null,mote:'#f8d9a5'},
+{name:'Rye Dawn',tint:'rgba(255,140,50,0.10)',mote:'#ffd0a0'},
+{name:'Midnight Patisserie',tint:'rgba(200,80,160,0.12)',mote:'#ffc0e0'}
+];
+function toggleCodex(){if(state==='codex')state=codexFrom;else{codexFrom=state;state='codex';codexPage=0}}
+const rnd=(x)=>Math.abs(Math.sin(x*78.233)*43758.5453)%1;
+
+function codexFlip(d){codexPage=(codexPage+d+RECIPES.length)%RECIPES.length;AudioKit.effect('pogo')}
+
+// CRUST_PHASE3 - three illustrated environments (art in art/phase3-bg.js)
+for(let q=1;q<=3;q++)if(!assets['phase3'+q]&&window.__PHASE3_BG)loadArt('phase3'+q,window.__PHASE3_BG[q]);
+const simulationClock=createFixedStepClock();
+const frameMonitor=createFrameMonitor();
+function simulationStep(){if(hitStop>0)hitStop--;else update();updateWorldProgress();updateViewCamera();}
+function loop(now){try{
+ AudioKit.scene?.(bakery,state);
+ if(Number.isFinite(now))presentationNow=now;
+ if(document.hidden){simulationClock.reset();requestAnimationFrame(loop);return;}
+ if(artworkLoading){simulationClock.reset();requestAnimationFrame(loop);return;}
+ frameMonitor?.begin(now);
+ simulationClock.advance(now,simulationStep);
+ draw();diagnosticOverlay();drawPhase3Map();syncGameShell();frameMonitor?.end();requestAnimationFrame(loop);
+}catch(err){statusEl.textContent='Game error: '+err.message;console.error(err)}}
+document.addEventListener('visibilitychange',()=>simulationClock.reset());const statusEl=document.getElementById('status');
+const minimap=document.getElementById('verticalMap');
+const mapButton=document.getElementById('mapButton');
+
+installSunkenPrototype();
+bindInput();bindCharacterSelector();
+try { init(); prepareWayfindingPreview(); initGameShell(); beginArtworkLoading(); updateViewCamera(); requestAnimationFrame(loop); statusEl.textContent='Wait for the lid to lift, then shoot. Clear the guarded passage. Tap a control to start music.'; }
+catch(err) { statusEl.textContent='Game error: '+err.message; console.error(err); }
+</script></body></html>
