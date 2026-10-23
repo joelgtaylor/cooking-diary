@@ -34,3 +34,9 @@ Generation used the built-in image tool. Prompt briefs: isolated side-view cream
 Browser review checks startup, loaded art, the first encounter and water readability. Physical phone performance/multitouch and subjective environment/enemy review remain user playtests. Existing three-world production source, progression and save keys have not changed. This preview still uses temporary hero swim pose samples and the existing cavern soundtrack. Other aquatic enemies, full World 4 geometry, environmental controls and the octopus boss are later milestones.
 
 Rebuild with `node previews/flooded-entrance/build.cjs`. It derives the page from the shared swim preview and adds only the environment/enemy adapter; no campaign entry point loads these modules.
+
+## Approved World 4 soundtrack
+
+Joel approved **Where the Starter Sleeps**, audition revision 04, on October 23, 2026: E Dorian, open-water theme at the start and end, mild tension through the middle, underwater mix. The Flooded Entrance now uses that exact score and treatment. Only music passes through the water filter/echo; gameplay effects retain their existing clear signal. Pause, master mute, hidden tabs and restart use the established facade/transport. The standalone swimming comparison and the three production worlds keep their existing scores.
+
+`build.cjs` derives preview-only `audio-engine.js` and `audio.js` from production, adding a music-output hook and selecting the approved theme through `soundtrack.js`. Rebuild rather than editing generated adapters. No production audio source is changed. The audition remains available separately.
