@@ -1,6 +1,6 @@
 # The Sunken Patisserie — design review
 
-Status: proposed; movement, art and encounter direction await Joel and Vance's review.
+Status: concept review in progress; enemies, boss appearance and revised horizontal hero swimming approved by Joel. See art/sunken-patisserie/README.md for review decisions and next-session handoff.
 Baseline: main c0d42c1601adef0f4fb9978f66050b0ee546813d, October 22, 2026.
 Branch: feature/keen-sunken-patisserie.
 Authority: CREATIVE_CHARTER.md. This document changes no production behavior.
@@ -13,7 +13,7 @@ Contrast warm dry rooms against spacious deep-blue water. Crisp pale masonry edg
 
 Three parallax layers: distant bakery city; monumental ovens/arches and coral gardens; sparse nearby kelp and particles. Reserve the clearest water for combat. Kelp and rays must not camouflage silhouettes or warnings. Water surfaces are horizontal, visibly animated boundaries, with different lighting above and below.
 
-Concept art status: the built-in generator failed twice with HTTP 400, "Unknown parameter: reasoning". No generated art or sprite assets are included and no substitute is represented as concept art. The visual briefs below remain pending illustration. CLI/API fallback requires explicit user choice and an API key; it has not been invoked.
+Concept art status: generated successfully on October 22, 2026. Boards and review decisions are in [the concept handoff](art/sunken-patisserie/README.md). All enemies and boss appearance approved; revised horizontal swimming poses approved. Environment approval has not yet been explicitly recorded.
 
 ## Movement comparison and recommendation
 
@@ -25,7 +25,7 @@ Concept art status: the built-in generator failed twice with HTTP 400, "Unknown 
 
 Both heroes use identical physics. Start with short acceleration, strong release braking and very gentle passive rise. Initial *tuning hypotheses*, not approved constants: reach cruise in roughly 0.15 seconds, stop in roughly 0.12 seconds; swim cruise near the current dry horizontal speed of 3.6 pixels per simulation tick; passive rise capped around 0.2 pixels/tick. Normalize diagonal input. Up/down have equal deliberate control authority. Currents add a separate bounded velocity; ordinary currents remain escapable.
 
-Keep the existing 29-by-38 collision body throughout the prototype. Upright/diagonal swim poses preserve its relationship to the artwork. Do not rotate a full horizontal body around an upright hitbox. If horizontal swimming is later preferred, discuss a stable water-specific collision body as a separate change, never frame-dependent collision.
+Review update: Joel requested natural horizontal human swimming and approved the revised concept sheet. This supersedes the original upright/diagonal pose and unchanged 29-by-38 underwater-body proposal. Use a stable horizontal water-specific collision body shared by both heroes; determine dimensions in the isolated prototype. Retain the original collision body on land. Validate safe entry/exit clearance and shallow-water transitions without embedding either body in solids. Collision must never change with individual animation frames.
 
 Use authored water rectangles and a stable torso probe with a small entry/exit hysteresis. Test corners, shallow water, overlapping regions and high-speed crossings. A small upward surface breach lets the player exit toward reachable ledges; dry gravity resumes on exit. Entering water clamps inherited falling speed; swimming never accumulates dry jump buffer or ledge-grab state. Clear stale input/state at transitions, checkpoints and restart.
 
@@ -60,7 +60,7 @@ Preserve Loafy's chef cap, red scarf, cream jacket, dark patched trousers, boots
 | Current push | Strained reach, trailing legs | Forward brace, scarf streaming |
 | Hurt | Brief recoil, readable recovery pose | Compact flinch, quick recovery |
 
-Animation is selected from movement state, never the reverse. Use stable torso anchors in water; retain existing foot anchors on land. Frame/crop/muzzle metadata belongs with each hero. Shooting and hurt take precedence without resetting locomotion needlessly. These are pose briefs, not completed animation sheets.
+Animation is selected from movement state, never the reverse. Use stable torso anchors in water; retain existing foot anchors on land. Frame/crop/muzzle metadata belongs with each hero. Shooting and hurt take precedence without resetting locomotion needlessly. These are pose briefs, not completed animation sheets. The approved horizontal concept sheet in art/sunken-patisserie/ supersedes the original upright posture assumption; use natural prone gliding/strokes with legs trailing behind.
 
 ## Aquatic roster
 
