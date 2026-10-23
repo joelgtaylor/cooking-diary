@@ -23,3 +23,9 @@ Build: `node previews/pot-crab/build.cjs`.
 `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs previews/sunken-audio/*.test.cjs previews/flooded-entrance/audio.test.cjs previews/puffer/*.test.cjs previews/current-rider/*.test.cjs previews/pot-crab/*.test.cjs`
 
 Coverage includes armor/open timing, hit guard, short warning/damage reach, persistent obstruction during open/death frames, full-height wet/dry bypass scans, actual boosted/invulnerable swimming into the barrier, post-defeat crossing, swept bullets versus adjacent masonry, both heroes and checkpoint resets. Human review remains the approval for encounter feel.
+
+## Mechanics approved; claw-grab visual revision
+
+Joel approved the mechanics, requesting that the attack actually read as a claw grab. `claw-animation.js` is a read-only visual timing adapter: during the existing 24-tick warning, full-size open pincers reach out; during the existing 12-tick damage window, they close and hold; during the following 14 harmless ticks, they release and retract. Tips coincide with the unchanged 60-pixel attack boundary. The former line glyph is removed. No health, damage, collision, passage, or vulnerability timings change.
+
+`claw-grab.png` was made with the built-in image-generation tool, referencing the existing approved crab frames: isolated right-facing copper/teal forearm and pincer, open / half-closed / shut, matching chunky pixel art, transparent background, consistent joint, no body/pot/text/effects. Original alpha is preserved. Runtime uses a common vertical crop and fixed draw size so closing the jaws reduces their opening rather than stretching them. Left claw mirrors the same frames. Additional tests compare visual reach/closure against every warning and damaging tick and ensure the visual adapter never mutates gameplay state.

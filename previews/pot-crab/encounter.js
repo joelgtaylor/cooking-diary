@@ -6,7 +6,8 @@ function installCrabEncounter(){
  const preview=window.sunkenPreview,slice=window.floodedEntrance;
  const encounter={enemy:null,hits:0,victory:false,crossed:false};window.crabEncounter=encounter;
  const sheet=new Image();sheet.src='../previews/pot-crab/crab-frames.png';
- const gate=prepareStartupArtwork;prepareStartupArtwork=()=>[...gate(),{label:'Copper pot crab animation',image:sheet}];
+ const claws=new Image();claws.src='../previews/pot-crab/claw-grab.png';
+ const gate=prepareStartupArtwork;prepareStartupArtwork=()=>[...gate(),{label:'Copper pot crab animation',image:sheet},{label:'Claw grab animation',image:claws}];
  const terrainHit=hit;
  hit=function(x,y,w,h){return terrainHit(x,y,w,h)||CrustCrab.blocks(encounter.enemy,x,y,w,h);};
  function reset(){encounter.enemy=CrustCrab.create({x:26*T,y:28*T});encounter.hits=0;encounter.victory=false;encounter.crossed=false;slice.patroller.alive=false;slice.patroller.deathT=0;preview.rings=[];}
@@ -64,10 +65,18 @@ function installCrabEncounter(){
     g.strokeStyle=e.phase==='open'?'#fff0bc':'#9fb7c1';g.lineWidth=2;g.strokeRect(e.x+1,e.y+1,94,94);
     if(e.phase==='rattle'){g.strokeStyle='#f5e5bc';g.beginPath();g.arc(e.x+48,e.y+16,27,-Math.PI*.8,-Math.PI*.2);g.stroke();}
     if(e.clang){g.strokeStyle='#eee9d2';g.beginPath();g.moveTo(e.x-6,e.y+42);g.lineTo(e.x-14,e.y+32);g.moveTo(e.x-8,e.y+51);g.lineTo(e.x-20,e.y+53);g.stroke();}
-    if(e.warning||e.jab){
-     g.strokeStyle=e.jab?'#fff0bc':'#dacda588';g.lineWidth=e.jab?4:2;
-     for(const direction of [-1,1]){g.beginPath();g.moveTo(e.x+48+direction*48,e.y+56);g.lineTo(e.x+48+direction*(e.jab?108:88),e.y+56);g.lineTo(e.x+48+direction*(e.jab?100:80),e.y+48);g.stroke();}
+    const claw=CrustCrabClaws.pose(e);
+    if(claw&&claws.naturalWidth){
+     const crops=[[74,140,648,420],[776,140,626,420],[1478,140,613,420]];
+     const crop=crops[claw.frame];
+     for(const direction of [-1,1]){
+      // Arm root overlays the resting claw. The tip reaches exactly the existing
+      // 60px attack boundary; open/close frames make the grab unmistakable.
+      g.save();g.translate(e.x+48+direction*34,e.y+56);g.scale(direction,1);
+      g.drawImage(claws,...crop,claw.reach-60,-27.4,74,48);g.restore();
+     }
     }
+
    }
   }
   if(!player.inv||Math.floor(player.inv/12)%2===0)drawPlayer();g.restore();
