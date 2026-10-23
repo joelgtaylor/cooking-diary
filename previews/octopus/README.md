@@ -2,9 +2,9 @@
 
 Isolated Milestone 6.1. Run `node previews/octopus/build.cjs`, then serve the repository and open this directory. Reuses approved free swimming, both heroes, underwater music, startup artwork gate, mobile controls, fullscreen and pause lifecycle. No campaign integration or save writes. Route preview remains separate.
 
-Fixed 960×540 arena keeps the whole tool and warning visible on landscape phones. Ninety-tick opening; 60-tick wind-up tracks for its first half, then locks for 30 ticks. A steady outlined ribbon is wider than the damaging 36-pixel razor sweep. Twenty-two-tick committed sweep, then 100-tick exposed-mantle recovery. Eight health, 24-tick hit immunity; no overlapping attacks, no damage from decorative limbs. Four player hearts. Retry resets the isolated fight. Defeat immediately disarms the attack; exhausted cap-droop/bow is a temporary first-attack finish, not the final integrated defeat.
+Fixed 960×540 arena keeps the whole tool and warning visible on landscape phones. Ninety-tick opening; 60-tick wind-up tracks for its first half, then locks for 30 ticks. A steady outlined ribbon is wider than the damaging 36-pixel razor sweep. Twenty-two-tick committed sweep, then 100-tick exposed-mantle recovery. Eight health, 24-tick hit immunity; no overlapping attacks, no damage from decorative limbs. Four player hearts. Retry resets the isolated fight. Defeat immediately disarms the attack and plays a four-second, six-pose theatrical sequence before completion. Both tools drop harmlessly, arms tangle in the apron, the cap collapses and the Master bows before settling into a persistent exhausted pose.
 
-Review dodging, tool readability and vulnerability timing first. Bench scraper, ink, anchor mobility, full defeat and route completion wait for subsequent reviews. No special boss music added; uses approved underwater track.
+Review dodging, tool readability and vulnerability timing first. Bench scraper, ink, anchor mobility, route completion wait for subsequent reviews. No special boss music added; uses approved underwater track.
 
 `node --test previews/octopus/*.test.cjs` checks warning/lock timing, swept hit detection, safe lanes, vulnerability/invulnerability, defeat disarm, both heroes, retry, stationary pressure and a complete damage-free encounter using real movement/shooting.
 
@@ -31,3 +31,11 @@ Generation prompts: preserve the three-body pixel atlas and repair only the uppe
 ## Slender-limb art refinement
 
 `lame-slender.png` refines the intermediate atlas to match the body: slimmer tentacle cross-sections, smaller suction cups, finer outlines and a smaller scoring lame. Generated through the built-in image tool using the previous atlas and joined body as references. Prompt: preserve all eight poses, layout, centerlines, lengths and blade/root anchors; halve tentacle thickness, sucker diameter, razor blade and handle size; keep pixel clusters, colors and transparency. This changes the loaded bitmap only, preserving frame selection, uniform render scale, shoulder layering and approved attack simulation.
+
+## Theatrical defeat review
+
+`defeat-frames.png` contains six generated poses: shock, release, apron tangle, apron knot/collapsed cap, deep bow and settled exhaustion. Body scale and source baselines are registered separately for each row, with a smooth descent to the real arena floor. The final sprite remains opaque; no disappearing boss. Dropped lame and scraper reuse approved tool artwork and have no hitboxes. The original attack timings, health and damage windows remain unchanged. Completion waits for all 240 simulation ticks; pause freezes the simulation and retry resets the sequence.
+
+Open `index.html?scene=defeat` for a direct review without combat. Choose Watch the Defeat, then use Pause / Retry to replay. The plain URL still offers the normal fight and triggers the same animation on the final hit. No production progression or save writes.
+
+Generated via built-in image generation using `joined-master.png` as the identity/style reference. Prompt: six equal cells, three columns and two rows, the same violet pixel-art octopus baker at consistent scale/base; startled recoil with empty hands, drooping arms, tentacles curling into the apron, apron knot and collapsed cap, theatrical deep forward bow, then a relaxed exhausted but comically offended final pose. All tools drop separately; preserve costume/toolbelt and transparent background. No held weapons, no gore, no smooth illustration or vector substitutes.

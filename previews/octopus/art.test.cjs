@@ -8,7 +8,7 @@ test('sprite razor follows approved live sweep tip without changing boss state',
 });
 test('generated inbetweens use one uniform scale, render behind body, and never stretch',()=>{
  const used=new Set();
- for(const phase of ['observe','prepare','sweep','recover','defeat'])for(let timer=1;timer<=100;timer++){
+ for(const phase of ['observe','prepare','sweep','recover'])for(let timer=1;timer<=100;timer++){
   const e={...B.create(),phase,alive:phase!=='defeat',timer,tipX:80+610*timer/100},calls=[];
   const g={save(){},restore(){},translate(){},rotate(){},beginPath(){},rect(){},clip(){},drawImage(...a){calls.push(a);}};
   const body={naturalWidth:2172},arm={naturalWidth:1452};Art.draw(g,e,body,arm);
@@ -21,4 +21,13 @@ test('generated inbetweens use one uniform scale, render behind body, and never 
 test('missing images reveal no vector fallback arm',()=>{
  const g={save(){},restore(){},drawImage(){throw Error('unloaded image drawn');}};
  Art.draw(g,B.create(),{naturalWidth:0},{naturalWidth:0});
+});
+test('defeat uses six generated poses, drops both tools and stays opaque on the final frame',()=>{
+ const body={naturalWidth:2172},arm={naturalWidth:1452},defeat={naturalWidth:1536};
+ for(const remaining of [240,210,175,130,80,0]){
+  const e={...B.create(),alive:false,phase:'defeat',deathT:remaining},calls=[];
+  const g={save(){},restore(){},translate(){},rotate(){},drawImage(...a){calls.push(a);}};
+  Art.draw(g,e,body,arm,defeat);assert.equal(calls.length,3);assert.equal(calls[0][0],defeat);
+  assert.ok(calls.every(c=>c.slice(1).every(Number.isFinite)));assert.equal(g.globalAlpha,undefined);
+ }
 });

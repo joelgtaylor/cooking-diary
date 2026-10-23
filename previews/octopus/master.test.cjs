@@ -22,7 +22,7 @@ test('only recovery exposes mantle and invulnerability bounds the damage rate',(
 });
 test('defeat immediately disarms the razor and finishes a bounded theatrical recovery',()=>{
  const e=B.create(),p=player();Object.assign(e,{hp:1,phase:'recover'});assert.equal(B.shot(e,{x:730,y:250,w:10,h:6}),'defeat');
- for(let i=0;i<150;i++)B.update(e,p);assert.equal(e.deathT,0);assert.equal(p.health,4);assert.equal(B.vulnerable(e),false);
+ for(let i=0;i<B.DEFEAT_DURATION;i++)B.update(e,p);assert.equal(e.deathT,0);assert.equal(p.health,4);assert.equal(B.vulnerable(e),false);
 });
 const game=()=>previewGame({htmlPath:path.resolve(__dirname,'index.html')});
 test('both heroes spawn underwater in fixed-camera arena, pause and retry reset safely',()=>{
@@ -39,4 +39,21 @@ test('real swimming and shooting can beat the isolated attack without damage',()
   const e=deepArena.boss,target=e.phase==='prepare'&&e.locked||e.phase==='sweep'?e.lane+90:270;
   const dy=target-player.y-player.h/2;keys={up:dy<-3,down:dy>3,shoot:true};simulationStep();
  }`);assert.equal(a.run('deepArena.victory'),true);assert.equal(a.run('player.health'),4);
+});
+test('defeat progresses through six beats once and leaves a persistent harmless final pose',()=>{
+ const e={...B.create(),hp:1,phase:'recover'},p=player(),frames=new Set();B.shot(e,{x:730,y:250,w:10,h:6});
+ assert.equal(e.deathT,B.DEFEAT_DURATION);
+ let previous=-1;
+ for(let i=0;i<=B.DEFEAT_DURATION;i++){
+  const beat=B.defeatPose(e);frames.add(beat.frame);assert.ok(beat.frame>=previous);previous=beat.frame;
+  assert.equal(B.contact(e,p),false);assert.equal(B.shot(e,{x:730,y:250,w:10,h:6}),false);B.update(e,p);
+ }
+ assert.deepEqual([...frames],[0,1,2,3,4,5]);assert.equal(p.health,4);
+ for(let i=0;i<400;i++)B.update(e,p);assert.equal(B.defeatPose(e).frame,5);assert.equal(e.deathT,0);
+});
+test('arena completion waits for the whole defeat and retry restores the fight',()=>{
+ const a=game();a.click('shellResume');a.run("Object.assign(deepArena.boss,{phase:'recover',hp:1,inv:0});CrustDeep.shot(deepArena.boss,{x:730,y:250,w:10,h:6})");
+ a.run('for(let i=0;i<CrustDeep.DEFEAT_DURATION-1;i++)simulationStep()');assert.equal(a.run('deepArena.victory'),false);
+ a.run('simulationStep()');assert.equal(a.run('deepArena.victory'),true);
+ a.run('respawnCheckpoint()');assert.equal(a.run('deepArena.boss.alive'),true);assert.equal(a.run('deepArena.boss.hp'),8);assert.equal(a.run('deepArena.victory'),false);
 });

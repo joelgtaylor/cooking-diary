@@ -7,8 +7,10 @@ function installDeepArena(){
  const arena={boss:null,victory:false};window.deepArena=arena;
  const sheet=new Image();sheet.src='../previews/octopus/joined-master.png';
  const limb=new Image();limb.src='../previews/octopus/lame-slender.png';
- const startup=prepareStartupArtwork;prepareStartupArtwork=()=>[...startup(),{label:'Pixel octopus baker animation',image:sheet},{label:'Pixel tentacle and lame animation',image:limb}];
- function reset(){arena.boss=CrustDeep.create();arena.victory=false;slice.patroller.alive=false;slice.patroller.deathT=0;preview.rings=[];preview.targets=[];shots=[];}
+ const defeat=new Image();defeat.src='../previews/octopus/defeat-frames.png';
+ const startup=prepareStartupArtwork;prepareStartupArtwork=()=>[...startup(),{label:'Pixel octopus baker animation',image:sheet},{label:'Pixel tentacle and lame animation',image:limb},{label:'Octopus theatrical defeat',image:defeat}];
+ const defeatReview=/(?:^|[?&])scene=defeat(?:&|$)/.test(window.location?.search||'');
+ function reset(){arena.boss=CrustDeep.create();if(defeatReview)Object.assign(arena.boss,{hp:0,alive:false,phase:'defeat',deathT:CrustDeep.DEFEAT_DURATION,dropOrigin:{x:560,y:210}});arena.victory=false;slice.patroller.alive=false;slice.patroller.deathT=0;preview.rings=[];preview.targets=[];shots=[];}
  const setup=init;
  init=function(){setup();map=Array.from({length:rows},(_,y)=>Array.from({length:cols},(_,x)=>x===0||x>=29||y<2||y>=16?'#':'.'));
   slice.width=W;slice.height=H;preview.water.splice(0,preview.water.length,{x:T,y:2*T,w:28*T,h:14*T});preview.currents.splice(0);
@@ -18,7 +20,7 @@ function installDeepArena(){
  const recover=respawnCheckpoint;respawnCheckpoint=function(){recover();player.health=4;player.inv=60;reset();};
  updateViewCamera=function(){camera=cameraY=0;};
  const combat=updateCombat;
- function shot(s){const result=CrustDeep.shot(arena.boss,s);if(result==='hit'||result==='defeat')AudioKit.effect('enemy');}
+ function shot(s){const tip=CrustDeepArt.pose(arena.boss).tip,result=CrustDeep.shot(arena.boss,s);if(result==='defeat')arena.boss.dropOrigin=tip;if(result==='hit'||result==='defeat')AudioKit.effect('enemy');}
  updateCombat=function(shoot,aimUp){
   const e=arena.boss;CrustDeep.update(e,player);
   for(const s of shots){const n=Math.max(1,Math.ceil(Math.max(Math.abs(s.vx),Math.abs(s.vy||0))));for(let i=0;i<=n&&!s.dead;i++){
@@ -41,7 +43,7 @@ function installDeepArena(){
    for(let x=90;x<690;x+=80){line(x+10,e.lane-6,x,e.lane,'#f9e9c2',2);line(x,e.lane,x+10,e.lane+6,'#f9e9c2',2);}
   }
   if(e.phase==='sweep')for(let x=Math.min(e.previousX,e.tipX);x<=Math.max(e.previousX,e.tipX);x+=8){g.fillStyle='#eedcf5';g.fillRect(Math.round(x/2)*2,Math.round(e.lane/2)*2-2,4,4);}
-  CrustDeepArt.draw(g,e,sheet,limb);
+  CrustDeepArt.draw(g,e,sheet,limb,defeat);
   if(CrustDeep.vulnerable(e)){const m=CrustDeep.mantle();g.strokeStyle='#fff1c5';g.lineWidth=2;g.strokeRect(m.x-4,m.y-4,m.w+8,m.h+8);R.text('EXPOSED',m.x+15,m.y-12,12);}
   for(const s of shots){g.fillStyle='#fff3cc';g.fillRect(s.x,s.y,s.w,s.h);}
   if(!player.inv||Math.floor(player.inv/12)%2===0)drawPlayer();
@@ -51,11 +53,12 @@ function installDeepArena(){
   g.fillStyle='#071e2bf2';g.fillRect(0,0,W,61);R.text('THE MASTER OF THE DEEP',18,25,18);R.text('LAME ATTACK REVIEW · '+selectedCharacter().name.toUpperCase(),18,46,10);
   R.text('♥ '.repeat(Math.max(0,player.health)),W-240,24,18);R.text('P · PAUSE / RETRY',W-240,45,11);
   for(let i=0;i<e.maxHp;i++){g.fillStyle=i<e.hp?'#edce99':'#40515b';g.fillRect(398+i*23,23,18,8);}
-  const message=arena.victory?'ATTACK REVIEW COMPLETE · P to retry':!e.alive?'“MY PERFECT SCORING!”':e.phase==='prepare'?(e.locked?'LANE LOCKED · SWIM CLEAR':'LAME RAISED · WATCH THE LANE'):e.phase==='sweep'?'SCORING SWEEP':e.phase==='recover'?'TOOL STUCK · SHOOT THE EXPOSED MANTLE':'“DO NOT DISTURB THE PROOF!”';
+  const message=arena.victory?'DEFEAT COMPLETE · P to retry':!e.alive?CrustDeep.defeatPose(e).message:e.phase==='prepare'?(e.locked?'LANE LOCKED · SWIM CLEAR':'LAME RAISED · WATCH THE LANE'):e.phase==='sweep'?'SCORING SWEEP':e.phase==='recover'?'TOOL STUCK · SHOOT THE EXPOSED MANTLE':'“DO NOT DISTURB THE PROOF!”';
   g.fillStyle='#071e2bed';g.fillRect(116,H-35,W-232,28);R.text(message,130,H-16,12);
   document.getElementById('wrap').dataset.swimming='true';const jump=document.querySelector('[data-action="jump"]');if(jump){jump.setAttribute('aria-label','Aim upward while shooting');jump.querySelector('small').textContent='AIM UP';}
  };
  const pause=shellPause;shellPause=function(reason){pause(reason);document.getElementById('shellTitle').textContent=shellStarted?'Paused':'The Master of the Deep';
   if(!shellStarted)document.getElementById('shellMessage').textContent='First attack review: a precise lame sweep. Watch the raised tool and outlined lane, swim above or below it, then fire at the exposed mantle. Both heroes, free swimming, unlimited shots. Scraper and ink follow after this attack is approved.';
-  document.getElementById('shellResume').textContent=shellStarted?'Resume':'Face the Baker';};
+  if(!shellStarted&&defeatReview){document.getElementById('shellTitle').textContent='A Very Offended Baker';document.getElementById('shellMessage').textContent='Defeat animation review: tools fall harmlessly, tentacles tangle in his apron, the chef cap slumps and the Master takes an indignant bow. The normal arena still includes the approved lame fight.';}
+  document.getElementById('shellResume').textContent=shellStarted?'Resume':defeatReview?'Watch the Defeat':'Face the Baker';};
 }

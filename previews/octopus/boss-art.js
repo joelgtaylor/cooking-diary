@@ -39,12 +39,29 @@ function drawArm(g,image,p){
  g.drawImage(image,...f.crop,(f.crop[0]-f.tip[0])*scale,(f.crop[1]-f.tip[1])*scale,f.crop[2]*scale,f.crop[3]*scale);
  g.restore();
 }
-function draw(g,e,body,arm){
- const p=pose(e);g.save();g.imageSmoothingEnabled=false;
- if(!e.alive){const t=1-e.deathT/150;g.translate(0,t*45);g.globalAlpha=1-t*.45;}
+function drawDefeat(g,e,body,arm,defeat){
+ const p=root.CrustDeep.defeatPose(e),s=327/512;
+ const crops=[[0,0,512,540],[512,0,512,540],[1024,0,512,540],[0,552,512,472],[512,552,512,472],[1024,552,512,472]];
+ const crop=crops[p.frame],baseline=p.frame<3?530:432;
+ const settle=1-Math.pow(1-p.settle,2),baseY=420+90*settle;
+ if(defeat?.naturalWidth)g.drawImage(defeat,...crop,600,baseY-baseline*s,crop[2]*s,crop[3]*s);
+ // Both tools are cosmetic and settle on the actual arena floor. No fading corpse.
+ const origin=e.dropOrigin||{x:560,y:210},t=p.drop;
+ function dropped(image,source,x0,y0,x1,y1,w,h,spin){
+  if(!image.naturalWidth)return;
+  const x=x0+(x1-x0)*t,y=y0+(y1-y0)*t*t;
+  g.save();g.translate(x,y);g.rotate(spin*t);g.drawImage(image,...source,-w/2,-h/2,w,h);g.restore();
+ }
+ dropped(arm,[410,104,90,45],origin.x,origin.y,Math.max(75,origin.x-50),486,58,29,Math.PI*.85);
+ dropped(body,[580,430,135,140],866,316,860,476,61,63,Math.PI*.45);
+}
+function draw(g,e,body,arm,defeat){
+ g.save();g.imageSmoothingEnabled=false;
+ if(!e.alive){drawDefeat(g,e,body,arm,defeat);g.restore();return;}
+ const p=pose(e);
  if(arm.naturalWidth)drawArm(g,arm,p);
  if(body.naturalWidth)g.drawImage(body,p.body*724,0,724,724,600,100,327,327);
  g.restore();
 }
-const api={pose,draw,drawArm,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
+const api={pose,draw,drawArm,drawDefeat,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
