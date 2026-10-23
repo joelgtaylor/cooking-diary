@@ -138,6 +138,9 @@ function installFloodedEntrance(){
  }
  drawWorld=function(){
   const sea=g.createLinearGradient(0,0,0,H);sea.addColorStop(0,'#183e4e');sea.addColorStop(1,'#092536');g.fillStyle=sea;g.fillRect(0,0,W,H);distantCity();
+  // Fade the concept-backed skyline into the deep water; its raster boundary
+  // must not resemble a second water surface halfway through the room.
+  const depth=g.createLinearGradient(0,220,0,390);depth.addColorStop(0,'#09253600');depth.addColorStop(1,'#092536');g.fillStyle=depth;g.fillRect(0,220,W,H-220);
   g.save();g.translate(-Math.round(camera),-Math.round(cameraY));
   // Decorations behind collision masonry never hide the navigable edges.
   warmRoom();art('coldOven',16*T,33*T-146,6*T,146,.8);
@@ -178,7 +181,7 @@ function installFloodedEntrance(){
   text(selectedCharacter().name.toUpperCase(),365,25,14);text(player.swimming?'SWIMMING':'DRY LAND',365,44,10,'#aec9c5');
   text('♥ '.repeat(Math.max(0,player.health)),560,25,17);text('RINGS '+preview.rings.filter(r=>r.got).length+'/3',560,44,10,'#aec9c5');
   text('✦ UNLIMITED',740,25,14);text('P · PAUSE',740,44,10,'#aec9c5');
-  const hint=slice.finished?'ENTRANCE EXPLORED · P to replay':player.x<15*T?'Enter the water · arrows / WASD swim':player.x<25*T?'Reef patroller ahead · shoot or swim around':player.x<30*T?'Follow the submerged passage →':'Rise to the dry exit ↑';
+  const hint=slice.finished?'ENTRANCE EXPLORED · P to replay':!player.swimming&&player.x<10*T?'Enter the water · arrows / WASD swim':player.x<25*T?'Reef patroller ahead · shoot or swim around':player.x<30*T?'Follow the submerged passage →':'Rise to the dry exit ↑';
   g.fillStyle='#081d2bbb';g.fillRect(200,H-38,560,29);text(hint,216,H-18,12);
   document.getElementById('wrap').dataset.swimming=String(!!player.swimming);
   const jump=document.querySelector('[data-action="jump"]');if(jump){jump.setAttribute('aria-label',player.swimming?'Aim upward while shooting':'Jump');jump.querySelector('small').textContent=player.swimming?'AIM UP':'JUMP';}

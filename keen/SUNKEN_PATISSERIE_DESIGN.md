@@ -1,6 +1,6 @@
 # The Sunken Patisserie — design review
 
-Status: isolated movement prototype implemented for review; full world remains proposed. Joel approved the prototype scope in this development session. Boss/enemy concepts and horizontal hero swimming direction are approved; see art/sunken-patisserie/README.md. Prototype instructions and limitations: ../previews/sunken/README.md.
+Status: free swimming approved after playtest; Milestone 3 Flooded Entrance environment and first reef patroller implemented for review. Full world remains proposed. Boss/enemy concepts and horizontal hero swimming direction are approved; see art/sunken-patisserie/README.md. Movement prototype: ../previews/sunken/README.md. Environmental slice: ../previews/flooded-entrance/README.md.
 Baseline: main c0d42c1601adef0f4fb9978f66050b0ee546813d, October 22, 2026.
 Branch: feature/keen-sunken-patisserie.
 Authority: CREATIVE_CHARTER.md. This document changes no production behavior.
@@ -172,4 +172,6 @@ Result: 416 passed, 0 failed. Canvas/audio stubs do not validate visual quality,
 
 Prototype validation: 432 tests passed, 0 failed, including 16 swimming tests and the unchanged three-world regression suite. Browser review confirmed startup, both horizontal hero poses and touch-control presentation.
 
-Next review: playable movement feel on desktop and a physical phone, horizontal body transitions, direction pad and independent aim. The approved small movement prototype is implemented in previews/sunken/. Environment art, full level construction, production integration and merge still require their later reviews.
+Milestone 3 validation: 440 tests passed, 0 failed. The isolated Flooded Entrance adds new architectural art, a single bounded reef patroller, safe checkpoint recovery and both-hero course coverage while retaining the approved free-swim tuning.
+
+Next review: environmental readability, water/air contrast, the first patroller encounter and physical phone performance. The slice is in previews/flooded-entrance/. Full level construction, further enemies, production integration and merge still require their later reviews.
