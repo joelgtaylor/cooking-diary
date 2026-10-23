@@ -65,6 +65,7 @@ function installSunkenWorld(){
  drawWorld=function(){
   const index=route.layout.sections.findIndex(s=>player.x/T>=s.from&&player.x/T<s.to),palettes=[['#183e4e','#092536'],['#184b54','#102e42'],['#22414b','#0c283a'],['#152b44','#080f27']],colors=palettes[Math.max(0,index)];
   const sea=g.createLinearGradient(0,0,0,H);sea.addColorStop(0,colors[0]);sea.addColorStop(1,colors[1]);g.fillStyle=sea;g.fillRect(0,0,W,H);R.distantCity();
+  const depth=g.createLinearGradient(0,220,0,390);depth.addColorStop(0,colors[1]+'00');depth.addColorStop(1,colors[1]);g.fillStyle=depth;g.fillRect(0,220,W,H-220);
   g.save();g.translate(-Math.round(camera),-Math.round(cameraY));
   for(const r of preview.water){g.fillStyle='#2b88961c';g.fillRect(r.x,r.y,r.w,r.h);g.strokeStyle='#bce7dc';g.lineWidth=2;g.beginPath();for(let x=r.x;x<=r.x+r.w;x+=12){const y=r.y+Math.sin(x*.03+tick*.05)*2;x===r.x?g.moveTo(x,y):g.lineTo(x,y);}g.stroke();}
   // Repeated structural motifs are supported by real shelves / chamber floors.
@@ -96,7 +97,7 @@ function installSunkenWorld(){
   document.getElementById('pogoBtn').textContent=pogoOn?'Mixer ON':'Mixer OFF';
  };
  const oldSheet=shellOpenSheet;
- shellOpenSheet=function(page){if(page!=='map')return oldSheet(page);shellPause();shellPage='map';document.getElementById('shellOverlay').setAttribute('aria-labelledby','sheetTitle');document.getElementById('shellMain').hidden=true;document.getElementById('shellSheet').hidden=false;document.getElementById('mapViewport').hidden=false;document.getElementById('recipeSheet').hidden=true;document.getElementById('confirmSheet').hidden=true;document.getElementById('sheetTitle').textContent='The Sunken Patisserie · route map';minimap.style.display='block';drawPhase3Map();document.getElementById('sheetBack').focus();};
+ shellOpenSheet=function(page){if(page!=='map')return oldSheet(page);shellPause();shellPage='map';document.getElementById('shellOverlay').setAttribute('aria-labelledby','sheetTitle');document.getElementById('shellMain').hidden=true;document.getElementById('shellSheet').hidden=false;document.getElementById('mapViewport').hidden=false;document.getElementById('recipeSheet').hidden=true;document.getElementById('confirmSheet').hidden=true;document.getElementById('sheetTitle').textContent='The Sunken Patisserie · route map';minimap.style.display='block';minimap.style.width='100%';minimap.style.maxWidth='100%';minimap.style.height='auto';drawPhase3Map();document.getElementById('sheetBack').focus();};
  drawPhase3Map=function(){const m=minimap.getContext('2d'),scale=8;minimap.width=840;minimap.height=500;m.fillStyle='#0a2233';m.fillRect(0,0,840,500);for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if(map[y][x]==='#'){m.fillStyle='#738f91';m.fillRect(x*scale,y*scale,scale,scale);}
   m.strokeStyle='#e9d6a1';m.lineWidth=2;m.beginPath();route.layout.mainRoute.forEach(([x,y],i)=>i?m.lineTo(x*scale,y*scale):m.moveTo(x*scale,y*scale));m.stroke();
   for(const gem of route.cultures){m.fillStyle=gem.got?'#668789':'#ffe4a0';m.fillRect(gem.x/T*scale-3,gem.y/T*scale-3,7,7);}m.fillStyle='#fff';m.beginPath();m.arc((player.x+player.w/2)/T*scale,(player.y+player.h/2)/T*scale,5,0,7);m.fill();m.font='13px monospace';m.fillText('● YOU   ■ CULTURES   — MAIN ROUTE',20,480);
