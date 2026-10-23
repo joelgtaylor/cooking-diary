@@ -175,3 +175,7 @@ Prototype validation: 432 tests passed, 0 failed, including 16 swimming tests an
 Milestone 3 validation: 440 tests passed, 0 failed. The isolated Flooded Entrance adds new architectural art, a single bounded reef patroller, safe checkpoint recovery and both-hero course coverage while retaining the approved free-swim tuning.
 
 Next review: environmental readability, water/air contrast, the first patroller encounter and physical phone performance. The slice is in previews/flooded-entrance/. Full level construction, further enemies, production integration and merge still require their later reviews.
+
+## Approved Current Rider placement — October 23, 2026
+
+The isolated Current Rider encounter is approved. Joel's placement direction: it is tricky and annoying, so use **one Current Rider total in the full World 4 map**, at a key point that keeps the player alert. Do not repeat it across sections or include multiple simultaneous Riders. Preserve its reviewed dash/telegraph/recovery behavior. Final location remains a world-construction decision; provide clear dash lanes, perpendicular escape space and wall-stun opportunities, then review the placement in context.

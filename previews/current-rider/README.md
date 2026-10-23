@@ -19,3 +19,7 @@ Run `node previews/current-rider/build.cjs` to rebuild the isolated page. Open `
 `node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs previews/sunken-audio/*.test.cjs previews/flooded-entrance/audio.test.cjs previews/puffer/*.test.cjs previews/current-rider/*.test.cjs`
 
 Tests cover wind-up/aim lock, committed trajectory, swept player/wall collision, wall stun, shared damage immunity, vulnerability/defeat, inactive target isolation, bounds/wake budget, both heroes, player-shot sweep, supported plinth and checkpoint reset. Difficulty and visual timing await human playtest approval.
+
+## Approved encounter and placement constraint
+
+Joel approved the Current Rider on October 23, 2026, finding it tricky and annoying in an enjoyable, limited role. Preserve the reviewed behavior. **Place exactly one Current Rider in the full World 4 map**, at a deliberate key encounter point; do not use it as a repeated patrol or add more elsewhere in the level. Choose geometry with readable dash lanes, perpendicular dodge space and masonry that supports the approved wall-stun counterplay. Review its final placement during world construction.
