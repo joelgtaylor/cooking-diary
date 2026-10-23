@@ -1,12 +1,15 @@
 /* Isolated preview adapter. Reuses production dry physics, timing, shell,
  * character roster, pause/fullscreen and audio lifecycle. Not loaded by keen/. */
 'use strict';
+// Only the two hero atlases and concept boards are needed for this preview.
+// Avoid downloading the three campaign worlds' artwork at startup.
+loadGameArt=function(){};
 function installSunkenPrototype(){
  const water=[{x:10*T,y:22*T,w:60*T,h:27*T}];
  const currents=[{x:33*T,y:37*T,w:15*T,h:5*T,vx:-1.05,vy:0},
   {x:51*T,y:29*T,w:8*T,h:18*T,vx:0,vy:-1.35}];
  const start={x:4*T,y:22*T-38};
- const preview={mode:'free',checkpoint:null,finished:false,targets:[],rings:[],sprites:[],lastShot:-100};
+ const preview={mode:'free',checkpoint:null,finished:false,targets:[],rings:[],sprites:[],lastShot:-100,blockDryJump:false};
  window.sunkenPreview=preview;
  const sheet=new Image();sheet.crossOrigin='anonymous';sheet.src='art/sunken-patisserie/heroes-horizontal-swim-concept.png';
  const backdrop=new Image();backdrop.src='art/sunken-patisserie/environment-concepts.png';
@@ -60,7 +63,7 @@ function installSunkenPrototype(){
  function actorAt(x,y,swimming=false){return {x,y,w:swimming?58:29,h:swimming?26:38,vx:0,vy:0,ground:false,
   health:3,inv:0,face:1,ammo:999,score:0,hang:null,climb:0,speedT:0,shield:false,kefirCharges:3,swimming};}
  init=function(){
-  originalInit(1);player=actorAt(start.x,start.y);preview.checkpoint={...start,swimming:false};preview.finished=false;
+  originalInit(1);player=actorAt(start.x,start.y);preview.checkpoint={...start,swimming:false};preview.finished=false;preview.blockDryJump=false;
   preview.targets=[{x:21*T,y:29*T,r:18,timer:0},{x:40*T,y:36*T,r:18,timer:0},{x:64*T,y:25*T,r:18,timer:0}];
   preview.rings=[[18,30],[26,34],[41,40],[55,33],[65,26]].map(([x,y])=>({x:x*T,y:y*T,got:false}));
   camera=0;cameraY=Math.max(0,player.y-H*.46);player.ammo=999;
@@ -68,7 +71,7 @@ function installSunkenPrototype(){
  };
  respawnCheckpoint=function(){
   const cp=preview.checkpoint||start;player=actorAt(cp.x,cp.y,cp.swimming);
-  keys={};shots=[];resetPlayerFire();shellClearInput();state='play';cameraY=Math.max(0,player.y-H*.46);
+  keys={};shots=[];resetPlayerFire();shellClearInput();preview.blockDryJump=false;state='play';cameraY=Math.max(0,player.y-H*.46);
  };
  restart=()=>init();advanceBakery=()=>init();
  // Shared dry controller is called unchanged, with Up translated to its
@@ -78,9 +81,11 @@ function installSunkenPrototype(){
   if(enter==='enter'){prevJump=false;AudioKit.effect('collect');}
   if(player.swimming){
    const movement=CrustSwim.step(player,keys,{hit,currents,mode:preview.mode});
-   CrustSwim.sync(player,water,hit);prevJump=false;return movement;
+   if(CrustSwim.sync(player,water,hit)==='exit')preview.blockDryJump=!!(keys.jump||keys.up);
+   prevJump=false;return movement;
   }
-  const held=keys;keys={...held,jump:held.jump||held.up};
+  const held=keys;if(!held.jump&&!held.up)preview.blockDryJump=false;
+  keys={...held,jump:!preview.blockDryJump&&(held.jump||held.up)};
   let movement;try{movement=originalDryMove();}finally{keys=held;}
   if(CrustSwim.sync(player,water,hit)==='enter'){prevJump=false;return {shoot:!!held.shoot,aimUp:!!held.jump};}
   return movement;
@@ -119,6 +124,8 @@ function installSunkenPrototype(){
  // No production progression writes or recipe unlocks occur in this preview.
  saveBest=function(){};saveCodex=function(){};prepareWayfindingPreview=function(){};
  drawPhase3Map=function(){};
+ const originalSheet=shellOpenSheet;
+ shellOpenSheet=function(page){if(page==='map'){shellPause('Follow the submerged arch, lower gallery and bubble lift to the exit');return;}return originalSheet(page);};
  function label(text,x,y,size=16,color='#e7e7c7'){
   g.font='bold '+size+'px monospace';g.fillStyle='#071b28';g.fillText(text,x+1,y+2);g.fillStyle=color;g.fillText(text,x,y);
  }

@@ -64,3 +64,42 @@ test('submerged checkpoint recovery restores water body and original saves are n
  assert.equal(a.run('player.swimming'),true);assert.equal(a.run('player.w'),58);assert.equal(a.run('hit(player.x,player.y,player.w,player.h)'),false);
  assert.equal(a.storage.has('crustQuestBest'),false);assert.equal(a.storage.has('crustQuestCodex'),false);
 });
+test('both heroes can swim the complete intended route and exit without clipping or save writes',()=>{
+ for(const hero of ['loafy','vance-wick']){
+  const a=previewGame();a.click('shellResume');a.run('selectCharacter('+JSON.stringify(hero)+')');
+  for(const [tx,ty]of [[20,34],[31,34],[44,40],[55,40],[55,28],[65,28],[68,21],[75,21]]){
+   let arrived=false;
+   for(let i=0;i<1100;i++){
+    const p=JSON.parse(a.run('JSON.stringify(player)')),dx=tx*32-p.x-p.w/2,dy=ty*32-p.y-p.h/2;
+    if(Math.hypot(dx,dy)<18){arrived=true;break;}
+    a.run('keys='+JSON.stringify({left:dx<-7,right:dx>7,up:dy<-7,down:dy>7})+';update();updateWorldProgress()');
+    // The shipped dry ledge-grab intentionally overlaps its wall by five
+    // pixels while its scripted hand anchor climbs; preserve that behavior.
+    assert.equal(a.run('player.hang&&!player.swimming?false:hit(player.x,player.y,player.w,player.h)'),false,hero+' must not clip');
+   }
+   assert.ok(arrived,hero+' reaches waypoint '+tx+','+ty);
+  }
+  assert.equal(a.run('sunkenPreview.finished'),true);assert.equal(a.run('player.swimming'),false);assert.equal(a.run('player.w'),29);
+  assert.equal(a.storage.has('crustQuestBest'),false);assert.equal(a.storage.has('crustQuestCodex'),false);
+ }
+});
+test('holding underwater aim across a surface exit does not buffer a land jump',()=>{
+ const a=previewGame();a.click('shellResume');
+ a.run('player.x=66*T;player.y=22*T;CrustSwim.sync(player,[{x:0,y:0,w:3000,h:3000}],hit);keys={up:true,jump:true}');
+ for(let i=0;i<15&&a.run('player.swimming');i++)a.run('update()');assert.equal(a.run('player.swimming'),false);
+ a.run('update()');assert.equal(a.run('player.buffer'),0);assert.equal(a.run('sunkenPreview.blockDryJump'),true);
+ a.run('keys={};update()');assert.equal(a.run('sunkenPreview.blockDryJump'),false);
+});
+test('touch cancellation clears its vector without releasing a keyboard direction',()=>{
+ const a=previewGame();a.click('shellResume');a.key('d','KeyD');
+ a.pointer('up','pointerdown',{pointerId:4,clientX:78,clientY:410});assert.equal(a.run('keys.up'),true);
+ a.pointer('up','lostpointercapture',{pointerId:4});assert.equal(a.run('!!keys.up'),false);assert.equal(a.run('keys.right'),true);
+ a.blur();assert.equal(a.run('shellInput.size()'),0);
+});
+test('buoyant comparison preset is distinct and paused display fitting preserves simulation coordinates',()=>{
+ const free=actor(),reference=actor();for(let i=0;i<80;i++){swim.step(free,{},env);swim.step(reference,{},{...env,mode:'buoyant'});}
+ assert.ok(reference.y>free.y+40);
+ const a=previewGame();a.click('shellResume');a.elements.get('wrap').clientWidth=390;a.elements.get('wrap').clientHeight=844;
+ a.elements.get('showTouch').checked=true;const before=a.run('player.x');a.run('shellSettings();shellFit()');
+ assert.equal(a.run('player.x'),before);assert.ok(parseFloat(a.elements.get('wrap').style['--canvas-width'])<=390);
+});

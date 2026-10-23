@@ -1,6 +1,6 @@
 # The Sunken Patisserie — design review
 
-Status: concept review in progress; enemies, boss appearance and revised horizontal hero swimming approved by Joel. See art/sunken-patisserie/README.md for review decisions and next-session handoff.
+Status: isolated movement prototype implemented for review; full world remains proposed. Joel approved the prototype scope in this development session. Boss/enemy concepts and horizontal hero swimming direction are approved; see art/sunken-patisserie/README.md. Prototype instructions and limitations: ../previews/sunken/README.md.
 Baseline: main c0d42c1601adef0f4fb9978f66050b0ee546813d, October 22, 2026.
 Branch: feature/keen-sunken-patisserie.
 Authority: CREATIVE_CHARTER.md. This document changes no production behavior.
@@ -168,4 +168,6 @@ node --test keen/tests/*.test.cjs previews/audio/audio.test.cjs
 
 Result: 416 passed, 0 failed. Canvas/audio stubs do not validate visual quality, phone performance, native fullscreen or physical multitouch. No gameplay changes were made.
 
-Next review: environment/boss appearance once the art service is available; region-hybrid movement; water direction pad and separate aim modifier; small movement-preview scope. No full level, production integration or merge is authorized by this design document.
+Prototype validation: 432 tests passed, 0 failed, including 16 swimming tests and the unchanged three-world regression suite. Browser review confirmed startup, both horizontal hero poses and touch-control presentation.
+
+Next review: playable movement feel on desktop and a physical phone, horizontal body transitions, direction pad and independent aim. The approved small movement prototype is implemented in previews/sunken/. Environment art, full level construction, production integration and merge still require their later reviews.
