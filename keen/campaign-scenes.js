@@ -79,12 +79,18 @@ function drawCampaignHero(x,y,row,frame,scale=1){
  if(!art?.complete||!art.naturalWidth)return;
  g.drawImage(art,...sprite.crop,x+(sprite.left??-sprite.w/2)*scale,y-sprite.h*scale,sprite.w*scale,sprite.h*scale);
 }
+function drawCampaignImage(image,x,y,w,h,pan=.5){
+ const ratio=w/h,sourceRatio=image.naturalWidth/image.naturalHeight;
+ const sw=sourceRatio>ratio?image.naturalHeight*ratio:image.naturalWidth;
+ const sh=sourceRatio>ratio?image.naturalHeight:image.naturalWidth/ratio;
+ g.drawImage(image,(image.naturalWidth-sw)*pan,(image.naturalHeight-sh)/2,sw,sh,x,y,w,h);
+}
 function drawCampaignScene(scene,ms,{reducedMotion}){
  const t=ms/1000,still=reducedMotion;
  g.save();g.fillStyle='#08141e';g.fillRect(0,0,W,H);
  if(t<3.2){
   const bg=assets.generatedClockworkBG;
-  if(bg?.complete&&bg.naturalWidth)g.drawImage(bg,0,0,W,H);
+  if(bg?.complete&&bg.naturalWidth)drawCampaignImage(bg,0,0,W,H);
   g.fillStyle='#08111e88';g.fillRect(0,0,W,H);
   g.fillStyle='#292f35';g.fillRect(0,360,W,180);
   g.strokeStyle='#d5ac70';g.lineWidth=8;g.strokeRect(580,348,170,110);
@@ -99,7 +105,7 @@ function drawCampaignScene(scene,ms,{reducedMotion}){
   if(reveal&&descentBackdrop.complete&&descentBackdrop.naturalWidth){
    // Top panel only: no concept-sheet seams or labels.
    const z=still?1:1.08-p*.08;
-   g.drawImage(descentBackdrop,0,0,descentBackdrop.naturalWidth,descentBackdrop.naturalHeight,-W*(z-1)/2,65,W*z,405*z);
+   drawCampaignImage(descentBackdrop,-W*(z-1)/2,65,W*z,405*z,.38+p*.24);
    g.fillStyle='#06334644';g.fillRect(0,0,W,H);
   }else{
    const grad=g.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#18434c');grad.addColorStop(1,'#071622');g.fillStyle=grad;g.fillRect(0,0,W,H);

@@ -21,4 +21,4 @@ To add a scene, define a duration and timestamped cues, supply a renderer and co
 
 ## Validation
 
-Full existing regression command from `.github/workflows/keen-tests.yml`, plus new timeline, token, production arrival/reload, hidden loading, input isolation, replay and mute persistence checks. All pass locally. Browser visual, physical multitouch, native fullscreen and audible review remain pending: this workspace had no browser executable and browser installation failed.
+Full existing regression command from `.github/workflows/keen-tests.yml`, plus new timeline, token, production arrival/reload, hidden loading, input isolation, replay and mute persistence checks. All pass locally. Cloud-browser playback, subtitles, hero rendering and return to the menu were reviewed on the commit preview. The initial visual review caught and corrected backdrop aspect-ratio distortion. Physical multitouch, native fullscreen, portrait layout and audible review remain pending. Local browser installation failed; the cloud browser supplied the desktop visual check.
