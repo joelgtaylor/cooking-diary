@@ -48,7 +48,7 @@ function installSunkenCompleteLevel(){
   level.bossDefeated=true;level.mode='finish';shots=[];player.waterPush=null;
   // A pressure-sealed dry pocket opens after the bow. Its water rectangles,
   // visible seal, roof and floor share the same coordinates.
-  for(let x=2;x<10;x++){map[6][x]='#';map[14][x]='#';}
+  for(let x=2;x<10;x++){map[6][x]='#';map[14][x]='#';}map[15][2]='#';map[15][9]='#';
   preview.water.splice(0,preview.water.length,{x:32,y:64,w:896,h:160},{x:32,y:224,w:32,h:224},{x:320,y:224,w:608,h:224},{x:32,y:448,w:896,h:64});
   if(hit(player.x,player.y,player.w,player.h)){player.x=352;player.y=380;player.vx=player.vy=0;}
   CrustSwim.sync(player,preview.water,hit);preview.checkpoint={x:352,y:380,swimming:true};
@@ -76,7 +76,7 @@ function installSunkenCompleteLevel(){
  drawHUD=function(){
   if(isRoute())return routeHooks.drawHUD();
   arenaHooks.drawHUD();
-  if(level.bossDefeated){g.fillStyle='#071e2bf2';g.fillRect(115,H-36,W-230,29);R.text(level.complete?'THE SUNKEN PATISSERIE · COMPLETE':'PRESSURE SEAL OPEN · ENTER THE OVEN ←',132,H-16,12);}
+  if(level.bossDefeated){g.fillStyle='#071e2bf2';g.fillRect(0,0,W,61);R.text('THE SUNKEN PATISSERIE',18,25,18);R.text('FINISHING OVEN · CULTURES '+collected+'/5',18,46,11);R.text('♥ '.repeat(Math.max(0,player.health)),W-240,25,18);R.text('P · PAUSE   Q · MAP',W-240,46,11);g.fillRect(115,H-36,W-230,29);R.text(level.complete?'THE SUNKEN PATISSERIE · COMPLETE':'PRESSURE SEAL OPEN · ENTER THE OVEN ←',132,H-16,12);}
   if(level.complete){
    g.fillStyle='#071e2bf2';g.fillRect(180,120,600,250);g.strokeStyle='#dbc38e';g.lineWidth=3;g.strokeRect(180,120,600,250);
    R.text('THE SUNKEN PATISSERIE',235,172,25);R.text('COMPLETE',365,215,28);R.text('5 CULTURES · THE MASTER DEFEATED',260,254,16);
