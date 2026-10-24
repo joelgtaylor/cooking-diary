@@ -76,7 +76,11 @@ function worldOvenTarget(){
 // Both keyboard and canvas input advance through the same clear-state gate.
 function advanceBakery(){
  if(state!=='clear')return;
- if(bakery<MAXBAKERY)init(bakery+1);
+ if(bakery<MAXBAKERY){
+  const next=window.CrustWorlds?.[bakery];
+  if(next?.href){shellClearInput();window.location.assign(next.href);return;}
+  init(bakery+1);
+ }
  else state='win';
 }
 function restart(){if(bakery===3&&window.__crustDevourerPreview){startDevourerPreview();return;}if(window.__crustBloomrotArena){startBloomrotPreview();return;}init(bakery)}

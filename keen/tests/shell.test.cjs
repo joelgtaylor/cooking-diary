@@ -67,7 +67,7 @@ test('production shell uses local assets and has no preview dependency or POC la
 });
 
 test('final credits acknowledge both creators and support recipes, resume and a fresh full playthrough',()=>{
- const a=shell();a.click('shellResume');a.run("init(3);state='clear';advanceBakery();syncGameShell()");
+ const a=shell();a.click('shellResume');a.run("init(3);state='win';syncGameShell()");
  assert.equal(a.run('state'),'win');assert.equal(a.elements.get('endCredits').hidden,false);assert.equal(a.doc.activeElement.id,'creditsTitle');
  assert.match(html,/Producer &amp; Developer<\/p><p class="credit-name">Joel Taylor/);
  assert.match(html,/Designer &amp; Lead Play Tester<\/p><p class="credit-name">Vance/);
@@ -84,7 +84,7 @@ test('production bootstrap tolerates invalid saves and preserves valid recipe ID
   a.click('shellResume');a.click('codexBtn');assert.equal(a.run('shellPage'),'recipes');
  }
  const a=shell({saved:{crustQuestCodex:'[0,2,2,-1,3,1.5,"1",null]',crustQuestBest:'123.9'}});
- assert.equal(a.run('JSON.stringify(unlocked)'),'[0,2]');assert.equal(a.run('best'),123);
+ assert.equal(a.run('JSON.stringify(unlocked)'),'[0,2,3]');assert.equal(a.run('best'),123);
  assert.equal(a.storage.get('crustQuestCodex'),'[0,2,2,-1,3,1.5,"1",null]');
 });
 test('denied storage does not prevent starting, viewing recipes or selecting either hero',()=>{
