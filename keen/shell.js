@@ -18,12 +18,12 @@ function shellPause(reason='Paused'){
  shellEl('shellMessage').textContent=shellStarted?reason+' · resume when you’re ready.':'Choose your baker, then start your adventure.';
  shellEl('shellResume').textContent=shellStarted?'Resume':'Play';shellEl('shellResume').focus();
 }
-function shellResume(){
+function shellResume(startAudio=true){
  if(document.hidden||(typeof artworkLoading!=='undefined'&&artworkLoading))return;
  shellClearInput();shellStarted=true;shellEl('wrap').dataset.started='true';
  state=shellSavedState==='shell-menu'?'play':shellSavedState;
  shellEl('shellOverlay').hidden=true;shellEl('wrap').dataset.mode='play';
- minimap.style.display='none';shellEl('gameStage').focus();AudioKit.start();simulationClock.reset();
+ minimap.style.display='none';shellEl('gameStage').focus();if(startAudio)AudioKit.start();simulationClock.reset();
 }
 function togglePause(){if(state==='shell-menu'&&shellStarted&&shellPage==='main')shellResume();else shellPause();}
 function toggleMap(){shellOpenSheet('map');}

@@ -12,7 +12,8 @@ test('production campaign advances through three dry worlds then launches the is
   a.run("state='clear';advanceBakery()");
   if(i<3){assert.equal(a.run('bakery'),i+1);assert.equal(a.run('state'),'play');}
  }
- assert.equal(a.run('destination'),'sunken.html');assert.equal(a.run('state'),'clear');assert.equal(a.run('typeof sunkenPreview'),'undefined');
+ assert.equal(a.run('state'),'cutscene');a.run('campaignScene.skip()');
+ assert.equal(a.run('destination'),'sunken.html');assert.equal(a.run('state'),'cutscene');assert.equal(a.run('typeof sunkenPreview'),'undefined');
 });
 test('existing three-recipe saves retain progress and expose World 4 for returning players',()=>{
  const saved={crustQuestCodex:'[0,1,2]',crustQuestBest:'8500',crustQuestCharacter:'vance-wick',crustQuestShellSettings:'{"touch":true,"size":110,"opacity":60}'};
@@ -46,4 +47,46 @@ test('production bundle has no preview resource paths and every static script an
   const file=path.join(root,'sunken',dir);if(!/\.js$/.test(file))continue;const src=fs.readFileSync(file,'utf8');assert.doesNotMatch(src,/\.\.\/previews\//,dir);
   for(const m of src.matchAll(/\.src=['"]([^'"]+)['"]/g))if(/\.(png|webp)$/.test(m[1]))assert.ok(fs.existsSync(path.join(root,m[1])),m[1]);
  }
+});
+
+function arrival(character='vance-wick',at=Date.now()){
+ const data=new Map([['crustQuestCampaignArrival',JSON.stringify({version:1,from:3,world:4,character,at})]]);
+ return {data,getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
+}
+test('campaign arrival waits for artwork, consumes once, selects hero and starts the water entrance',()=>{
+ const sessionStorage=arrival();
+ const a=campaign({globals:{sessionStorage},saved:{crustQuestCodex:'[0,1,2]',crustQuestShellSettings:'{"touch":true,"size":110,"opacity":60}'}});
+ assert.equal(a.run('state'),'play');assert.equal(a.run('selectedCharacterId'),'vance-wick');assert.equal(a.run('shellStarted'),true);
+ assert.equal(a.run('sunkenLevel.mode'),'route');assert.equal(a.run('Object.keys(keys).length'),0);assert.equal(sessionStorage.data.size,0);
+ assert.equal(a.run('JSON.stringify(unlocked)'),'[0,1,2]');assert.equal(a.elements.get('showTouch').checked,true);
+ const direct=campaign({globals:{sessionStorage}});assert.equal(direct.run('state'),'shell-menu');
+});
+test('stale and invalid arrival tokens leave the direct menu available',()=>{
+ for(const sessionStorage of [arrival('unknown'),arrival('loafy',Date.now()-121000),arrival('loafy',Date.now()+60000)]){
+  const a=campaign({globals:{sessionStorage}});assert.equal(a.run('state'),'shell-menu');assert.equal(sessionStorage.data.size,0);
+ }
+ const a=campaign({globals:{sessionStorage:{getItem(){throw Error('denied')},removeItem(){throw Error('denied')}}}});assert.equal(a.run('state'),'shell-menu');
+});
+test('cutscene freezes simulation, isolates shortcuts and held controls, and replay restores menu',()=>{
+ const a=main();a.click('shellResume');a.key('d','KeyD');a.run('shellPause()');
+ const before=a.run('JSON.stringify({player,tick,enemies,shots,collected,checkpointState})');a.click('replayTransition');
+ assert.equal(a.run('state'),'cutscene');assert.equal(a.run('Object.keys(keys).length'),0);
+ a.key('d','KeyD');a.key('x','KeyX');a.key('r');a.key('p');a.key('f');
+ a.run('campaignSceneFrame(100);campaignSceneFrame(2000)');
+ assert.equal(a.run('JSON.stringify({player,tick,enemies,shots,collected,checkpointState})'),before);
+ a.key('Escape');assert.equal(a.run('state'),'shell-menu');assert.equal(a.run('Object.keys(keys).length'),0);
+ a.click('replayTransition');a.run('campaignSceneFrame(100);campaignSceneFrame(12000)');assert.equal(a.run('state'),'shell-menu');
+});
+test('a real departure writes a fresh one-use token only on cinematic completion',()=>{
+ const sessionStorage=arrival();sessionStorage.data.clear();const a=main({globals:{sessionStorage}});a.click('shellResume');
+ a.run("window.location.assign=url=>window.destination=url;init(3);state='clear';advanceBakery()");assert.equal(sessionStorage.data.size,0);
+ a.run('campaignSceneFrame(100);campaignSceneFrame(12000)');assert.equal(a.run('destination'),'sunken.html');
+ const b=campaign({globals:{sessionStorage}});assert.equal(b.run('state'),'play');assert.equal(sessionStorage.data.size,0);
+});
+
+test('arrival cannot advance behind artwork; interrupted loading keeps the explicit Resume boundary',()=>{
+ const a=campaign({globals:{sessionStorage:arrival()},deferArtwork:true});
+ assert.equal(a.run('state'),'shell-menu');assert.equal(a.run('artworkLoading'),true);assert.equal(a.run('shellStarted'),false);
+ a.run('window.audioStarts=0;AudioKit.start=()=>audioStarts++;completeArtworkLoading()');assert.equal(a.run('state'),'play');assert.equal(a.run('audioStarts'),0);
+ const b=campaign({globals:{sessionStorage:arrival()},deferArtwork:true});b.doc.hidden=true;b.run('completeArtworkLoading()');assert.equal(b.run('state'),'shell-menu');b.doc.hidden=false;b.click('shellResume');assert.equal(b.run('state'),'play');
 });

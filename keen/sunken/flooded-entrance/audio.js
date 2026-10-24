@@ -4,6 +4,9 @@
 'use strict';
 window.AudioKit=(()=>{
  let engine=null,enabled=true,unlocked=false,world=1,gameState='play',selected=1,signature='',warned=false;
+ try{enabled=localStorage.getItem('crustQuestMuted')!=='true';}catch{}
+ function refreshButton(){const button=document.getElementById('audioBtn');if(button)button.textContent=enabled?'♫ Sound: ON':'♫ Sound: OFF';}
+ refreshButton();
  const hidden=()=>!!document.hidden;
  function report(error){if(!warned){warned=true;console.warn('Audio unavailable:',error);}}
  function safely(fn){try{const result=fn();if(result&&typeof result.catch==='function')result.catch(report);}catch(error){report(error);}}
@@ -36,6 +39,7 @@ window.AudioKit=(()=>{
  }
  function toggle(){
   enabled=!enabled;
+  try{localStorage.setItem('crustQuestMuted',String(!enabled));}catch{}
   const button=document.getElementById('audioBtn');
   if(button)button.textContent=enabled?'♫ Sound: ON':'♫ Sound: OFF';
   if(enabled)start();else sync(true);
