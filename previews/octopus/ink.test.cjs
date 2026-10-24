@@ -20,12 +20,12 @@ test('foreground ink expands from the boss to cover the arena, holds, then fades
  for(let age=186;age<240;age++){e.ink.age=age;const a=I.overlay(e,p);assert.ok(a.opacity<=previous);previous=a.opacity;}
  I.update(e,p);assert.equal(e.ink,null);
 });
-test('player opening, moving orientation gap and reduced obstruction stay bounded at native mobile canvas size',()=>{
+test('full ink has no player opening; reduced keeps player visibility and a bounded orientation gap',()=>{
  const e=I.create(),p=player();
  for(let age=18;age<240;age++){e.ink={age};const a=I.overlay(e,p),r=I.overlay(e,p,true);
-  assert.equal(a.clear.x,p.x+p.w/2);assert.equal(a.clear.y,p.y+p.h/2);assert.ok(a.clear.r>Math.hypot(p.w/2,p.h/2));
+  assert.equal(a.clear,null);assert.equal(r.clear.x,p.x+p.w/2);assert.equal(r.clear.y,p.y+p.h/2);assert.ok(r.clear.r>Math.hypot(p.w/2,p.h/2));
   assert.ok(a.opening.x-a.opening.r>32&&a.opening.x+a.opening.r<928);assert.ok(a.opening.y-a.opening.r>=64);
-  assert.ok(r.opacity<a.opacity&&r.opacity<=.275);assert.ok(r.clear.r>a.clear.r);
+  assert.ok(r.opacity<a.opacity&&r.opacity<=.275);assert.equal(r.clear.r,100);
  }
 });
 test('defeat instantly removes all obscuration and hazards and preserves the theatrical ending',()=>{
@@ -34,12 +34,13 @@ test('defeat instantly removes all obscuration and hazards and preserves the the
  for(let i=0;i<B.DEFEAT_DURATION;i++)I.update(e,p);assert.equal(B.defeatPose(e).frame,5);
 });
 const game=()=>previewGame({htmlPath:path.resolve(__dirname,'index.html'),search:'?attack=ink'});
-test('both heroes render the foreground mask and local player above it; full/reduced settings survive retry',()=>{
+test('full ink covers both heroes and warning lanes; reduced restores them and survives retry',()=>{
  for(const hero of ['loafy','vance-wick']){
-  const a=game();a.click('shellResume');a.run(`selectCharacter('${hero}');init();player.inv=0;for(const a of prepareStartupArtwork())if(a.label==='Camera ink splatter')a.image.naturalWidth=1536;deepArena.boss.ink={age:100};`);
-  const order=a.run(`(()=>{const order=[],dp=drawPlayer,di=g.drawImage;drawPlayer=()=>order.push('player');g.drawImage=(image,...args)=>{if(image.width===960&&image.height===540)order.push('mask');};draw();drawPlayer=dp;g.drawImage=di;return order})()`);
-  assert.ok(order.includes('mask'));assert.equal(order.at(-1),'player');assert.ok(order.indexOf('mask')>order.indexOf('player'));
+  const a=game();a.click('shellResume');a.run(`selectCharacter('${hero}');init();player.inv=0;for(const a of prepareStartupArtwork())if(a.label==='Camera ink splatter')a.image.naturalWidth=1536;Object.assign(deepArena.boss,{phase:'prepare',locked:true,ink:{age:100}});`);
+  const trace=`(()=>{const order=[],dp=drawPlayer,di=g.drawImage,st=g.stroke;drawPlayer=()=>order.push('player');g.stroke=()=>order.push('warning');g.drawImage=(image,...args)=>{if(image.width===960&&image.height===540)order.push('mask');};draw();drawPlayer=dp;g.drawImage=di;g.stroke=st;return order})()`;
+  const full=a.run(trace);assert.ok(full.includes('mask'));const covered=full.slice(full.lastIndexOf('mask')+1);assert.ok(!covered.includes('player'));assert.ok(!covered.includes('warning'));
   assert.equal(a.doc.getElementById('inkObstructionBtn').hidden,false);a.click('inkObstructionBtn');assert.equal(a.storage.get('crustQuestPreviewInkReduced'),'true');
+  const reduced=a.run(trace),visible=reduced.slice(reduced.lastIndexOf('mask')+1);assert.ok(visible.includes('player'));assert.ok(visible.includes('warning'));
   a.run('respawnCheckpoint();draw()');assert.equal(a.run('deepArena.boss.ink'),null);assert.match(a.doc.getElementById('inkObstructionBtn').textContent,/REDUCED/);
  }
 });

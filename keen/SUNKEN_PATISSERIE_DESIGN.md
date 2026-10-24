@@ -119,6 +119,8 @@ Start with approximately 0.7–1.0-second tool warnings and a roughly two-second
 
 Ink is a bounded world-space effect: draw cloudy backdrop obstruction, then restore player, immediate collision edges, projectile threats and damage warnings over it. Keep a clear player-centered area and stable arena landmark visible. Reduced obstruction makes clouds faint outlines while preserving their timing. No flashes, uniform black overlay or invisible hitboxes.
 
+Review update, October 24, 2026: Joel explicitly requested FULL ink to cover the player and warning lanes, relying on memory of attack timing during the brief obstruction. FULL therefore removes the player opening and above-ink player/threat/warning redraws. REDUCED retains the original visibility aids. This approved decision supersedes the always-readable player/local-warning requirement in the preceding ink proposal for FULL mode.
+
 The final phase combines previously learned patterns with recovery gaps, rather than increasing health or attack frequency excessively. Exact health waits for arena playtesting. Defeat: tools settle safely, the octopus tangles gently in its own apron, cap deflates, then it gives an indignant exhausted bow and opens the finishing oven. No production boss work before isolated attack review.
 
 ## Technical impact assessment

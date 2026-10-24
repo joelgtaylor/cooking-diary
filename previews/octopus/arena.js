@@ -58,13 +58,15 @@ function installDeepArena(){
   mask.clearRect(0,0,W,H);mask.save();mask.imageSmoothingEnabled=false;mask.globalAlpha=effect.opacity;
   mask.drawImage(inkCloud,effect.x-effect.width/2,effect.y-effect.height/2,effect.width,effect.height);
   mask.globalAlpha=1;mask.globalCompositeOperation='destination-out';
-  for(const hole of [effect.clear,effect.opening]){mask.beginPath();mask.arc(hole.x,hole.y,hole.r,0,Math.PI*2);mask.fill();}
+  for(const hole of [effect.clear,effect.opening].filter(Boolean)){mask.beginPath();mask.arc(hole.x,hole.y,hole.r,0,Math.PI*2);mask.fill();}
   mask.restore();g.save();g.beginPath();g.rect(32,64,896,448);g.clip();g.drawImage(inkMask,0,0);g.restore();
-  // Stable room outline and local warnings stay legible above foreground ink.
-  g.strokeStyle='#b4d4c6';g.lineWidth=2;g.strokeRect(32,64,896,448);drawAttackWarning(e,true);
+  // Full ink hides actors and warnings; reduced mode restores visibility aids.
+  g.strokeStyle='#b4d4c6';g.lineWidth=2;g.strokeRect(32,64,896,448);
+  if(reducedInk){drawAttackWarning(e,true);
   if(e.phase==='sweep'&&Math.abs(e.tipX-player.x)<145){const t=CrustDeep.tool(e);g.strokeStyle='#fff1c5';g.lineWidth=2;g.strokeRect(t.x,t.y,t.w,t.h);}
   if(e.wave&&Math.abs(e.wave.x-player.x)<160)CrustDeepArt.drawWake(g,e,wake);
   if(!player.inv||Math.floor(player.inv/12)%2===0)drawPlayer();
+  }
  }
  drawWorld=function(){
   const e=arena.boss;g.fillStyle='#103246';g.fillRect(0,0,W,H);R.distantCity();
@@ -94,7 +96,7 @@ function installDeepArena(){
  const pause=shellPause;shellPause=function(reason){pause(reason);document.getElementById('shellTitle').textContent=shellStarted?'Paused':'The Master of the Deep';
   if(!shellStarted)document.getElementById('shellMessage').textContent='First attack review: a precise lame sweep. Watch the raised tool and outlined lane, swim above or below it, then fire at the exposed mantle. Both heroes, free swimming, unlimited shots. Scraper and ink follow after this attack is approved.';
   if(!shellStarted&&scraperReview){document.getElementById('shellTitle').textContent='The Bench Scraper';document.getElementById('shellMessage').textContent='Second attack review: a broad scraper shove releases a slow pressure wave. Swim above or below the outlined lane; a hit pushes you back. Shoot the mantle during recovery. The approved lame and defeat remain in the original preview.';}
-  if(!shellStarted&&inkReview){document.getElementById('shellTitle').textContent='Ink on the Glass';document.getElementById('shellMessage').textContent='Ink rushes toward the screen and blacks out much of the view for four seconds. It does no damage. A lame sweep or scraper wave follows behind it. Your immediate surroundings and nearby damage warnings remain readable. Use Ink obstruction to choose FULL or REDUCED.';}
+  if(!shellStarted&&inkReview){document.getElementById('shellTitle').textContent='Ink on the Glass';document.getElementById('shellMessage').textContent='Ink rushes toward the screen and blacks out much of the view for four seconds. It does no damage. A lame sweep or scraper wave follows behind it. FULL also hides your character and attack warnings: remember the timing. REDUCED keeps visibility aids. Use Ink obstruction to choose FULL or REDUCED.';}
   if(!shellStarted&&defeatReview){document.getElementById('shellTitle').textContent='A Very Offended Baker';document.getElementById('shellMessage').textContent='Defeat animation review: tools fall harmlessly, tentacles tangle in his apron, the chef cap slumps and the Master takes an indignant bow. The normal arena still includes the approved lame fight.';}
   document.getElementById('shellResume').textContent=shellStarted?'Resume':defeatReview?'Watch the Defeat':inkReview?'Face the Ink':scraperReview?'Face the Scraper':'Face the Baker';};
 }

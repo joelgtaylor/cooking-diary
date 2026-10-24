@@ -26,7 +26,7 @@ function overlay(e,p,reduced=false){
  if(!e.ink||!e.alive)return null;
  const age=e.ink.age,arrival=Math.min(1,age/18),fade=age>186?(INK_LIFE-age)/54:1;
  return {age,arrival,opacity:Math.max(0,Math.min(.98,.98*arrival*fade))*(reduced?.28:1),
-  clear:{x:p.x+p.w/2,y:p.y+p.h/2,r:reduced?100:68},
+  clear:reduced?{x:p.x+p.w/2,y:p.y+p.h/2,r:100}:null,
   opening:{x:650+Math.sin(age*.015)*130,y:170+Math.cos(age*.021)*45,r:55},
   width:70+1280*arrival,height:45+850*arrival,x:760+(480-760)*arrival,y:250+(290-250)*arrival};
 }
