@@ -77,5 +77,13 @@ function drawWake(g,e,image){
  g.save();g.imageSmoothingEnabled=false;g.globalAlpha=.9;
  g.drawImage(image,frame*image.naturalWidth/4+50,20,370,750,w.x-4,w.y,71,144);g.restore();
 }
-const api={pose,draw,drawArm,drawDefeat,drawScraper,drawWake,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
+function drawInkBody(g,e,image){
+ if(!image.naturalWidth)return;
+ const frame=e.phase==='ink-spit'?2:e.phase==='ink-rest'?3:e.timer>36?0:1;
+ const frames=[{crop:[0,0,630,635],anchor:370,base:630},{crop:[630,0,631,635],anchor:970,base:630},
+  {crop:[0,635,655,612],anchor:350,base:1235},{crop:[655,635,606,612],anchor:970,base:1235}];
+ const f=frames[frame],s=327/630;g.save();g.imageSmoothingEnabled=false;
+ g.drawImage(image,...f.crop,760-(f.anchor-f.crop[0])*s,420-(f.base-f.crop[1])*s,f.crop[2]*s,f.crop[3]*s);g.restore();
+}
+const api={pose,draw,drawArm,drawDefeat,drawScraper,drawWake,drawInkBody,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
