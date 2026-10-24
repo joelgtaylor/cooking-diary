@@ -12,7 +12,7 @@ function previewGame(options={}){
  for(const m of html.matchAll(/<([\w-]+)([^>]*\bid="([^"]+)"[^>]*)>/g)){const el=element(m[3],m[2]);el.tag=m[1];}
  for(const m of html.matchAll(/<button[^>]*data-action="([^"]+)"[^>]*>/g)){const el=element('action-'+m[1]);el.dataset.action=m[1];actions.push(el);}
  doc={hidden:false,fullscreenElement:null,activeElement:null,getElementById:id=>elements.get(id)||null,querySelectorAll:s=>s==='[data-action]'?actions:[],querySelector:s=>actions.find(e=>s.includes('"'+e.dataset.action+'"')),addEventListener(type,fn,capture){(events[type]??=[]).push({fn,capture});},createElement:tag=>element('created-'+Math.random()),elementFromPoint:()=>null};
- const a=game({}, {html,context:ctx,search:'',globals:{document:doc,innerWidth:1280,innerHeight:720,matchMedia:()=>({matches:false})}});
+ const a=game({}, {html,context:ctx,search:options.search||'',globals:{document:doc,innerWidth:1280,innerHeight:720,matchMedia:()=>({matches:false})}});
  a.run('completeArtworkLoading()');
  function fire(el,type,props={}){const event={button:0,pointerId:1,key:'',code:'',detail:1,clientX:25,clientY:478,repeat:false,target:el,preventDefault(){},stopPropagation(){},...props};for(const fn of el.listeners[type]||[])fn(event);}
  function key(key,code=key,type='keydown'){

@@ -63,5 +63,19 @@ function draw(g,e,body,arm,defeat){
  if(body.naturalWidth)g.drawImage(body,p.body*724,0,724,724,600,100,327,327);
  g.restore();
 }
-const api={pose,draw,drawArm,drawDefeat,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
+function drawScraper(g,e,image){
+ if(!image.naturalWidth)return;
+ const frame=e.phase==='recover'?3:e.phase==='shove'?(e.timer>20?1:2):0;
+ const frames=[{crop:[0,0,768,520],anchor:460,base:515},{crop:[768,0,768,520],anchor:1176,base:515},
+  {crop:[0,520,820,504],anchor:520,base:1000},{crop:[880,520,656,504],anchor:1210,base:1000}];
+ const f=frames[frame],s=.60;g.save();g.imageSmoothingEnabled=false;
+ g.drawImage(image,...f.crop,750-(f.anchor-f.crop[0])*s,420-(f.base-f.crop[1])*s,f.crop[2]*s,f.crop[3]*s);g.restore();
+}
+function drawWake(g,e,image){
+ if(!e.wave||!image.naturalWidth)return;
+ const frame=Math.floor(e.age/7)%4,w=e.wave;
+ g.save();g.imageSmoothingEnabled=false;g.globalAlpha=.9;
+ g.drawImage(image,frame*image.naturalWidth/4+50,20,370,750,w.x-4,w.y,71,144);g.restore();
+}
+const api={pose,draw,drawArm,drawDefeat,drawScraper,drawWake,armFrames,scale};root.CrustDeepArt=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
