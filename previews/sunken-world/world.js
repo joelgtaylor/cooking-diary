@@ -65,7 +65,7 @@ function installSunkenWorld(){
   for(const gem of route.cultures)if(!gem.got&&Math.hypot(player.x+player.w/2-gem.x,player.y+player.h/2-gem.y)<33){gem.got=true;collected++;player.score+=250;AudioKit.effect('collect');}
   for(const item of route.supplies)if(!item.got&&Math.hypot(player.x+player.w/2-item.x,player.y+player.h/2-item.y)<35){item.got=true;if(item.kind==='rye')player.health=Math.min(5,player.health+1);if(item.kind==='kefir')player.kefirCharges++;if(item.kind==='cache')player.score+=500;AudioKit.effect('collect');}
   route.layout.checkpoints.forEach((cp,i)=>{if(i>route.checkpoint&&Math.hypot(player.x-cp.x*T,player.y-cp.y*T)<75){route.checkpoint=i;preview.checkpoint={x:cp.x*T,y:cp.y*T,swimming:cp.wet};player.health=Math.max(3,player.health);AudioKit.effect('collect');}});
-  const f=route.layout.finish;if(!route.complete&&collected===5&&Math.hypot(player.x-f.x*T,player.y-f.y*T)<95){route.complete=true;AudioKit.effect('win');}
+  const f=route.layout.finish;if(!route.complete&&collected===5&&Math.hypot(player.x-f.x*T,player.y-f.y*T)<95){if(route.onApproach)route.onApproach();else{route.complete=true;AudioKit.effect('win');}}
   const button=document.getElementById('exploreBtn');button.style.display=pumpNear()?'':'none';button.textContent=route.pumpOn?'Pump ← (E)':'Pump → (E)';
  };
  function visible(x,y,w=100,h=100){return x+w>=camera&&x<=camera+W&&y+h>=cameraY&&y<=cameraY+H;}
@@ -138,7 +138,7 @@ function installSunkenWorld(){
   for(const a of route.actors)if(visible(a.e.x-150,a.e.y-100,400,250))drawSunkenActor(a.kind,a.e,images);
   for(const s of shots){g.fillStyle='#fff0ca';g.fillRect(s.x,s.y,s.w,s.h);}
   if(!player.inv||Math.floor(player.inv/12)%2===0)drawPlayer();
-  const f=route.layout.finish;g.strokeStyle='#eadbb5';g.lineWidth=3;g.strokeRect(f.x*T-40,16*T,80,6*T);R.text('BOSS APPROACH',f.x*T-53,17*T,11);if(collected<5)R.text('5 CULTURES',f.x*T-40,18*T,11);g.restore();
+  const f=route.layout.finish;g.strokeStyle='#eadbb5';g.lineWidth=3;g.strokeRect(f.x*T-40,16*T,80,6*T);R.text(route.onApproach?'THE MASTER':'BOSS APPROACH',f.x*T-53,17*T,11);if(collected<5)R.text('5 CULTURES',f.x*T-40,18*T,11);g.restore();
  };
  drawHUD=function(){const section=route.layout.sections.find(s=>player.x/T>=s.from&&player.x/T<s.to)||route.layout.sections[0];
   g.fillStyle='#081d2cf0';g.fillRect(0,0,W,58);R.text('THE SUNKEN PATISSERIE',18,25,17);R.text(section.name.toUpperCase(),18,45,11);

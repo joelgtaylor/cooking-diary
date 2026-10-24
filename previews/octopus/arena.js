@@ -2,10 +2,10 @@
 'use strict';
 const installBeforeDeep=installSunkenPrototype;
 installSunkenPrototype=function(){installBeforeDeep();installDeepArena();};
-function installDeepArena(){
+function installDeepArena(options={}){
  const preview=window.sunkenPreview,slice=window.floodedEntrance,R=slice.render;
  const scraperReview=/(?:^|[?&])attack=scraper(?:&|$)/.test(window.location?.search||'');
- const fullReview=/(?:^|[?&])attack=full(?:&|$)/.test(window.location?.search||'');
+ const fullReview=!!options.integrated||/(?:^|[?&])attack=full(?:&|$)/.test(window.location?.search||'');
  const inkReview=fullReview||/(?:^|[?&])attack=ink(?:&|$)/.test(window.location?.search||'');
  const Controller=fullReview?CrustDeepFight:inkReview?CrustInk:scraperReview?CrustScraper:CrustDeep;if(inkReview)document.title='The Master of the Deep · Ink attack review';if(scraperReview)document.title='The Master of the Deep · Bench scraper review';
  if(fullReview)document.title='The Master of the Deep · Full fight';
@@ -24,7 +24,7 @@ function installDeepArena(){
  const defeatReview=/(?:^|[?&])scene=defeat(?:&|$)/.test(window.location?.search||'');
  function reset(){arena.boss=Controller.create();if(defeatReview)Object.assign(arena.boss,{hp:0,alive:false,phase:'defeat',deathT:CrustDeep.DEFEAT_DURATION,dropOrigin:{x:560,y:210}});arena.victory=false;slice.patroller.alive=false;slice.patroller.deathT=0;preview.rings=[];preview.targets=[];shots=[];}
  const setup=init;
- init=function(){setup();map=Array.from({length:rows},(_,y)=>Array.from({length:cols},(_,x)=>x===0||x>=29||y<2||y>=16?'#':'.'));
+ init=function(){if(!options.integrated)setup();map=Array.from({length:rows},(_,y)=>Array.from({length:cols},(_,x)=>x===0||x>=29||y<2||y>=16?'#':'.'));
   slice.width=W;slice.height=H;preview.water.splice(0,preview.water.length,{x:T,y:2*T,w:28*T,h:14*T});preview.currents.splice(0);
   preview.checkpoint={x:8*T,y:9*T,swimming:true};player.x=8*T;player.y=9*T;player.vx=player.vy=0;player.health=4;player.inv=60;
   CrustSwim.sync(player,preview.water,hit);camera=cameraY=0;reset();return player;
