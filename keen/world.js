@@ -78,7 +78,10 @@ function advanceBakery(){
  if(state!=='clear')return;
  if(bakery<MAXBAKERY){
   const next=window.CrustWorlds?.[bakery];
-  if(next?.href){shellClearInput();window.location.assign(next.href);return;}
+  if(next?.href){
+   if(typeof playCampaignDescent==='function'){playCampaignDescent({navigate:true});return;}
+   shellClearInput();window.location.assign(next.href);return;
+  }
   init(bakery+1);
  }
  else state='win';
