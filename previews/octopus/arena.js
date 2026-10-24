@@ -5,8 +5,10 @@ installSunkenPrototype=function(){installBeforeDeep();installDeepArena();};
 function installDeepArena(){
  const preview=window.sunkenPreview,slice=window.floodedEntrance,R=slice.render;
  const scraperReview=/(?:^|[?&])attack=scraper(?:&|$)/.test(window.location?.search||'');
- const inkReview=/(?:^|[?&])attack=ink(?:&|$)/.test(window.location?.search||'');
- const Controller=inkReview?CrustInk:scraperReview?CrustScraper:CrustDeep;if(inkReview)document.title='The Master of the Deep · Ink attack review';if(scraperReview)document.title='The Master of the Deep · Bench scraper review';
+ const fullReview=/(?:^|[?&])attack=full(?:&|$)/.test(window.location?.search||'');
+ const inkReview=fullReview||/(?:^|[?&])attack=ink(?:&|$)/.test(window.location?.search||'');
+ const Controller=fullReview?CrustDeepFight:inkReview?CrustInk:scraperReview?CrustScraper:CrustDeep;if(inkReview)document.title='The Master of the Deep · Ink attack review';if(scraperReview)document.title='The Master of the Deep · Bench scraper review';
+ if(fullReview)document.title='The Master of the Deep · Full fight';
  const arena={boss:null,victory:false};window.deepArena=arena;
  const sheet=new Image();sheet.src='../previews/octopus/joined-master.png';
  const limb=new Image();limb.src='../previews/octopus/lame-slender.png';
@@ -85,9 +87,10 @@ function installDeepArena(){
   drawInk(e);
  };
  drawHUD=function(){const e=arena.boss,wide=e.attack==='scraper'||scraperReview;
-  g.fillStyle='#071e2bf2';g.fillRect(0,0,W,61);R.text('THE MASTER OF THE DEEP',18,25,18);R.text((inkReview?'INK + TOOL REVIEW · ':scraperReview?'BENCH SCRAPER REVIEW · ':'LAME ATTACK REVIEW · ')+selectedCharacter().name.toUpperCase(),18,46,10);
+  g.fillStyle='#071e2bf2';g.fillRect(0,0,W,61);R.text('THE MASTER OF THE DEEP',18,25,18);R.text((fullReview?'FULL FIGHT · ':inkReview?'INK + TOOL REVIEW · ':scraperReview?'BENCH SCRAPER REVIEW · ':'LAME ATTACK REVIEW · ')+selectedCharacter().name.toUpperCase(),18,46,10);
   R.text('♥ '.repeat(Math.max(0,player.health)),W-240,24,18);R.text('P · PAUSE / RETRY',W-240,45,11);
-  for(let i=0;i<e.maxHp;i++){g.fillStyle=i<e.hp?'#edce99':'#40515b';g.fillRect(398+i*23,23,18,8);}
+  const bars=fullReview?12:e.maxHp;for(let i=0;i<bars;i++){g.fillStyle=i<Math.ceil(e.hp/e.maxHp*bars)?'#edce99':'#40515b';g.fillRect(398+i*(fullReview?20:23),23,fullReview?15:18,8);}
+  if(fullReview)R.text(e.battleStage==='opening'?'I · OPEN WATER':e.battleStage==='escalation'?'II · INK RISING':'III · DEEP FURY',398,46,10);
   const inkMessage=inkReview&&e.phase.startsWith('ink-')?(e.phase==='ink-inhale'?'CHEEKS PUFFING · INK INCOMING':e.phase==='ink-spit'?'INK ON THE GLASS · WATCH THE NEXT TOOL':'INK CLEARING · STAY READY'):null;
   const message=arena.victory?'DEFEAT COMPLETE · P to retry':!e.alive?CrustDeep.defeatPose(e).message:inkMessage|| (e.phase==='prepare'?(e.locked?'LANE LOCKED · SWIM CLEAR':wide?'SCRAPER BROADSIDE · WATCH THE WIDE LANE':'LAME RAISED · WATCH THE LANE'):e.phase==='shove'?'SCRAPER SHOVE · DODGE ABOVE OR BELOW':e.phase==='sweep'?'SCORING SWEEP':e.phase==='recover'?(wide?'SCRAPER RESETTING · SHOOT THE MANTLE':'TOOL STUCK · SHOOT THE EXPOSED MANTLE'):'“DO NOT DISTURB THE PROOF!”');
   g.fillStyle='#071e2bed';g.fillRect(116,H-35,W-232,28);R.text(message,130,H-16,12);
@@ -97,6 +100,7 @@ function installDeepArena(){
   if(!shellStarted)document.getElementById('shellMessage').textContent='First attack review: a precise lame sweep. Watch the raised tool and outlined lane, swim above or below it, then fire at the exposed mantle. Both heroes, free swimming, unlimited shots. Scraper and ink follow after this attack is approved.';
   if(!shellStarted&&scraperReview){document.getElementById('shellTitle').textContent='The Bench Scraper';document.getElementById('shellMessage').textContent='Second attack review: a broad scraper shove releases a slow pressure wave. Swim above or below the outlined lane; a hit pushes you back. Shoot the mantle during recovery. The approved lame and defeat remain in the original preview.';}
   if(!shellStarted&&inkReview){document.getElementById('shellTitle').textContent='Ink on the Glass';document.getElementById('shellMessage').textContent='Ink rushes toward the screen and blacks out much of the view for four seconds. It does no damage. A lame sweep or scraper wave follows behind it. FULL also hides your character and attack warnings: remember the timing. REDUCED keeps visibility aids. Use Ink obstruction to choose FULL or REDUCED.';}
+  if(!shellStarted&&fullReview){document.getElementById('shellTitle').textContent='The Master of the Deep';document.getElementById('shellMessage').textContent='The combined fight: first learn two clear rounds of lame and scraper attacks. Then ink enters every other attack, before a final phase of ink followed by every tool attack. FULL hides you and the warning lanes. Remember the rhythm, shoot during recovery, and earn the Master’s indignant bow.';}
   if(!shellStarted&&defeatReview){document.getElementById('shellTitle').textContent='A Very Offended Baker';document.getElementById('shellMessage').textContent='Defeat animation review: tools fall harmlessly, tentacles tangle in his apron, the chef cap slumps and the Master takes an indignant bow. The normal arena still includes the approved lame fight.';}
-  document.getElementById('shellResume').textContent=shellStarted?'Resume':defeatReview?'Watch the Defeat':inkReview?'Face the Ink':scraperReview?'Face the Scraper':'Face the Baker';};
+  document.getElementById('shellResume').textContent=shellStarted?'Resume':defeatReview?'Watch the Defeat':fullReview?'Face the Master':inkReview?'Face the Ink':scraperReview?'Face the Scraper':'Face the Baker';};
 }

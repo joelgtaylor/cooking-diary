@@ -63,3 +63,11 @@ Built-in generated assets: `ink-frames.png` (four aligned cheek inhale, puff, fr
 Coverage includes harmless warning/spit, alternating attacks under ink, arrival/hold/fade, clear player/navigation openings, reduced obstruction, defeat cleanup, above-mask player rendering for both heroes, persisted preference/retry, pause and a complete damage-free combat run with actual swimming/shooting controls.
 
 Full obstruction revision: Joel approved stronger concealment of the player and warning lanes on October 24, 2026. This supersedes the original always-readable player/local-warning ink proposal for FULL mode; REDUCED retains those aids. Obstruction timing, damage and physics are unchanged.
+
+## Combined fight — three-stage review
+
+Open `index.html?attack=full`. Four clear attacks teach lame → scraper → lame → scraper. Stage II adds one clear lame then an ink-covered scraper. Stage III puts the approved ink sequence before every alternating tool attack. Stage changes wait for the previous recovery to finish; no attack overlaps or mid-swing phase changes. Clear gaps shorten from 52 to 40 to 24 ticks, while tool preparation, active motion, recovery, ink warning/duration and collision behavior remain exactly as approved. The first opening rest is 90 ticks.
+
+The full encounter has 36 health with ordinary one-point hits and unchanged 24-tick immunity. It uses no invulnerable phase gates or forced damage caps. The compact twelve-segment HUD scales to the full health total and labels I/Open Water, II/Ink Rising and III/Deep Fury. A real-control automated damage-free run finishes in about 89 seconds including the four-second defeat, across 16 tool cycles, reaching all three stages. This is pacing evidence, not a substitute for human timing/memory playtesting under FULL ink. Both heroes have the same combat/physics, and retry restores the clear opening. Approved individual attack and defeat review URLs remain available. No campaign progression/recipe/save integration or merge.
+
+Coverage checks the exact stage/ink schedule through ten live cycles, original wind-up/recovery lengths, ordinary damage and immunity, defeat cleanup, both heroes/retry, and a full real-control run reaching all stages before the bow.
