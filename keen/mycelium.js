@@ -7,6 +7,7 @@ function syncMyceliumBloom(){
  const r=relayLayout();if(!r||!myceliumState?.solved)return;
  const [x,y,len]=r.bloom;for(let i=0;i<len;i++)map[y][x+i]='M';
  const [gx,gy,height]=r.gate;for(let i=0;i<height;i++)map[gy+i][gx]='.';
+ if(typeof invalidateFungalGeometry==='function')invalidateFungalGeometry();
 }
 // Only a projectile fired by Vance can blast the root doorway. Reuse the
 // solved relay state so collision, visuals and checkpoint recovery agree.
@@ -81,8 +82,9 @@ function talkMycelium(){
 }
 function syncMyceliumTalkButton(){
  const button=document.getElementById('talkBtn');
- button.style.display=(state==='dialogue'||state==='play'&&nearSporekeeper())?'':'none';
- button.textContent=state==='dialogue'?'Continue (E)':'Talk (E)';
+ const display=(state==='dialogue'||state==='play'&&nearSporekeeper())?'':'none',text=state==='dialogue'?'Continue (E)':'Talk (E)';
+ if(button.style.display!==display)button.style.display=display;
+ if(button.textContent!==text)button.textContent=text;
 }
 function drawMycelium(){
  const r=relayLayout(),s=myceliumState;if(!r||!s||camera>1900||camera+W<880||cameraY>1280||cameraY+H<832)return;
@@ -141,3 +143,4 @@ function drawMyceliumUI(){
  const hint=s.solved?'ROOT RELAY · The cavern path is open':selectedCharacterId==='vance-wick'?'VANCE WICK · Shoot the root door to open the path':!s.clueKnown?'SLEEPING ROOTS · Ask the Sporekeeper to the left':s.wrong?'ROOT RELAY · Listen again; no harm done':s.round===1?'ROOT RELAY · Follow the roots’ reply':'ROOT RELAY · Pogo the remembered order';
  rect(14,54,Math.min(620,hint.length*7+24),27,'#142735');g.font='12px monospace';g.textAlign='left';g.fillStyle='#e4e8c7';g.fillText(hint,24,72);
 }
+

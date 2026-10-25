@@ -19,7 +19,9 @@ function createFrameMonitor(){
    const ordered=intervals.slice().sort((a,b)=>a-b);
    const p95=ordered[Math.max(0,Math.ceil(ordered.length*.95)-1)]||0;
    const ready=Array.from({length:9},(_,i)=>assets['moonlitShadedTerrain'+i]).filter(a=>a?.complete&&a.naturalWidth===256&&a.naturalHeight===96).length;
-   output.textContent='Forecourt performance v2\n'+(1000/(average(intervals)||Infinity)).toFixed(0)+' FPS · p95 '+p95.toFixed(1)+' ms\nCPU '+average(cpu).toFixed(1)+' ms/frame\nShaded textures '+ready+'/9\nBakery '+bakery+' · '+state;
+   const stamps=typeof fungalStampCache!=='undefined'&&bakery===2?'\nFungal stamps '+fungalStampCache.entries.size+' · '+Math.round(fungalStampCache.pixels*4/1024)+' KiB':'';
+   output.textContent='Crust Quest performance\n'+(1000/(average(intervals)||Infinity)).toFixed(0)+' FPS · p95 '+p95.toFixed(1)+' ms\nCPU '+average(cpu).toFixed(1)+' ms/frame\nShaded textures '+ready+'/9'+stamps+'\nBakery '+bakery+' · '+state;
   }
  };
 }
+

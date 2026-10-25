@@ -20,23 +20,70 @@ function fungalEnvironmentReady(){
   !/(?:^|[?&])environment=off(?:&|$)/.test(window.location?.search||'')&&
   a&&a.complete&&a.naturalWidth===1536&&a.naturalHeight===1024;
 }
-function fungalSprite(crop,x,y,width,brightness=1,flipY=false){
- const [sx,sy,sw,sh]=crop,height=Math.round(width*sh/sw);
- if(x+width<camera||x>camera+W||y+height<cameraY||y>cameraY+H)return;
- g.save();g.imageSmoothingEnabled=false;g.filter='brightness('+brightness+')';
- if(flipY){g.translate(Math.round(x),Math.round(y)+height);g.scale(1,-1);}
- g.drawImage(assets.fungalEnvironment,sx,sy,sw,sh,
-  flipY?0:Math.round(x),flipY?0:Math.round(y),Math.round(width),height);g.restore();
+// Small reusable stamps, capped at 2 MiB of RGBA pixels. Never allocate a
+// world-sized canvas on a phone. Eviction only affects rendering cost.
+const fungalStampCache={image:null,entries:new Map(),pixels:0,hits:0,misses:0,disabled:false};
+const FUNGAL_STAMP_PIXELS=512*1024;
+function fungalVisible(x,y,w,h){
+ const margin=Math.ceil(typeof shake==='number'?shake:0)+1;
+ return x+w>=camera-margin&&x<=camera+W+margin&&y+h>=cameraY-margin&&y<=cameraY+H+margin;
 }
-function fungalPlatformRuns(){
- const out=[];
+function fungalStamp(key,x,y,w,h,paint){
+ const cache=fungalStampCache,image=assets.fungalEnvironment;
+ if(cache.disabled||/(?:^|[?&])fungalCache=off(?:&|$)/.test(window.location?.search||''))return false;
+ if(cache.image!==image){cache.entries.clear();cache.pixels=0;cache.image=image;}
+ let entry=cache.entries.get(key);
+ if(entry){cache.hits++;cache.entries.delete(key);cache.entries.set(key,entry);}
+ else{
+  w=Math.ceil(w);h=Math.ceil(h);if(w<=0||h<=0||w*h>FUNGAL_STAMP_PIXELS)return false;
+  let canvas,brush;
+  try{
+   canvas=typeof OffscreenCanvas==='function'?new OffscreenCanvas(w,h):document.createElement?.('canvas');
+   if(!canvas){cache.disabled=true;return false;}
+   canvas.width=w;canvas.height=h;brush=canvas.getContext('2d');
+   // Headless tests and unsupported contexts keep the original direct path.
+   if(!brush||brush.canvas!==canvas){cache.disabled=true;return false;}
+   brush.imageSmoothingEnabled=false;paint(brush);
+  }catch{cache.disabled=true;return false;}
+  while(cache.entries.size&&(cache.pixels+w*h>FUNGAL_STAMP_PIXELS||cache.entries.size>=128)){
+   const oldest=cache.entries.keys().next().value,old=cache.entries.get(oldest);
+   cache.pixels-=old.width*old.height;cache.entries.delete(oldest);
+  }
+  entry=canvas;cache.entries.set(key,entry);cache.pixels+=w*h;cache.misses++;
+ }
+ g.save();g.imageSmoothingEnabled=false;g.filter='none';
+ g.drawImage(entry,Math.round(x),Math.round(y));g.restore();return true;
+}
+let fungalGeometryCache=null;
+function invalidateFungalGeometry(){fungalGeometryCache=null;}
+function fungalGeometryRuns(){
+ if(fungalGeometryCache?.map===map)return fungalGeometryCache;
+ const platforms=[],surfaces=[];
  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
   if(map[y][x]!=='=')continue;
   const start=x;while(x+1<cols&&map[y][x+1]==='=')x++;
-  out.push({x:start,y,w:x-start+1});
+  platforms.push({x:start,y,w:x-start+1});
  }
- return out;
+ for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+  if(map[y][x]!=='#'||tile(x,y-1)==='#'||tile(x,y-1)==='=')continue;
+  const start=x;while(x+1<cols&&map[y][x+1]==='#'&&tile(x+1,y-1)!=='#'&&tile(x+1,y-1)!=='=')x++;
+  surfaces.push({x:start,y,w:x-start+1});
+ }
+ return fungalGeometryCache={map,platforms,surfaces};
 }
+function fungalSprite(crop,x,y,width,brightness=1,flipY=false,ctx=g){
+ const [sx,sy,sw,sh]=crop,height=Math.round(width*sh/sw);
+ if(ctx===g){
+  if(!fungalVisible(x,y,width,height))return;
+  if(fungalStamp('sprite:'+crop.join(',')+':'+width+':'+brightness+':'+flipY,x,y,width,height,
+   brush=>fungalSprite(crop,0,0,width,brightness,flipY,brush)))return;
+ }
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.filter='brightness('+brightness+')';
+ if(flipY){ctx.translate(Math.round(x),Math.round(y)+height);ctx.scale(1,-1);}
+ ctx.drawImage(assets.fungalEnvironment,sx,sy,sw,sh,
+  flipY?0:Math.round(x),flipY?0:Math.round(y),Math.round(width),height);ctx.restore();
+}
+function fungalPlatformRuns(){return fungalGeometryRuns().platforms;}
 function fungalPlatformKind(x,y){
  if(x>=56&&y<=31)return 'cap';
  if(x>=32&&x<56&&y===35)return 'root';
@@ -61,35 +108,45 @@ function drawFungalDepthVeil(){
 // Stem textures repeat vertically at their own aspect ratio and terminate in
 // a proportioned root foot. Their dark faces sit behind all gameplay art.
 // Overlap textured samples at their native scale; feather only the join band.
-// No extra silhouettes, collision surfaces or generated per-frame textures.
-function fungalJoinedSprite(crop,x,y,width,brightness,fadeTop=0){
+// No extra silhouettes or collision surfaces. Joined pieces are cached once.
+function fungalJoinedSprite(crop,x,y,width,brightness,fadeTop=0,ctx=g){
  const height=Math.round(width*crop[3]/crop[2]),fade=Math.min(fadeTop,height);
- if(!fade){fungalSprite(crop,x,y,width,brightness);return;}
+ if(!fade){fungalSprite(crop,x,y,width,brightness,false,ctx);return;}
  for(let i=0;i<4;i++){
   const top=fade*i/4,bottom=fade*(i+1)/4;
-  g.save();g.globalAlpha*=((i+1)/4);
-  fungalSprite([crop[0],crop[1]+crop[3]*top/height,crop[2],crop[3]*(bottom-top)/height],x,y+top,width,brightness);g.restore();
+  ctx.save();ctx.globalAlpha*=((i+1)/4);
+  fungalSprite([crop[0],crop[1]+crop[3]*top/height,crop[2],crop[3]*(bottom-top)/height],x,y+top,width,brightness,false,ctx);ctx.restore();
  }
- if(height>fade)fungalSprite([crop[0],crop[1]+crop[3]*fade/height,crop[2],crop[3]*(height-fade)/height],x,y+fade,width,brightness);
+ if(height>fade)fungalSprite([crop[0],crop[1]+crop[3]*fade/height,crop[2],crop[3]*(height-fade)/height],x,y+fade,width,brightness,false,ctx);
 }
-function fungalStem(cx,top,bottom,width=3*T,brightness=.48,kind='root'){
+function fungalStem(cx,top,bottom,width=3*T,brightness=.48,kind='root',ctx=g){
+ if(ctx===g){
+  if(!fungalVisible(cx-width,top,width*2,bottom-top))return;
+  if(fungalStamp('stem:'+width+':'+(bottom-top)+':'+brightness+':'+kind,cx-width,top,width*2,bottom-top,
+   brush=>fungalStem(width,0,bottom-top,width,brightness,kind,brush)))return;
+ }
  const body=FUNGAL_ENVIRONMENT_CROPS[kind==='mushroom'?'mushroomBody':'rootBody'],foot=FUNGAL_ENVIRONMENT_CROPS.trunk;
  const bodyHeight=Math.round(width*body[3]/body[2]),footWidth=width*2;
  const footHeight=Math.round(footWidth*foot[3]/foot[2]);
  const join=Math.max(top,bottom-footHeight+width*.28);
- g.save();g.beginPath();g.rect(cx-width,top,width*2,Math.max(0,bottom-top));g.clip();
+ ctx.save();ctx.beginPath();ctx.rect(cx-width,top,width*2,Math.max(0,bottom-top));ctx.clip();
  const overlap=Math.min(12,bodyHeight/4);
  for(let y=top,i=0;y<join;y+=bodyHeight-overlap,i++)
-  fungalJoinedSprite(body,cx-width/2,y,width,brightness,i?overlap:0);
- fungalJoinedSprite(foot,cx-footWidth/2,Math.max(top,bottom-footHeight),footWidth,brightness,12);
- g.restore();
+  fungalJoinedSprite(body,cx-width/2,y,width,brightness,i?overlap:0,ctx);
+ fungalJoinedSprite(foot,cx-footWidth/2,Math.max(top,bottom-footHeight),footWidth,brightness,12,ctx);
+ ctx.restore();
 }
-function fungalCliff(x,top,width,bottom,brightness=.55){
+function fungalCliff(x,top,width,bottom,brightness=.55,ctx=g){
+ if(ctx===g){
+  if(!fungalVisible(x,top,width,bottom-top))return;
+  if(fungalStamp('cliff:'+width+':'+(bottom-top)+':'+brightness,x,top,width,bottom-top,
+   brush=>fungalCliff(0,0,width,bottom-top,brightness,brush)))return;
+ }
  const body=FUNGAL_ENVIRONMENT_CROPS.rockBody,height=Math.round(width*body[3]/body[2]);
- g.save();g.beginPath();g.rect(x,top,width,Math.max(0,bottom-top));g.clip();
+ ctx.save();ctx.beginPath();ctx.rect(x,top,width,Math.max(0,bottom-top));ctx.clip();
  const overlap=Math.min(12,height/4);
- for(let y=top,i=0;y<bottom;y+=height-overlap,i++)fungalJoinedSprite(body,x,y,width,brightness,i?overlap:0);
- g.restore();
+ for(let y=top,i=0;y<bottom;y+=height-overlap,i++)fungalJoinedSprite(body,x,y,width,brightness,i?overlap:0,ctx);
+ ctx.restore();
 }
 function drawFungalEnvironment(){
  if(!fungalEnvironmentReady())return;
@@ -150,10 +207,8 @@ function drawFungalPlatformFaces(){
  }
  // Solid cells keep their opaque original terrain. Natural trim is clipped
  // inside the real cell, including the low doorway and relay ceiling.
- for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
-  if(map[y][x]!=='#'||tile(x,y-1)==='#'||tile(x,y-1)==='=')continue;
-  const start=x;while(x+1<cols&&map[y][x+1]==='#'&&tile(x+1,y-1)!=='#'&&tile(x+1,y-1)!=='=')x++;
-  const px=start*T,py=y*T,w=(x-start+1)*T;
+ for(const r of fungalGeometryRuns().surfaces){
+  const px=r.x*T,py=r.y*T,w=r.w*T,y=r.y;
   if(px+w<camera||px>camera+W||py+T<cameraY||py>cameraY+H)continue;
   g.save();g.beginPath();g.rect(px,py,w,T);g.clip();
   fungalStrip(y===26?'root':'shelf',px,py,w,.88);g.restore();
@@ -168,3 +223,4 @@ function prepareFungalEnvironmentPreview(search){
  init(2);player.x=x*T;player.y=y*T-player.h;player.ground=true;
  camera=cx;cameraY=cy;state='pause';return true;
 }
+

@@ -174,17 +174,21 @@ function initGameShell(){
  const recover=respawnCheckpoint;respawnCheckpoint=function(){shellClearInput();return recover();};
  shellReady=true;shellEl('wrap').dataset.started='false';shellLoadSettings();shellSavedState='play';if(state==='pause')state='play';shellPause();
 }
+function shellSet(target,key,value){if(target[key]!==value)target[key]=value;}
+let shellPogoPressed=null,shellGameError=null;
 function syncGameShell(){
  if(!shellReady)return;
  if(shellPendingShoot>=0&&tick>shellPendingShoot){shellPendingShoot=-1;shellPublishInput();}
- shellEl('pogoBtn').setAttribute('aria-pressed',String(pogoOn));
- shellEl('interactIdle').style.display=shellEl('exploreBtn').style.display==='none'&&shellEl('talkBtn').style.display==='none'?'':'none';
+ if(shellPogoPressed!==pogoOn){shellEl('pogoBtn').setAttribute('aria-pressed',String(pogoOn));shellPogoPressed=pogoOn;}
+ shellSet(shellEl('interactIdle').style,'display',shellEl('exploreBtn').style.display==='none'&&shellEl('talkBtn').style.display==='none'?'':'none');
  const credits=shellEl('endCredits'),showCredits=state==='win';
  if(credits.hidden===showCredits){credits.hidden=!showCredits;if(showCredits){shellClearInput();shellEl('creditsTitle').focus();}}
- shellEl('wrap').dataset.ending=String(showCredits);
- shellEl('advanceBtn').hidden=state!=='clear';
- shellEl('shellFullscreen').textContent=!shellStarted?'Play fullscreen':document.fullscreenElement?'Exit fullscreen':'Enter fullscreen';
- shellEl('wrap').dataset.mode=state==='shell-menu'||state==='character-select'?'menu':'play';
- shellEl('rotateHint').hidden=!shellStarted||shellPortrait!==true||shellEl('wrap').dataset.touch!=='true'||shellRotationDismissed||state==='shell-menu';
- shellEl('status').classList.toggle('game-error',shellEl('status').textContent.startsWith('Game error:'));
+ shellSet(shellEl('wrap').dataset,'ending',String(showCredits));
+ shellSet(shellEl('advanceBtn'),'hidden',state!=='clear');
+ shellSet(shellEl('shellFullscreen'),'textContent',!shellStarted?'Play fullscreen':document.fullscreenElement?'Exit fullscreen':'Enter fullscreen');
+ shellSet(shellEl('wrap').dataset,'mode',state==='shell-menu'||state==='character-select'?'menu':'play');
+ shellSet(shellEl('rotateHint'),'hidden',!shellStarted||shellPortrait!==true||shellEl('wrap').dataset.touch!=='true'||shellRotationDismissed||state==='shell-menu');
+ const error=shellEl('status').textContent.startsWith('Game error:');
+ if(error!==shellGameError){shellEl('status').classList.toggle('game-error',error);shellGameError=error;}
 }
+

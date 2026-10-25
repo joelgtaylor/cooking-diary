@@ -29,6 +29,7 @@ function interactCavernExploration(){
  const s=cavernExploration,d=cavernDiscoveryLayout(),action=cavernExploreAction();if(!action)return false;
  if(action.startsWith('cellar-')){
   const i=Number(action.slice(7)),[x,y,w]=d.cellar.mouths[i];s.opened.add(i);for(let j=0;j<w;j++)map[y][x+j]='.';
+  if(typeof invalidateFungalGeometry==='function')invalidateFungalGeometry();
   floater(player.x,player.y-18,'A STAIRWAY BELOW...','#e2d3ad');AudioKit.effect('climb');
  }else if(action==='repair'){
   s.repaired=true;player.score+=250;floater(player.x,player.y-20,'FREIGHT LIFT RESTORED','#ffe2a4');AudioKit.effect('climb');
@@ -74,7 +75,9 @@ function updateCavernExploration(){
 }
 function syncCavernExploreButton(){
  const b=document.getElementById('exploreBtn'),action=cavernExploreAction();
- b.style.display=action?'':'none';b.textContent=action?.startsWith('cellar-')?'Open cellar (E)':({repair:'Repair lift (E)',ride:'Ride lift (E)',call:'Call lift (E)',broken:'Inspect lift (E)'})[action]||'Explore (E)';
+ const display=action?'':'none',text=action?.startsWith('cellar-')?'Open cellar (E)':({repair:'Repair lift (E)',ride:'Ride lift (E)',call:'Call lift (E)',broken:'Inspect lift (E)'})[action]||'Explore (E)';
+ if(b.style.display!==display)b.style.display=display;
+ if(b.textContent!==text)b.textContent=text;
 }
 function cavernVisible(x,y,w,h){return x+w>=camera&&x<=camera+W&&y+h>=cameraY&&y<=cameraY+H;}
 function cavernPlaque(x,y,text,color='#e6cb98'){
@@ -169,3 +172,4 @@ function drawCavernDistrictMap(ctx,sy,offset){
  if(s.repaired){ctx.beginPath();ctx.moveTo(d.lift.x*10,d.lift.top*sy+offset);ctx.lineTo(d.lift.x*10,d.lift.bottom*sy+offset);ctx.stroke();ctx.fillText('LIFT',d.lift.x*10+6,40*sy+offset);}
  ctx.restore();
 }
+

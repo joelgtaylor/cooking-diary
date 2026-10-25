@@ -18,13 +18,13 @@
 <script src="art/environment-gameplay-atlas.js"></script>
 <script src="audio-engine.js"></script>
 <script src="audio.js"></script>
-<script src="performance.js"></script>
+<script src="performance.js?v=mobile-cavern-20261025"></script>
 <script src="timing.js"></script>
 <script src="camera.js"></script>
 <script src="world-registry.js"></script><script src="world.js?v=enemy-scale-release-20261022"></script>
 <script src="character-select.js?v=vance-playable-20261022"></script>
 <script src="input-model.js?v=credits-20261022"></script>
-<script src="shell.js?v=startup-art-20261022"></script>
+<script src="shell.js?v=mobile-cavern-20261025"></script>
 <script src="collision.js"></script>
 <script src="physics.js"></script>
 <script src="clockwork-enemies.js?v=visual-polish-20261022"></script>
@@ -32,8 +32,8 @@
 <script src="throwers.js?v=enemy-scale-all-20261022"></script>
 <script src="combat.js?v=animation-alignment-20261022"></script>
 <script src="cavern-discovery-art.js?v=cavern-art-20261022b"></script>
-<script src="cavern-exploration.js?v=cellar-plaque-20261022"></script>
-<script src="gameplay.js?v=pickup-feedback-20261022"></script>
+<script src="cavern-exploration.js?v=mobile-cavern-20261025"></script>
+<script src="gameplay.js?v=mobile-cavern-20261025"></script>
 <script src="characters.js?v=enemy-scale-20261022"></script>
 <script src="vance-wick.js?v=animation-alignment-20261022"></script>
 <script src="baker-pilot.js?v=animation-alignment-20261022"></script>
@@ -43,12 +43,12 @@
 <script src="interactables.js"></script>
 <script src="art/moonlit-shading.js"></script>
 <script src="moonlit-environment.js?v=clockwork-worlds-20261021"></script>
-<script src="fungal-environment.js?v=visual-polish-20261022"></script>
+<script src="fungal-environment.js?v=mobile-cavern-20261025"></script>
 <script src="clockwork-environment.js?v=clockwork-worlds-20261021"></script>
 <script src="architecture.js?v=clockwork-worlds-20261021"></script>
 <script src="foreman.js?v=clockwork-worlds-20261021"></script>
-<script src="mycelium.js?v=pre-expansion-20261022"></script>
-<script src="bloomrot.js"></script>
+<script src="mycelium.js?v=mobile-cavern-20261025"></script>
+<script src="bloomrot.js?v=mobile-cavern-20261025"></script>
 <script src="devourer.js"></script>
 <script src="render.js?v=visual-polish-20261022"></script>
 <script src="assets.js?v=clockwork-worlds-20261021"></script>
@@ -108,3 +108,4 @@ const sunkenReplay=document.getElementById('sunkenReplay');sunkenReplay.hidden=!
 try { init(); prepareWayfindingPreview(); initGameShell(); beginArtworkLoading(); updateViewCamera(); requestAnimationFrame(loop); statusEl.textContent='Find five yeast cultures, then reach the grand oven. Tap a control to start music.'; }
 catch(err) { statusEl.textContent='Game error: '+err.message; console.error(err); }
 </script></body></html>
+

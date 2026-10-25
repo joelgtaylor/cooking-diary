@@ -2,7 +2,11 @@
 'use strict';
 let bloomrotState=null;
 function bloomrotArena(){return bakery===2?window.__crustBloomrotArena||currentVerticalLayout().bloomrot||null:null;}
-function bloomrotGate(x,closed){for(let y=42;y<54;y++)map[y][x]=closed?'#':'.';}
+function bloomrotGate(x,closed){
+ const value=closed?'#':'.';let changed=false;
+ for(let y=42;y<54;y++)if(map[y][x]!==value){map[y][x]=value;changed=true;}
+ if(changed&&typeof invalidateFungalGeometry==='function')invalidateFungalGeometry();
+}
 function loadBloomrotArt(){
  // Full literal URLs also let the offline preview embed every image.
  for(const [name,uri] of [['bloomrotPoses','art/bloomrot-poses.png'],['bloomrotActions','art/bloomrot-actions.png'],['bloomrotChamber','art/bloomrot-chamber.png']])if(!assets[name])loadArt(name,uri);
@@ -149,3 +153,4 @@ function drawBloomrotChamber(){
   for(let i=0;i<6;i++){g.save();g.globalAlpha=(i+.5)/6;g.drawImage(art,art.naturalWidth*i*16/width,0,art.naturalWidth*16/width,art.naturalHeight,80*T+i*16,a.floor-512,16,512);g.restore();}
   g.drawImage(art,art.naturalWidth*96/width,0,art.naturalWidth*(width-96)/width,art.naturalHeight,80*T+96,a.floor-512,width-96,512);}
 }
+
