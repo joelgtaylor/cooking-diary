@@ -34,9 +34,12 @@ function activateKefir(){
 }
 function syncKefirButton(){
  const b=document.getElementById('kefirBtn');
- b.style.display=player.kefirCharges||player.speedT>0?'':'none';
- b.disabled=state!=='play'||player.speedT>0||!player.kefirCharges;
- b.textContent=player.speedT>0?'Dash '+Math.ceil(player.speedT/60)+'s':'Kefir '+(player.kefirCharges||0)+' (V)';
+ const display=player.kefirCharges||player.speedT>0?'':'none';
+ const disabled=state!=='play'||player.speedT>0||!player.kefirCharges;
+ const text=player.speedT>0?'Dash '+Math.ceil(player.speedT/60)+'s':'Kefir '+(player.kefirCharges||0)+' (V)';
+ if(b.style.display!==display)b.style.display=display;
+ if(b.disabled!==disabled)b.disabled=disabled;
+ if(b.textContent!==text)b.textContent=text;
 }
 
 function updateAmmoCaches(){
@@ -45,3 +48,4 @@ function updateAmmoCaches(){
   if(--u.refreshT===0)u.got=false;
  }
 }
+

@@ -49,7 +49,7 @@ test('dough blob rendering preserves the actual projectile and preview scene wri
 test('baker scripts carry release versions so cached clients receive updates',()=>{
  const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
  for(const name of ['combat','vance-wick','baker-pilot'])assert.ok(html.includes('src="'+name+'.js?v=animation-alignment-20261022"'));
- assert.ok(html.includes('src="mycelium.js?v=pre-expansion-20261022"'));
+ assert.ok(html.includes('src="mycelium.js?v=mobile-cavern-20261025"'));
  for(const name of ['architecture','foreman','moonlit-environment','clockwork-environment','assets'])assert.ok(html.includes('src="'+name+'.js?v=clockwork-worlds-20261021"'));
 });
 
@@ -100,3 +100,4 @@ test('Vance keeps fire cadence, ammo, speed and shot dimensions while Loafy keep
   assert.equal(a.run('shots[0].w'),b.run('shots[0].w'));assert.equal(a.run('shots[0].h'),b.run('shots[0].h'));
  }
 });
+

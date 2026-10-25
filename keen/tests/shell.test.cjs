@@ -123,3 +123,20 @@ test('loading gate blocks play and simulation until artwork is ready',()=>{
  assert.equal(a.run('state'),'shell-menu');assert.equal(a.run('JSON.stringify({player,tick,enemies})'),before);
  a.run('completeArtworkLoading()');a.click('shellResume');assert.equal(a.run('state'),'play');
 });
+
+
+test('steady Bakery 2 frames do not rewrite unchanged controls or shell DOM',()=>{
+ const a=shell();a.click('shellResume');a.run('init(2);draw();syncGameShell()');
+ let writes=0;
+ function watch(object,key){let value=object[key];Object.defineProperty(object,key,{configurable:true,get:()=>value,set:v=>{writes++;value=v;}});}
+ for(const id of ['talkBtn','exploreBtn','kefirBtn','shellFullscreen'])watch(a.elements.get(id),'textContent');
+ for(const id of ['talkBtn','exploreBtn','kefirBtn','interactIdle'])watch(a.elements.get(id).style,'display');
+ watch(a.elements.get('kefirBtn'),'disabled');
+ for(const id of ['advanceBtn','rotateHint','endCredits'])watch(a.elements.get(id),'hidden');
+ for(const key of ['ending','mode'])watch(a.elements.get('wrap').dataset,key);
+ const pogo=a.elements.get('pogoBtn'),set=pogo.setAttribute.bind(pogo);pogo.setAttribute=(...args)=>{writes++;set(...args);};
+ a.run('for(let i=0;i<10;i++){draw();syncGameShell()}');assert.equal(writes,0);
+ a.run('player.kefirCharges=1;draw();syncGameShell()');
+ assert.equal(a.elements.get('kefirBtn').textContent,'Kefir 1 (V)');
+ assert.equal(a.elements.get('kefirBtn').style.display,'');assert.ok(writes>0);
+});
