@@ -67,8 +67,10 @@ both bounds; individual edge texels can differ more. Geometry and landing lines
 are unchanged.
 
 These are operation counts and native rendering checks, not phone FPS results.
-Chromium installation was unavailable in this environment. Physical-phone testing
-of startup, traversal, fullscreen/multitouch, relay/hatches, boss retry and saved
-recipes remains the final release check. Compare the Deep Plunge using `perf=1`
+Local Chromium installation was unavailable; a cloud Chrome smoke test verified
+startup/rendering in all three bakeries and movement/jumping in Bakery 2.
+GitHub Actions also passed. Physical-phone testing of traversal, fullscreen/
+multitouch, relay/hatches, boss retry and saved recipes remains the final release check. Compare the Deep Plunge using `perf=1`
 and `scene=environment-plunge`; use Play to resume from that camera shortcut.
 Do not merge into main before Joel's review.
+
